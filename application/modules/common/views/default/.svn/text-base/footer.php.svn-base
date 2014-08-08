@@ -1,0 +1,117 @@
+    <div class="clear"></div>
+    </div>
+</div>
+<div class="footerwrap">
+	<div class="footer">
+		<a href="<?php echo base_url('about/guifan');?>" target="_blank">项目规范</a>
+		<a href="<?php echo base_url('about/question');?>" target="_blank">常见问题</a>
+		<a href="<?php echo base_url('about/us');?>" target="_blank">关于我们</a>
+		<a href="mailto:cxyfzx@js.chinamobile.com">建议反馈</a>
+		<p>© 中国移动通信集团版权所有</p>
+        <div id="huodong" class="huodong" style="display: block;">
+            <a href="/about/tuiguang"></a>
+        </div>
+        <div id="fankui" class="fankui" style="display: block;">
+            <a href="mailto:cxyfzx@js.chinamobile.com"></a>
+        </div>
+		<div id="backtop" class="backtop" style="display: block;">
+			<a href="#top"></a>
+		</div>
+	</div>
+</div>
+<script>
+$(window).ready(function(){
+	//截取字符串
+	itsqe.ellipsis();
+	//
+	itsqe.tabcolor();
+	
+	function getOs()
+    {
+        var OsObject = "";
+        if(navigator.userAgent.indexOf("MSIE")>0) {
+            return "MSIE";
+        }
+        if(isFirefox=navigator.userAgent.indexOf("Firefox")>0){
+            return "Firefox";
+        }
+        if(isSafari=navigator.userAgent.indexOf("Safari")>0) {
+            return "Safari";
+        }  
+        if(isCamino=navigator.userAgent.indexOf("Camino")>0){
+            return "Camino";
+        }
+        if(isMozilla=navigator.userAgent.indexOf("Gecko/")>0){
+            return "Gecko";
+        }
+    }
+	$("#backtop").hide();
+	$(window).scroll(function(){
+        var src = 0;
+        if(!(("undefined" == typeof index) || index=='' || index==null || index == false)){
+        	scr = $(window).scrollTop();//滚动条距离顶端高度
+            height = $("div.content").height();//获取内容高
+            //alert(scr);
+            if(height - scr < 900){
+            	index =false;
+            	$.get('/welcome/ajax_get/?'+$("#currentUrl").val(),
+                    	{
+            		   '<?php echo $this->config->item( 'csrf_token_name');?>':'<?php echo get_cookie($this->config->item( 'csrf_cookie_name'));?>',
+            		   'start': $("#start").val()
+            		   },
+                    	function(data){
+            			    res = eval('('+data+')');
+                        	if(res.msg == ''){
+                            	//取不到数据了
+                            	index =false;
+                            	//隐藏加载框
+                            	$("#getmore").hide();
+                        	}else{
+                        		$('#plists').append(res.msg);
+                        		index = true;
+                        		//修改start
+                        		$("#start").val(res.start);
+                        	}
+                	});
+            }
+        }
+	    if ($(window).scrollTop()>100){
+	        $("#backtop").fadeIn(1000);
+	    }
+	    else
+	    {
+	        $("#backtop").fadeOut(1000);
+	    }
+	});
+    //显示发布下拉
+	$(".pubProject").mouseover(function(){
+		var t = $(this).children(".menulist");
+        t.show();
+    });
+    $(".pubProject").mouseout(function(){
+        var t = $(this).children(".menulist");
+        t.hide();
+    });
+
+    //显示
+    $("#username").mouseover(function(){
+        $("#user-information").show();
+    });
+    $("#username").mouseout(function(){
+        $("#user-information").hide();
+    });
+    //ajax tongji
+    
+	$.get('/welcome/tongji',{'ur':'<?php echo (isset($_SERVER["HTTP_REFERER"]))?urlencode($_SERVER['HTTP_REFERER']):"";?>','t':encodeURI(document.title)},function(data){});
+    
+});
+//当点击跳转链接后，回到页面顶部位置
+$("#backtop").click(function(){
+    $('body,html').animate({scrollTop:0},500);
+    return false;
+});
+//-->
+</script>
+<script type="text/javascript" src="/assets/js/lhgdialog/lhgdialog.js?skin=discuz"></script>
+</body>
+</html>

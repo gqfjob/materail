@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title><?php if(isset($title) && !empty($title)) echo $title.'-';?>创新梦工厂</title>
+<meta name="description" content="<?php if(isset($description) && !empty($description)) echo $description.'-';?>">
+<meta name="keywords" content="爱创新,<?php if(isset($keywords) && !empty($keywords)) echo $keywords;?>">
+<link href="<?php echo base_url('assets/css/bootstrap-responsive.min.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/css/bootstrap.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/js/uploadfy/uploadify.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/js/jqueryUI/base/jquery.ui.core.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/js/jqueryUI/base/jquery.ui.datepicker.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/css/project_detail.css');?>" media="screen" rel="stylesheet" type="text/css">
+<link href="<?php echo base_url('assets/css/bootstrap-modal.css');?>" media="screen" rel="stylesheet" type="text/css">
+
+<link href="<?php echo base_url('assets/css/common.css');?>" media="screen" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery-migrate-1.1.1.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jqueryUI/jquery.ui.core.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jqueryUI/jquery.ui.datepicker.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jqueryUI/jquery.ui.datepicker-zh-CN.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery.validate.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery.form.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery.lightmodel.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/bootstrap.js');?>"></script>
+<script type="text/javascript">
+var csrf_token_name = '<?php echo $this->security->get_csrf_token_name(); ?>';
+var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
+</script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/itsqe.js');?>"></script>
+
+<script type="text/javascript" src="<?php echo base_url('assets/js/uploadfy/jquery.uploadify.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/jquery.placeholder.js');?>"></script>
+<script type="text/javascript" src="<?php echo base_url('assets/js/common.js');?>"></script>
+
+<script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_config.js');?>"></script>
+<script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_all.js');?>"></script>
+<script type="text/javascript">
+if(window.ActiveXObject) {
+    var ua = navigator.userAgent.toLowerCase();
+    var ie=ua.match(/msie ([\d.]+)/)[1];
+    if(7 > parseInt(ie) ){
+         alert("您的浏览器版本过低，在本系统中不能达到良好的视觉效果，建议您升级到ie8以上！或者换用chrome/firefox等现代浏览器浏览网站");
+    }
+}
+</script>
+
+</head>
+<body>
+<div style="display:none">
+<img src="<?php echo base_url('assets/img/new/bg_tanchu_delete.png');?>"/>
+<img src="<?php echo base_url('assets/img/new/bg_quedin_normal.png');?>" />
+<img src="<?php echo base_url('assets/img/new/bg_tanchu_quxiao_click.png');?>" />
+<img src="<?php echo base_url('assets/img/new/btn_close_hover.png');?>" />
+</div>
+<div id="headwrap">
+	<div class="head" <?php if(($title == '首页')){echo 'style="width:1180px"';}?>>
+		<a href="/" class="logo" style="height:50px;line-height:45px">
+			<img src="/assets/img/logo2.png" title="创新梦工厂">
+		</a>
+		<div class="head-l">
+			<div class="head-l-menu" style="font-size:16px;float:left">
+                <div style="float:left;width:40px;margin-left:30px">
+    				<a href="/" class="">首页</a> 
+                </div>
+                <div style="float:left;width:110px;text-align:center" class="pubProject">
+    				<a href="javascript:void(0);">发布项目</a>
+                    <ul class="menulist" id="pub_project_list" style="display:none;">
+                        <li class="toplines"></li>
+                        <!-- <li class="toplines"><img src="/assets/img/site/toplines.gif"></li> -->
+                        <li><a href="<?php echo base_url('project/create/1');?>" target="_self">发布创新</a></li>
+                        <li><a href="<?php echo base_url('project/create/2');?>" target="_self">发布研发</a></li>
+                        <li><a href="<?php echo base_url('project/create/3');?>" target="_self">发布试用</a></li>
+                    </ul>
+                </div>
+			</div>
+		</div>
+        <?php if(($title == '首页')){echo '<div style="float:left;width:170px;height:50px">&nbsp;</div>';}?>
+		<div class="head-r" <?php if(($title == '首页')){echo 'style="width:630px"';}?>>
+
+            <?php if((is_numeric($user) && $user>0) || is_array($user)):?>
+            <div class="head-search" style="*padding-top:7px;<?php if(($title == '首页')){echo 'margin-right:50px';}?>">
+            <?php echo form_open('project/search');?>
+                <input type="text" autocomplete="off" name="k" id="searchText" hidefocus="true" placeholder="请输入项目名称" value="" maxlength="20" style="outline:none;height:22px;width:110px;padding: 1px 6px;margin-top:5px;background-color:#2c97DE;border:0px;color:#D0F3FE;">
+            <?php echo form_close();?>
+            </div>
+            
+            <div id="head-userinfo">
+                <div class="fl">
+                    <div class="fl mrr20" style="margin-left:10px">
+                         <a href="<?php echo base_url('user/info/create');?>" target="_self">
+                         <div style="background:url(/assets/img/small.png) no-repeat center;width:40px; height:50px;">
+                         <img src="/assets/img/small-cover.png" align="absmiddle" style="border:0px;margin-top:8px;margin-left:3px">
+                         </div>
+                        </a>
+                    </div>
+                    <div id="" class="fl pubProject" >
+	                    <a  href="<?php echo base_url('user/info/create');?>" target="_self" title="<?php echo $user['nickname']?>" class="h50" style="color:#d9f8ff;font-size:16px;width:85px;overflow:hidden;display:inline-block"><?php echo $user['nickname']?></a>
+	                    <ul id="head-user-scores" class="menulist" style="display:none;width:80px;text-align:center">
+	                        <li class="toplines" style="height:5px;padding:0px;"></li>
+	                        <li><a href="<?php echo base_url('user/info/create');?>">积分(<?php echo (isset($score['score']))?$score['score']:0;?>)</a></li>
+	                        <li><a href="<?php echo base_url('user/info/create');?>">金币(<?php echo (isset($score['coin']))?$score['coin']:0;?>)</a></li>
+	                        <li><a href="<?php echo base_url('user/info/create');?>">等级(1)</a></li>
+	                    </ul>
+                    </div>
+                </div>
+                <div class="fl mrr20" >
+                    <div id="user-projects" class="pubProject" style="width:80px;text-align:center;">
+                        <a href="javascript:void(0);" class="h50" style="color:#d9f8ff;font-size:16px;">我的项目</a>
+                        <ul id="all-user-project" class="menulist" style="display:none;width:125px;text-align:center">
+                            <li class="toplines"></li>
+                            <li><a href="<?php echo base_url('user/info/create');?>" target="_self">发起的项目(<?php echo $num['chuangjian'];?>)</a></li>
+                            <li><a href="<?php echo base_url('user/info/part');?>" target="_self">参与的项目(<?php echo $num['canyu'];?>)</a></li>
+                            <li><a href="<?php echo base_url('user/info/atten');?>" target="_self">关注的项目(<?php echo $num['guanzhu'];?>)</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fl mrr20" style="margin-left:10px">
+                    <a href="<?php echo base_url('user/notice');?>" class="h50" style="color:#d9f8ff" target="_self" <?php if($newNotice > 0):?>style="line-height:45px" title="有<?php echo $newNotice;?>条新消息"<?php endif;?>>
+                    <?php if($newNotice > 0):?>
+                        <img src="<?php echo base_url('/assets/img/new/btn_message_yes.png');?>" alt="通知"/>
+                    <?php else:?>
+                        <img src="<?php echo base_url('/assets/img/new/btn_message.png');?>" alt="通知"/>
+                    <?php endif;?>
+                    </a>
+                </div>
+                <div class="fl" style="margin-left:20px">
+                    <a href="<?php echo base_url('user/logout');?>" class="h50" style="color:#d9f8ff;font-size:16px;">注销</a>
+                </div>
+            </div>
+            <?php else://未登录?>
+            <div class="fl">
+                <div class="fl" style="height:50px;width:300px;">&nbsp;</div>
+	            <div class="head-search" style="*padding-top:7px;">
+	            <?php echo form_open('project/search');?>
+	                <input type="text" autocomplete="off" name="k" id="searchText" hidefocus="true" placeholder="请输入项目名称" value="" maxlength="20" style="outline:none;height:22px;width:110px;padding: 1px 6px;margin-top:5px;background-color:#2c97DE;border:0px;color:#D0F3FE;">
+	            <?php echo form_close();?>
+	            </div>
+	            <div class="fl" style="margin-left:20px">
+	            <a href="<?php echo base_url('user/login/?callback=').$curl;?>" class="h50" style="color:#d9f8ff;font-size:16px;">登录</a>
+	            </div>
+            </div>
+            <?php endif;?>
+		</div>
+
+	</div>
+</div>
+<div class="content">
+    <div id="mainpage">

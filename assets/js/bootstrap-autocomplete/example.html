@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+        <div class="member_apply_friend" style="padding-bottom: 15px;">
+            <div class="fblod14 mt10">邀请成员(输入用户姓名查询)</div>
+            <div class="mt5" style="overflow: hidden;">
+                <div style="height:35px;" id="inviteUser">
+                    <input type="text" name="member_name" id="member_name_class" class="member_name_class" style="margin: 0px;width:200px;" />
+                </div>
+            </div>
+            
+            <div class="mt5" style="overflow: hidden;">
+               <a href="javascript:void(0);"><span class="bg_fabiao fll" id="invite-btn" data-pid="<?php echo $pid;?>" data-src="">邀请</span></a>
+            </div>
+        </div>
+
+<!-- 
+后台
+        $res = array();
+        if(is_array($all) && sizeof($all) > 0){
+            foreach ($all as $u){
+                $t = array();
+                $t['regionNick'] = $u['oanick'];
+                $t['regionName'] = $u['name'];
+                $t['regionId'] = $u['tno'];
+                $t['regionDepart'] = $u['depart'];
+                array_push($res, $t);
+                unset($t);
+            }
+            /*
+            $res =array(
+                0=>array('regionNick'=>'timsf','regionName'=>'张三','regionDepart'=>'技术部','regionId'=>'123'),
+                1=>array('regionNick'=>'tiff','regionName'=>'李四','regionDepart'=>'技术部','regionId'=>'122'),
+                2=>array('regionNick'=>'fims','regionName'=>'王五','regionDepart'=>'技术部','regionId'=>'121'),
+            );*/
+        }
+            
+        echo json_encode($res);
+        exit;
+ -->
+<script>
+$("#member_name_class").autocomplete({
+    source:function(query,process){
+        var matchCount = this.options.items;
+        $.post("/project/ajax_getUser",{"matchInfo":query,"matchCount":matchCount,'<?php echo $this->security->get_csrf_token_name(); ?>':'<?php echo $this->security->get_csrf_hash(); ?>'},function(respData){
+            return process(respData);
+        },'json');
+    },
+    formatItem:function(item){
+        return item["regionId"]+" - "+item["regionName"]+" - "+item["regionDepart"];
+    },
+    setValue:function(item){
+        return {'data-value':item["regionName"],'real-value':item["regionId"]};
+    }
+});
+</script>
+</body>
+</html>

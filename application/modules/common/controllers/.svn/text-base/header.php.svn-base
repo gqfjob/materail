@@ -1,0 +1,160 @@
+<?php  if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+class Common_Header_module extends CI_Module {
+
+    /**
+     * 构造函数
+     *
+     * @return void
+     * @author
+     **/
+    function __construct()
+    {
+        parent::__construct();
+        $this->load->model('user_model','user');
+        $this->load->model('config_model');
+        
+    }
+    
+    /**
+     * 首页
+     * 
+     * @param $arr 标题，描述等基本属性
+     * @param $metas 扩展meta
+     */
+    function index($arr=array(),$metas=array())
+    {
+        //先检查cookie值 ObSSOCookie，有在检查
+        $co = get_cookie('ObSSOCookie',true);
+        $valid = valid_cookie($co);
+        $token = $this->session->userdata($this->config->item('sess_cookie_name'));
+        $res = $this->user->valideToken($token,true);
+        if($co && $valid){
+        	//先检查$co的有效性
+            //从session中获取当前登录用户信息
+           
+            if(empty($res)  || ($res == 0)){//并且当前页不是登录页
+                //检查cookie值 ObSSOCookie，带上当前url为callback，跳转到user/ssologinCallback
+                redirect(base_url('user/ssologinCallback').'/?callback='.urlencode(current_url()));
+            }else{
+            	//TODO:有cookie，检查当前token用户是否是cookie对应的id，是则通过，不是则跳转到login
+            	$url = $this->config->item('ssoserver').'sso/ssoservice/getUser';
+            	$ores = post_data($url,$co);
+            	if(!$ores || ((string)$ores->uid) != $res['nickname']){
+		            redirect(base_url('user/ssologinCallback').'/?callback='.urlencode(current_url()));
+            	}
+            }
+            $data['user'] = $res;
+            $data['num'] = $this->_getAllNums($data['user']['id']);
+            $data['score'] = $this->user->getUserScore($data['user']['id']);//用户积分
+            //查看是否有新通知
+            $data['newNotice'] = $this->user->getUserUnreadNum($data['user']['id']);
+            
+            //初次访问进入导航
+            $log = $this->config_model->getModelsBykeyarray(array("uid"=>$data['user']['id'],"ctitle"=>urldecode("初次用户浏览记录")),"visit_log");
+            if(sizeof($log) == 0){
+                redirect(base_url("about/stepzero"));
+            }
+        }else{
+        	if(empty($res)  || ($res == 0)){
+                $data['user'] = false;
+                //注销用户信息
+                $this->user->delToken($token);
+                $redis = getRedis(CACHE_SESSION);
+                if($redis){
+                    $redis->delete($token);
+                }
+                $this->session->unset_userdata($token);
+        	}else{
+        		//本地session有效
+	            $data['user'] = $res;
+	            $data['num'] = $this->_getAllNums($data['user']['id']);//
+	            $data['score'] = $this->user->getUserScore($data['user']['id']);//用户积分
+	            //查看是否有新通知
+	            $data['newNotice'] = $this->user->getUserUnreadNum($data['user']['id']);
+        	    //初次访问进入导航
+                $log = $this->config_model->getModelsBykeyarray(array("uid"=>$data['user']['id'],"ctitle"=>urldecode("初次用户浏览记录")),"visit_log");
+                if(sizeof($log) == 0){
+                    redirect(base_url("about/stepzero"));
+                }
+        	}
+        }
+    	
+    	$data['curl'] = urlencode(current_url());
+    	//自定义标题，描述等
+        if(is_string($arr)){
+            $data['title'] = $arr;
+        }else if(is_array($arr)){
+            if(isset($arr['title']))
+            {
+               $data['title'] = $arr['title'];
+            }else{
+               $data['title'] = '';
+            }
+            if(isset($arr['description']))
+            {
+               $data['description'] = $arr['description'];
+            }else{
+               $arr['description'] = '';
+            }
+            if(isset($arr['keywords'])){
+                 $data['keywords'] = $arr['keywords'];
+            }else{
+                $data['keywords'] = '';
+            }
+            if(isset($arr['cur'])){
+                $data['cur'] = $arr['cur'];
+            }
+        }
+        
+        $this->load->view('header',$data);
+    }
+    
+    
+    private function _getAllNums($uid){
+        $allIds = $this->_getMyAllProjectsSplit($uid);
+        $num['canyu'] = sizeof($allIds['canyu']);
+        $num['chuangjian'] = sizeof($allIds['chuangjian']);
+        $num['guanzhu'] = sizeof($allIds['guanzhu']);
+        $count = $this->config_model->countBykeyarray(array('user_id'=>$uid,'status'=>0),'cs_message_inbox');
+        $num['tixing'] = $count->num;
+        return $num;
+    }
+    /**
+     * 获取与用户相关的所有项目ID列表
+     */
+    private function _getMyAllProjects($uid){
+        $this->load->model('project_user_model');
+        $res = $this->project_user_model->getUserPids($uid);
+        return $res;
+    }
+    /**
+     * 
+     * 获取与用户相关的所有项目ID列表并且分组
+     * @param unknown_type $uid
+     */
+    private function _getMyAllProjectsSplit($uid){
+        $canyu = array();
+        $chuangjian = array();
+        $guanzhu = array();
+        $allIds = $this->_getMyAllProjects($uid);
+        foreach($allIds as $id){
+            switch ($id['type']) {
+                case 0://创建者
+                    array_push($chuangjian, $id['pid']);
+                    break;
+                case 1:
+                case 4://参与
+                    array_push($canyu, $id['pid']);
+                    break;
+                case 3://关注
+                    array_push($guanzhu, $id['pid']);
+                    break;
+            }
+        }
+        $res['chuangjian'] = $chuangjian;
+        $res['canyu'] = $canyu;
+        $res['guanzhu'] = $guanzhu;
+        return $res;
+    }
+}
