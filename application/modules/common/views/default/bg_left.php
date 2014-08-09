@@ -5,11 +5,11 @@
         <!--- Sidebar navigation -->
         <ul id="nav">
           <!-- Main menu with font awesome icon -->
-          <li><a href="index.html" class="open"><i class="icon-home"></i>后台首页</a></li>
-          <li><a href="#"><i class="icon-file-alt"></i> 素材管理 </a></li>                             
-          <li><a href="charts.html"><i class="icon-bar-chart"></i>访问日志</a></li> 
-          <li><a href="forms.html"><i class="icon-tasks"></i>分类管理</a></li>
-          <li><a href="ui.html"><i class="icon-magic"></i>系统设置</a></li>
+          <li><a href="/admin/index" class="<?php echo $current1;?>"><i class="icon-home"></i>后台首页</a></li>
+          <li><a href="/admin/mgMaterial" class="<?php echo $current2;?>"><i class="icon-file-alt"></i> 素材管理 </a></li>                             
+          <li><a href="/admin/mgVisitor" class="<?php echo $current3;?>"><i class="icon-bar-chart"></i>访问日志</a></li> 
+          <li><a href="/admin/mgCategories" class="<?php echo $current4;?>"><i class="icon-tasks"></i>分类管理</a></li>
+          <li><a href="/admin/mgSystem" class="<?php echo $current5;?>"><i class="icon-magic"></i>系统设置</a></li>
         </ul>
     </div>
 

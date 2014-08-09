@@ -60,5 +60,49 @@ class Admin extends CI_Controller {
     	$this->load->view("admin/index",$data);
     	$this->load->module("common/bg_footer");
     }
+
+    /**
+    * 素材管理
+     */
+     public function mgMaterial()
+     {
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(2),true);
     
+     	$this->load->module("common/bg_header");
+    	$this->load->view("admin/material",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     /**
+      * 访问日志管理
+      */
+     public function mgVisitor()
+     {
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(3),true);
+     
+     	$this->load->module("common/bg_header");
+     	$this->load->view("admin/visitor",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     /**
+      * 分类管理
+      */
+     public function mgCategories()
+     {
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(4),true);
+     	 
+     	$this->load->module("common/bg_header");
+     	$this->load->view("admin/category",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     /**
+      * 系统设置
+      */
+     public function mgSystem()
+     {
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(5),true);
+     	 
+     	$this->load->module("common/bg_header");
+     	$this->load->view("admin/system",$data);
+     	$this->load->module("common/bg_footer");
+     }
 }

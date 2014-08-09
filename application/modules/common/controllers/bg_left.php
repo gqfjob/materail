@@ -25,7 +25,7 @@ class Common_Bg_Left_module extends CI_Module {
     	for($i=1;$i<=9;$i++){
     		$data['current'.$i] = ''; 
     	}
-    	$data['current'.$currentID] = 'current';
+    	$data['current'.$currentID] = 'open';
         $this->load->view('bg_left',$data);
     }
 }
