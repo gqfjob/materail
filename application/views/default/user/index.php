@@ -2,10 +2,7 @@
 .container{
 	width:500px;
 }
-#msgModal .modal-dialog{
-	width:300px;
-	height:100px;
-}
+
 </style>
 
 
@@ -78,37 +75,17 @@
   </div> 
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="msgModal" tabindex="-1" role="dialog" aria-labelledby="msgModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title" id="msgModalLabel">通知</h4>
-      </div>
-      <div class="modal-body" id="msg" style="text-align: center">
-      ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script type="text/javascript">
-function notice(msg){
-	$("#msg").html(msg);
-	$("#msgModal").modal("show");
-}
+
 $("#loginBtn").click(function(){
     if($.trim($("#inputEmail").val())==""){
-        notice("请输入用户名");
+        notice("请输入用户名",300,100);
         $("#inputEmail").focus();
         return false;
     }
     if($.trim($("#inputPassword").val())==""){
-    	notice("请输入密码");
+    	notice("请输入密码",300,100);
         $("#inputPassword").focus();
         return false;
     }

@@ -128,9 +128,14 @@
 	display: block;
 }
 
+.form-search  .sAction{
+	height:24px;
+	line-height:24px;
+}
 
-
-
+.form-search .line{
+	height:10px;
+}
 
 /* Shutterstock spcific styles */
 .form-search.form-emphasis .input-group {
@@ -359,7 +364,7 @@
 <div id="container">
 	<div>
 		<!-- 搜索 -->
-		<form class="form-search form-emphasis" id="site-search" method="post" action="/search/all">
+		<form class="form-search form-emphasis" id="site-search" method="post" action="/search/all"  onsubmit="return checkData();">
 			<div class="input-group">
 				<div class="form-control">
 					<div class="placeholder_parent">
@@ -371,25 +376,15 @@
 					<div class="dropdown-wrapper">
 						<span class="dropdown-trigger" role="button" data-toggle="dropdown" href="#" id="mateNow">全部素材</span>
 						<ul class="dropdown-menu" role="menu" aria-labelledby="Content Type Dropdown">
-							<li role="presentation" data-action="/search" data-media-name="allMate" clas>
+							<li role="presentation" data-action="/material/search" data-media-name="allMate" clas>
 								<label><input type="radio" name="media_type" value="allMate" class="visuallyhidden">全部素材</label>
 							</li>
 							<li class="line"></li>
-							<li class="indent sAction" role="presentation" data-action="/search/pic" data-media-name="pic">
-								<label><input type="radio" name="media_type" value="pic" class="visuallyhidden">图片</label>
+							<?php foreach ($cate as $c):?>
+							<li class="indent sAction" role="presentation" data-action="/material/search/<?php echo $c['id'];?>" data-media-name="<?php echo $c['id'];?>">
+								<label><input type="radio" name="media_type" value="<?php echo $c['id'];?>" class="visuallyhidden"><?php echo $c['cname'];?></label>
 							</li>
-							<li class="indent sAction" role="presentation" data-action="/search/doc" data-media-name="doc">
-								<label><input type="radio" name="media_type" value="doc" class="visuallyhidden">文档</label>
-							</li>
-							<li class="indent sAction" role="presentation" data-action="/search/src" data-media-name="src">
-								<label><input type="radio" name="media_type" value="src" class="visuallyhidden">源码</label>
-							</li>
-							<li class="indent sAction" role="presentation" data-action="/search/app" data-media-name="app">
-								<label> <input type="radio" name="app" class="visuallyhidden">应用</label>
-							</li>
-							<li class="indent sAction" role="presentation" data-action="/search/other" data-media-name="other">
-								<label> <input type="radio" name="other" class="visuallyhidden">其他</label>
-							</li>							
+							<?php endforeach;?>							
 							<!-- 
 							<li role="presentation" data-action="/search/app" data-media-name="app">
 								<label> <input type="radio" name="app" class="visuallyhidden">应用</label>
@@ -404,6 +399,7 @@
 				<span class="input-group-btn">
 					<button class="btn btn-primary">
 						<span class="visuallyhidden">search</span> <img src="/assets/img/site/search-icon.png" alt="icon-search">
+						<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>"/>
 					</button>
 				</span>
 			</div>
@@ -411,6 +407,7 @@
 		<div class="cl"></div>
 	</div>
 	<div class="cl"></div>
+	<?php var_dump($cate);?>
 	<!-- 切换 -->
 	<div id="infoLists">
 		<div id="info" class="usual">
@@ -432,6 +429,7 @@
 		<div class="cl"></div>
 	</div>
 </div>
+
 <script type="text/javascript"> 
 	$("#info ul").idTabs("tabs1");
 	
@@ -449,4 +447,7 @@
 			$("#search_label").html("请输入关键词");
 		}
 	});
+	function checkData(){
+		return false;
+	}
 </script>

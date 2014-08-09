@@ -19,9 +19,13 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-
-		$this->load->module("common/header",array('title'=>'首页'));
-		$this->load->view('page/index');
+		// 获取素材分类
+		$this->load->model ( "material_model" );
+		$allCate = $this->material_model->get_material_cate ();
+		$data ['cate'] = $allCate ['material_cate'];
+		
+		$this->load->module("common/header",array('title'=>'首页','cur'=>0));
+		$this->load->view('page/index',$data);
 		$this->load->module("common/footer");	
 	}
 	/**

@@ -37,39 +37,32 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 <body>
 
 <div id="headwrap">
-<header>
-	<div class="navbar navbar-static-top navbar-shutterstock clearfix">
-	    <div class="navbar-inner-left pull-left container-fluid">
-	        <ul class="nav pull-left">
-	            <li class="fl b16">
-	                <a href="###">图片</a>
-	            </li >
-	            <li class="active fl b16">
-	                <a href="###">文档</a>
-	            </li>
-	            <li class="fl b16">
-	                <a href="###">源码</a>
-	            </li>
-	            <li class="fl b16">
-	                <a href="###">应用</a>
-	            </li>
-	            <li class="fl b16">
-	                <a href="###">其他</a>
-	            </li>
-	        </ul>
-	    </div>
-	
-	    <div class="pull-right container-fluid nav-horiz navbar-inner-right">
-	
-			<div id="navbar-signin" class="nav-link pull-left">
-				<a href="###">登录</a>
-			</div>
-			<div id="navbar-name" class="nav-link pull-left">
-				<a href="###">张三</a>
+	<header>
+		<div class="navbar navbar-static-top navbar-shutterstock clearfix">
+		    <div class="navbar-inner-left pull-left container-fluid">
+		        <ul class="nav pull-left">
+		            <li class="<?php if($cur == 0){echo "active ";}?>fl b16">
+		                <a href="/">首页</a>
+		            </li >
+		            <?php foreach($cate as $c):?>
+		            <li class="<?php if($cur == $c['id']){echo "active ";}?>fl b16">
+		                <a href="/material/lists/<?php echo $c['id'];?>"><?php echo $c['cname']?></a>
+		            </li>
+		            <?php endforeach;?>
+		        </ul>
+		    </div>
+		
+		    <div class="pull-right container-fluid nav-horiz navbar-inner-right">
+		
+				<div id="navbar-signin" class="nav-link pull-left">
+					<a href="###">登录</a>
+				</div>
+				<div id="navbar-name" class="nav-link pull-left">
+					<a href="###">张三</a>
+				</div>
 			</div>
 		</div>
-	</div>
-</header>
+	</header>
 </div>
 <div class="content">
     <div id="mainpage">

@@ -13,46 +13,28 @@ class Common_Header_module extends CI_Module {
         parent::__construct();
         
     }
-    
-    /**
-     * 首页
-     * 
-     * @param $arr 标题，描述等基本属性
-     * @param $metas 扩展meta
-     */
-    function index($arr=array(),$metas=array())
-    {
+	
+	/**
+	 * 首页
+	 *
+	 * @param $arr 标题，描述等基本属性        	
+	 * @param $metas 扩展meta        	
+	 */
+	function index($title = "", $cur = 0, $description = "", $keywords = "") {
+		$data ['curl'] = urlencode ( current_url () );
+		// 获取当前tab
+		$data ['cur'] = $cur;
+		// 自定义标题，描述等
+		$data ['title'] = $title;
+		$data ['description'] = $description;
+		$data ['keywords'] = $keywords;
 
-    	
-    	$data['curl'] = urlencode(current_url());
-    	//自定义标题，描述等
-        if(is_string($arr)){
-            $data['title'] = $arr;
-        }else if(is_array($arr)){
-            if(isset($arr['title']))
-            {
-               $data['title'] = $arr['title'];
-            }else{
-               $data['title'] = '';
-            }
-            if(isset($arr['description']))
-            {
-               $data['description'] = $arr['description'];
-            }else{
-               $arr['description'] = '';
-            }
-            if(isset($arr['keywords'])){
-                 $data['keywords'] = $arr['keywords'];
-            }else{
-                $data['keywords'] = '';
-            }
-            if(isset($arr['cur'])){
-                $data['cur'] = $arr['cur'];
-            }
-        }
-        
-        $this->load->view('header',$data);
-    }
+		// 获取素材分类
+		$this->load->model ( "material_model" );
+		$allCate = $this->material_model->get_material_cate ();
+		$data ['cate'] = $allCate ['material_cate'];
+		$this->load->view ( 'header', $data );
+	}
     
     public function getLinks(){
     	$data = array();

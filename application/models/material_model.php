@@ -598,4 +598,12 @@ class Material_Model extends CI_Model
 			return array('status' => 1, 'type_attachment' => $type_attachment);
 		}
 	}
+	
+	public function getCateMaterial($cid){
+		if(is_numeric($cid)){
+			$this->rdb->get_where();
+		}else{
+			return false;
+		}
+	}
 }

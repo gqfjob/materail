@@ -626,10 +626,10 @@ class Material extends CI_Controller {
 	/**
 	 * 素材分类列表
 	 */
-	public function lists($cat)
+	public function lists($cat = 0 )
 	{
-		
-		$this->load->module("common/header",array('title'=>'列表'));
+		//查询当前分类下的素材
+		$this->load->module("common/header",array('title'=>'列表','cur'=> $cat));
 		$this->load->view('mate/list');
 		$this->load->module("common/footer");	
 	}
