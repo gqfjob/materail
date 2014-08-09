@@ -1,5 +1,7 @@
 <style>
-
+.container{
+	width:500px;
+}
 </style>
 
 
