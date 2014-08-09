@@ -267,9 +267,9 @@
 }
 .form-search.form-emphasis .input-group {
 	border: 4px solid #595959;
-	border: 4px solid rgba(89, 89, 89, 0.6);           
+	border: 6px solid rgba(218, 218, 209, 0.6);           
 	background: #595959;
-	background: rgba(89, 89, 89, 0.6);           
+	background: rgba(189, 189, 89, 0.6);           
 	background-clip: content-box;
 }
 #search_label{
