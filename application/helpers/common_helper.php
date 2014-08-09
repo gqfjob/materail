@@ -1159,6 +1159,18 @@ function createStaticPath($path = '',$abs = FALSE){
 	   return base_url($src);
 	}
 }
+/**
+ * 检查用户是否具有后台管理权限
+ * @return boolean
+ */
+function checkAdminRight($user){
+	if(is_array($user)){
+		if(($user['status'] == 1) && in_array($user['auth'], array(2,999))){
+			return true;
+		}
+	}
+	return false;
+}
 
 function check_permission()
 {

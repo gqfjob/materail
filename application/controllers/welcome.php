@@ -19,9 +19,7 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$user = checklogin();
-		var_dump($user);
-		exit(0);
+
 		$this->load->module("common/header",array('title'=>'首页'));
 		$this->load->view('page/index');
 		$this->load->module("common/footer");	

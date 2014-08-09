@@ -58,7 +58,7 @@
                         	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>"/>
                         	<input type="hidden" name="ajax" value="1"/>
                         	<?php if($callback):?>
-                        	<input type="hidden" name="" value="<?php echo $callback;?>"/>
+                        	<input type="hidden" name="callback" value="<?php echo $callback;?>"/>
                         	<?php endif;?>
 							<button id="loginBtn" class="btn btn-danger">登录</button>
 							<button type="reset" class="btn btn-default">重置</button>
