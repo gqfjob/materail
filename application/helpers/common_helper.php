@@ -1161,6 +1161,7 @@ function createStaticPath($path = '',$abs = FALSE){
 }
 /**
  * 检查用户是否具有后台管理权限
+ * $param $user 用户数组信息
  * @return boolean
  */
 function checkAdminRight($user){

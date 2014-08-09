@@ -1,12 +1,16 @@
-	<div class="bo_left">
-	   <ul>
-	       <li class="<?php echo $current1?>"><div><a href="<?php echo base_url('admin');?>">我的工作台</a></div></li>
-	       <li class="<?php echo $current2?>"><div><a href="<?php echo base_url('admin/project');?>">爱创新管理</a></div></li>
-	       <li class="<?php echo $current3?>"><div><a href="<?php echo base_url('admin/project/2');?>">爱研发管理</a></div></li>
-	       <li class="<?php echo $current4?>"><div><a href="<?php echo base_url('admin/project/3');?>">爱试用管理</a></div></li>
-	       <li class="<?php echo $current5?>"><div><a href="<?php echo base_url('admin/users');?>">用户管理</a></div></li>
-	       <li class="<?php echo $current6?>"><div><a href="<?php echo base_url('admin/operate');?>">运营管理</a></div></li>
-	       <li class="<?php echo $current7?>"><div><a href="<?php echo base_url('admin/system');?>">系统管理</a></div></li>
-	       <li class="<?php echo $current8?>"><div><a href="<?php echo base_url('admin/tongji');?>">数据统计</a></div></li>
-	   </ul>
-	</div>
+  	<!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-dropdown"><a href="#">导航</a></div>
+
+        <!--- Sidebar navigation -->
+        <ul id="nav">
+          <!-- Main menu with font awesome icon -->
+          <li><a href="index.html" class="open"><i class="icon-home"></i>后台首页</a></li>
+          <li><a href="#"><i class="icon-file-alt"></i> 素材管理 </a></li>                             
+          <li><a href="charts.html"><i class="icon-bar-chart"></i>访问日志</a></li> 
+          <li><a href="forms.html"><i class="icon-tasks"></i>分类管理</a></li>
+          <li><a href="ui.html"><i class="icon-magic"></i>系统设置</a></li>
+        </ul>
+    </div>
+
+    <!-- Sidebar ends -->

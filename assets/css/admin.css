@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+.fl{
+	float:left;
+}
+.fr{
+	float:right;
+}
+.cl{
+	clear:both;
+}

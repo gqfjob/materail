@@ -17,7 +17,7 @@ class Common_Bg_Header_module extends CI_Module {
     {
        
     	$data = array();
-    	$data['admin_name'] = $this->session->userdata('SUPER_ADMIN');
+    	$data['admin_name'] = '管理员';
     	//自定义标题，描述等
         if(is_string($arr)){
             $data['title'] = $arr;

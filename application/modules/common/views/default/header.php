@@ -30,7 +30,9 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 <script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_config.js');?>"></script>
 <script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_all.js');?>"></script>
 
-
+<!--[if lt IE 9]>
+<script src="<?php echo base_url('assets/js/tools/html5.js');?>"></script>
+<![endif]-->
 </head>
 <body>
 
