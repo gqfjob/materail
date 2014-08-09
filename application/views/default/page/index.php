@@ -407,7 +407,7 @@
 		<div class="cl"></div>
 	</div>
 	<div class="cl"></div>
-	<?php var_dump($cate);?>
+	<?php //var_dump($cate);?>
 	<!-- 切换 -->
 	<div id="infoLists">
 		<div id="info" class="usual">
@@ -448,6 +448,10 @@
 		}
 	});
 	function checkData(){
-		return false;
+		var res = $.trim($('#index_keyword_input').val());
+		if(res == ''){
+			notice("请输入关键词",300,150);
+			return false;
+		}
 	}
 </script>
