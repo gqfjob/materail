@@ -2,6 +2,10 @@
 .container{
 	width:500px;
 }
+#msgModal .modal-dialog{
+	width:300px;
+	height:100px;
+}
 </style>
 
 
@@ -22,19 +26,19 @@
               <div class="widget-content">
                 <div class="padd">
                   <!-- Login form -->
-                  <form class="form-horizontal" id="newSession">
+                  <form class="form-horizontal" id="newSession"  action="/user/loginDo" method="post">
                     <!-- Email -->
                     <div class="form-group">
-                      <label class="control-label col-lg-3" for="inputEmail">Email</label>
+                      <label class="control-label col-lg-3" for="inputEmail">用户名</label>
                       <div class="col-lg-9">
-                        <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+                        <input type="text" class="form-control" name="loginName" id="inputEmail" placeholder="邮箱或者昵称">
                       </div>
                     </div>
                     <!-- Password -->
                     <div class="form-group">
                       <label class="control-label col-lg-3" for="inputPassword">密码</label>
                       <div class="col-lg-9">
-                        <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                        <input type="password" class="form-control" name="loginPwd" id="inputPassword" placeholder="Password">
                       </div>
                     </div>
                     <!-- Remember me checkbox and sign in button -->
@@ -51,6 +55,11 @@
 					 -->
 					</div>
                         <div class="col-lg-9 col-lg-offset-2">
+                        	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>"/>
+                        	<input type="hidden" name="ajax" value="1"/>
+                        	<?php if($callback):?>
+                        	<input type="hidden" name="" value="<?php echo $callback;?>"/>
+                        	<?php endif;?>
 							<button id="loginBtn" class="btn btn-danger">登录</button>
 							<button type="reset" class="btn btn-default">重置</button>
 						</div>
@@ -82,7 +91,6 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
@@ -110,11 +118,13 @@ $("#loginBtn").click(function(){
 	    	   if(res.errno == 0){
 	    		   location.href=decodeURIComponent(res.data);
 	    	   }else{
-	    		   itsqe.noticef(res.msg);
+	    		   notice(res.msg);
 	    	   }
 	    }
     };
+
     $("#newSession").ajaxSubmit(options);
+    return false;
     
 });
 $(document).keydown(function(event){

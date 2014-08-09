@@ -100,14 +100,14 @@ class User extends CI_Controller {
 		            }
 		            if($ajax){
 		                echo RST(urlencode($callback),0,'登录成功');
-		                die(0);
+		                exit(0);
 		            }else{
 		                redirect($callback);
 		            }
 		        }else{
 		            if($ajax){
 		                echo RST('用户名或者密码错误，登录失败',100001,'用户名或者密码错误，登录失败');//登录失败
-		                die(0);
+		                exit(0);
 		            }else{
 		                show_error("登录失败");
 		            }
@@ -119,8 +119,8 @@ class User extends CI_Controller {
         			echo RST('登录失败，密码错误',100003,'登录失败，密码错误');//登录失败
         		}else{
         			echo RST('登录失败，账户不存在',100003,'登录失败，账户不存在');//登录失败
-        			
-        		}die(0);
+        		}
+        		exit(0);
         	}else{
         		if($checkName ){
         			show_error("登录失败,密码错误");
@@ -161,7 +161,7 @@ class User extends CI_Controller {
 		    $token_name = $this->config->item('sess_cookie_name');
 		    $res = $this->session->set_userdata(array($token_name=>$token));
 		    //登录奖励积分
-		    getScore($uid, "user-login");
+		    //getScore($uid, "user-login");
 		    //长期登录，保存一个加密的用户信息到cookie，下次先检查是否存在
 		    //set_cookie($this->config->item('sess_cookie_name'),$token,$cookie_expiration,$cookie_domain,$cookie_path,$cookie_prefix);
 		    //记录登录日志
