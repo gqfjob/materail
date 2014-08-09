@@ -145,21 +145,26 @@ class User extends CI_Controller {
 	    }
 		if($uid){
             $ip = $this->input->ip_address();
-		    $token = $this->user->createToken($uid,$ip,$this->config->item('sess_expiration'));
-            $user = $this->user->getUser($uid);
             //用户信息保存时间
-            $cookie_expiration = $this->config->item('cookie_expiration');
-
+            $exptime = $this->config->item('cookie_expiration');
+            $cookie_prefix = $this->config->item('cookie_prefix');
+            $cookie_domain = $this->config->item('cookie_domain');
+            $cookie_path = $this->config->item('cookie_path');
+            $exptime = $this->config->item('cookie_expiration');
+		    $token = $this->user->createToken($uid,$ip,$exptime);
+            $user = $this->user->getUser($uid);
             //保存用户信息到redis
 		    if($user){
 		        $redis = getRedis(CACHE_SESSION);
 		        if($redis){
-		            $redis->setex($token,$cookie_expiration,json_encode($user));
+		            $redis->setex($token,$exptime,json_encode($user));
 		        }
 		    }
-		    //生成的token保存在session中
-		    $token_name = $this->config->item('sess_cookie_name');
-		    $res = $this->session->set_userdata(array($token_name=>$token));
+		    //生成的token保存在cookie中
+		    $token_name = $this->config->item('user_login_cookie');
+		    //$res = $this->session->set_userdata(array($token_name=>$token));
+		    
+		    $res = set_cookie($token_name,$token,$exptime,$cookie_domain,$cookie_path,$cookie_prefix);
 		    //登录奖励积分
 		    //getScore($uid, "user-login");
 		    //长期登录，保存一个加密的用户信息到cookie，下次先检查是否存在

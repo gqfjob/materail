@@ -150,11 +150,11 @@ function strlen_utf8($str) {
 //判断用户是否登录(登录情况下，返回用户对象，反之false)
 function checklogin()
 {
-	/*
 	$CI = & get_instance();
 	$CI->load->model('user_model');
-	$token_name = $CI->config->item('sess_cookie_name');
-    $token = $CI->session->userdata($CI->config->item('sess_cookie_name'));
+	$token_name = $CI->config->item('user_login_cookie');
+    //$token = $CI->session->userdata($CI->config->item('user_login_cookie'));
+    $token = get_cookie($CI->config->item('user_login_cookie'));
     $res = $CI->user_model->valideToken($token,true);
     //从session中获取当前登录用户信息
     if($res != 0){
@@ -163,8 +163,6 @@ function checklogin()
     	$user = false;
     }
     return $user;
-*/
-	return false;
 }
 
 
