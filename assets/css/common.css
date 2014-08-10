@@ -27,12 +27,19 @@ li {
 }
 
 a {
-    color: #404040;
+    color: #64676B;
     text-decoration: none
 }
 
-a:hover {
-    text-decoration: underline
+a:visited {
+    color: #555;
+}
+a:hover,
+a:focus,
+a:active {
+    text-decoration: none;
+    outline: 0;
+    color: #F90;
 }
 
 a img {
@@ -185,7 +192,10 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 .footer{
     text-align:center;
 }
-
+.footer a{
+    font-size:14px;
+    padding:0px 10px;
+}
 
 /********************************************************
 	                                   素材上传样式开始

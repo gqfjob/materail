@@ -51,7 +51,11 @@ $(window).ready(function(){
 
     
 	$.get('/welcome/tongji',{'ur':'<?php echo (isset($_SERVER["HTTP_REFERER"]))?urlencode($_SERVER['HTTP_REFERER']):"";?>','t':encodeURI(document.title)},function(data){});
-    
+    //取用户信息
+    $.post('/user/information',{'<?php echo $this->security->get_csrf_token_name();?>':'<?php echo $this->security->get_csrf_hash();?>'},function(data){
+		$("#userInfo").html(data.msg);
+    },'json');
+
 });
 //当点击跳转链接后，回到页面顶部位置
 $("#backtop").click(function(){

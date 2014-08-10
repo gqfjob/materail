@@ -52,13 +52,9 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 		        </ul>
 		    </div>
 		
-		    <div class="pull-right container-fluid nav-horiz navbar-inner-right">
-		
-				<div id="navbar-signin" class="nav-link pull-left">
-					<a href="###">登录</a>
-				</div>
-				<div id="navbar-name" class="nav-link pull-left">
-					<a href="###">张三</a>
+		    <div id="userInfo" class="pull-right container-fluid nav-horiz navbar-inner-right">
+				<div style="padding-top:15px;">
+					<img src="/assets/img/long-loading.gif"/>
 				</div>
 			</div>
 		</div>
