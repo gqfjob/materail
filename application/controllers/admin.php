@@ -64,9 +64,40 @@ class Admin extends CI_Controller {
     /**
     * 素材管理
      */
-     public function mgMaterial()
+     public function mgMaterial($search = '', $page = 1)
      {
+     	$this->load->model('material_model', 'material');
+     	$this->load->model('user_model', 'user');
+     	
+     	//分页配置
+     	$config['base_url'] = base_url('admin/mgMaterial');
+		$config['total_rows'] = 200;
+		$config['per_page'] = 20; 
+		
+     	$search = trim($search);
+     	$material_query = $this->material->get_all_materials($page - 1, $config['per_page']);
+     	if( ! $material_query['status'])
+     	{
+     		show_error("数据库查询出错了",500,"出错了");
+     	}
+     	
+     	$uids = array();
+     	foreach($material_query['materials'] as $material)
+     	{
+     		$uids[] = $material['uid'];
+     	}
+     	
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser(implode(',', $uids));
+     	}
+     	
      	$data['bg_left'] = $this->load->module("common/bg_left",array(2),true);
+     	
+     	$data['materials'] = $material_query['materials'];
+     	$data['users'] = $users;
+     	
     
      	$this->load->module("common/bg_header");
     	$this->load->view("admin/material",$data);

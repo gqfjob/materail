@@ -606,4 +606,38 @@ class Material_Model extends CI_Model
 			return false;
 		}
 	}
+	
+	/**
+	 * 获取所有素材
+	 * @param int $page
+	 * @param int $pre_page
+	 * @param string $search
+	 */
+	public function get_all_materials($page = 0, $pre_page = 10, $search = '' )
+	{
+		if(empty($search))
+		{
+			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id ORDER BY id DESC LIMIT ?,?";
+			$query = $this->rdb->query($sql, array($page, $pre_page));
+		}
+		else
+		{
+			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id WHERE mi.mname LIKE %?% ORDER BY id DESC LIMIT ?,?";
+			$query = $this->rdb->query($sql, array($search, $page, $pre_page));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$materials = array();
+			if ($query->num_rows() > 0)
+			{
+				$materials = $query->result_array();
+			} 
+			return array('status' => 1, 'materials' => $materials);
+		}
+	}
 }
