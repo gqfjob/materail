@@ -1,6 +1,7 @@
 <style>
 .container{
 	width:500px;
+	background:none;
 }
 
 </style>
