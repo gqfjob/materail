@@ -214,6 +214,194 @@ class Admin extends CI_Controller {
      }
      
      /**
+      * 管理素材版本
+      */
+     public function mgVersion($mid = 0)
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$mid = (int)$mid;
+		if( ! $mid)
+		{
+			show_error('参数错误');
+		}
+		//查询素材信息
+		$material_query = $this->material->get_material($mid);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			show_error('素材不存在');
+		}
+		$material = $material_query['material'];
+		
+        //查询素材版本信息
+		$material_versions_query = $this->material->get_material_versions($mid);
+		if( ! $material_versions_query['status'])
+		{
+			$material_versions = array();
+		}
+		else
+		{
+			$material_versions = $material_versions_query['material_versions'];
+		}
+		
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(2),true);
+     	$data['material'] = $material;
+     	$data['material_versions'] = $material_versions;
+     	
+     	$this->load->module("common/bg_header");
+    	$this->load->view("admin/material_version",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      *  设置默认版本
+      */
+     public function set_default_version()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$post = $this->input->post(NULL, TRUE);
+		$mid = (int) $post['mid'];
+		$vid = (int) $post['vid'];
+		if( ! $mid || ! $vid)
+		{
+			echo json_encode(array('status' => 0));
+			exit;
+		}
+		
+		//检查权限
+		$check_version_query = $this->material->check_version_of_material($vid, $mid);
+		if($check_version_query['status'])
+		{
+			if($check_version_query['check'] == FALSE)
+			{
+				echo json_encode(array('status' => 0));
+				exit;
+			}
+		}
+		else
+		{
+			echo json_encode(array('status' => 0));
+			exit;
+		}
+		
+		$set_default_version = $this->material->set_default_version($vid, $mid);
+		if($set_default_version['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}
+		else
+		{
+			echo json_encode(array('status' => 0));
+		}
+     }
+     
+     /**
+      * 删除版本
+      */
+     public function delete_version()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$post = $this->input->post(NULL, TRUE);
+		$mid = (int) $post['mid'];
+		$vid = (int) $post['vid'];
+		if( ! $mid || ! $vid)
+		{
+			echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+			exit;
+		}
+		
+		$check_version_query = $this->material->check_version_of_material($vid, $mid);
+		if($check_version_query['status'])
+		{
+			if($check_version_query['check'] == FALSE)
+			{
+				echo json_encode(array('status' => 0 , 'msg' => '该版本不属于此素材，无法操作'));
+				exit;
+			}
+		}
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			exit;
+		}
+		
+		//查询素材信息
+		$material_query = $this->material->get_material($mid);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			exit;
+		}
+		$material = $material_query['material'];
+		
+		if($material['cversion'] == $vid)
+		{
+			echo json_encode(array('status' => 0, 'msg' => '默认版本无法删除'));
+			exit;
+		}
+		
+		if($material['vernum'] == 1)
+		{
+			echo json_encode(array('status' => 0,'msg' => '最后一个版本无法删除'));
+			exit;
+		}
+		
+		$delete_version = $this->material->delete_version($vid, $mid);
+		if($delete_version['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '删除失败'));
+		}
+     }
+     
+     /**
+      * 修改版本详细说明
+      */
+     public function edit_version_content()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$post = $this->input->post(NULL, TRUE);
+     	$mid = (int) $post['mid'];
+		$vid = (int) $post['vid'];
+		$content = trim($post['content']);
+		if( ! $mid || ! $vid)
+		{
+			echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+			exit;
+		}
+		
+    	$check_version_query = $this->material->check_version_of_material($vid, $mid);
+		if($check_version_query['status'])
+		{
+			if($check_version_query['check'] == FALSE)
+			{
+				echo json_encode(array('status' => 0 , 'msg' => '该版本不属于此素材，无法操作'));
+				exit;
+			}
+		}
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			exit;
+		}
+     	$update_version = $this->material->update_version_content($content, $vid, $mid);
+		if($update_version['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '删除失败'));
+		}
+     }
+     
+     /**
       * 访问日志管理
       */
      public function mgVisitor()

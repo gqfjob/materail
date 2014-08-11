@@ -18,14 +18,15 @@
         	<div class="clearfix"></div>
       </div>
       <div class="container">
-	      	 <form class="navbar-form navbar-right" role="form" method="get" action="<?php echo base_url('admin/mgMaterial');?>">
-				  <div class="form-group">
-				    <label class="sr-only" for="exampleInputEmail2">搜索素材</label>
-				    <input type="text" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="搜索素材名">
-				  </div>
-				  <div class="form-group">
-				  <button type="submit" class="btn btn-default">查找</button>
-		 	</form>
+      	 <form class="navbar-form navbar-right" role="form" method="get" action="<?php echo base_url('admin/mgMaterial');?>">
+			  <div class="form-group">
+			    <label class="sr-only" for="exampleInputEmail2">搜索素材</label>
+			    <input type="text" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="搜索素材名">
+			  </div>
+			  <div class="form-group">
+			  	<button type="submit" class="btn btn-default">查找</button>
+			  </div>
+	 	 </form>
 		 	
 	  </div>
 	  <div class="clearfix"></div>
@@ -62,8 +63,8 @@
 		                         <?php foreach($materials as $material) : ?>
 		                         <tr>
 		                         	<td><input autocomplete="off" type="checkbox" name="material" data-id="<?php echo $material['id'];?>" value="" /></td>
-		                         	<td><a href="<?php echo base_url('admin/material_detail/' . $material['id']);?>" target="_blank"><?php echo $material['mname']; ?></a></td>
-		                         	<td><?php echo isset($users[$material['uid']]['nickname']) ? $users[$material['uid']]['nickname'] : '';?></td>
+		                         	<td><a href="<?php echo base_url('admin/mgVersion/' . $material['id']);?>"><?php echo $material['mname']; ?></a></td>
+		                         	<td><a href=""><?php echo isset($users[$material['uid']]['nickname']) ? $users[$material['uid']]['nickname'] : '';?></a></td>
 		                         	<td><?php echo $material['cname']; ?></td>
 		                         	<td><?php echo isset($attachment_num[$material['id']]) ? $attachment_num[$material['id']] : '';?></td>
 		                         	<td><?php echo $material['vernum']?></td>
@@ -132,12 +133,14 @@
 			mids = mids.join();
 			var status = parseInt(_this.attr('data-status'));
 			var text = (status) ? '发布' : '转为草稿';
+			_this.addClass('disabled');
 			$.ajax({
 				url:'/admin/set_material_status',
 				type:'post',
 				dataType:'json',
 				data:{mids:mids,status:status,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
 				success:function(res){
+					_this.removeClass('disabled');
 					if(res.status){
 						notice(text + '成功', 300);
 					}else{
@@ -149,12 +152,14 @@
 					}
 				},
 				error:function(){
+					_this.removeClass('disabled');
 					notice('出错了', 300);
 				},
 				
 			});
 		});
 
+		//删除素材
 		$('#delete-material').click(function(){
 			var _this = $(this);
 			var material_checked = $('input[name="material"]:checked');
@@ -167,12 +172,14 @@
 				mids.push(parseInt($(this).attr('data-id')));
 			});
 			mids = mids.join();
+			_this.addClass('disabled');
 			$.ajax({
 				url:'/admin/delete_material',
 				type:'post',
 				dataType:'json',
 				data:{mids:mids,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
 				success:function(res){
+					_this.removeClass('disabled');
 					if(res.status){
 						notice('删除成功', 300);
 						material_checked.parents('tr').remove();
@@ -181,6 +188,7 @@
 					}
 				},
 				error:function(){
+					_this.removeClass('disabled');
 					notice('出错了', 300);
 				},
 				

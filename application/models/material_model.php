@@ -271,8 +271,8 @@ class Material_Model extends CI_Model
 		{
 			return array('status' => 0);
 		}
-		$update_sql = "UPDATE material_info SET state=?  WHERE id=?";
-		$query = $this->wdb->query($update_sql, array($status, $mid));
+		$update_sql = "UPDATE material_info SET state=?,update_at=? WHERE id=?";
+		$query = $this->wdb->query($update_sql, array($status, time(), $mid));
 		if($query)
 		{
 			return array('status' => 1);
@@ -786,6 +786,34 @@ class Material_Model extends CI_Model
 		$this->wdb->delete('material_version');
 		$this->wdb->where_in('mid', $mids);
 		$this->wdb->update('material_attatch', array('stat' => 0));
+		$this->wdb->trans_complete();
+		$this->wdb->trans_off();
+		if ($this->wdb->trans_status() === FALSE)
+		{
+		    return array('status' => 0);
+		}
+		
+		return array('status' => 1);
+	}
+	
+	/**
+	 * 修改版本详细说明
+	 * @param string $content
+	 * @param int $vid
+	 * @param int $mid
+	 */
+	public function update_version_content($content, $vid, $mid)
+	{
+		if(empty($vid) || empty($mid))
+		{
+			return json_encode(array('status' => 0));
+		}
+		
+		$this->wdb->trans_start();
+		$this->wdb->where_in('id', $vid);
+		$this->wdb->update('material_version', array('content' => $content, 'nohtml' => strip_tags($content)));
+		$this->wdb->where_in('id', $mid);
+		$this->wdb->update('material_info', array('update_at' => time()));
 		$this->wdb->trans_complete();
 		$this->wdb->trans_off();
 		if ($this->wdb->trans_status() === FALSE)
