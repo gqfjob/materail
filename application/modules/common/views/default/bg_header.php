@@ -21,8 +21,6 @@
 <script type="text/javascript" src="<?php echo base_url('assets/js/uploadfy/jquery.uploadify.js');?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/js/tools/jquery.placeholder.js');?>"></script>
 
-<script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_config.js');?>"></script>
-<script type="text/javascript" charset="utf-8" src="<?php echo base_url('assets/plugins/ueditor/editor_all.js');?>"></script>
 <script type="text/javascript" src="<?php echo base_url('assets/js/bgcommon.js');?>"></script>  <!-- HTML5 Support for IE -->
 <!--[if lt IE 9]>
 <script src="<?php echo base_url('assets/js/tools/html5.js');?>"></script>

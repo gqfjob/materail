@@ -361,6 +361,7 @@ $config['proxy_ips'] = '';
 
 include 'errno.php';
 include 'cache_keys.php';
+include 'pagination.php';
 
 /* End of file config.php */
 /* Location: ./application/config/config.php */

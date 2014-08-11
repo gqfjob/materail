@@ -608,27 +608,61 @@ class Material_Model extends CI_Model
 	}
 	
 	/**
+	 * 查询素材总数
+	 * 
+	 * @param unknown_type $search
+	 */
+	public function get_total_material($search = '')
+	{
+		if(empty($search))
+		{
+			$sql = "SELECT COUNT(*) as total FROM material_info";
+			$query = $this->rdb->query($sql);
+		}
+		else
+		{
+			$sql = "SELECT COUNT(*) as total FROM material_info WHERE mname LIKE ?";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$total = 0;
+			if ($query->num_rows() > 0)
+			{
+				$result = $query->row_array();
+			} 
+			return array('status' => 1, 'total' => $result['total']);
+		}
+	}
+	
+	/**
 	 * 获取所有素材
 	 * @param int $page
 	 * @param int $pre_page
 	 * @param string $search
 	 */
-	public function get_all_materials($page = 0, $pre_page = 10, $search = '' )
+	public function get_all_materials($page = 1, $pre_page = 10, $search = '' )
 	{
+		$record = ($page - 1) * $pre_page;
 		if(empty($search))
 		{
-			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id ORDER BY id DESC LIMIT ?,?";
-			$query = $this->rdb->query($sql, array($page, $pre_page));
+			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id ORDER BY id DESC LIMIT {$record},{$pre_page}";
+			$query = $this->rdb->query($sql);
 		}
 		else
 		{
-			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id WHERE mi.mname LIKE %?% ORDER BY id DESC LIMIT ?,?";
-			$query = $this->rdb->query($sql, array($search, $page, $pre_page));
+			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id WHERE mi.mname LIKE ? ORDER BY id DESC LIMIT {$record},{$pre_page}";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
 		}
 		
 		if($query == FALSE)
 		{
-			return array('status' => 0, 'msg' => '');
+			return array('status' => 0);
 		}
 		else
 		{
@@ -639,5 +673,126 @@ class Material_Model extends CI_Model
 			} 
 			return array('status' => 1, 'materials' => $materials);
 		}
+	}
+	
+	/**
+	 * 批量获取版本信息
+	 * 
+	 * @param $vids array
+	 */
+	public function get_batch_verisions($vids)
+	{
+		if(empty($vids))
+		{
+			return json_encode(array('status' => 0));
+		}
+		
+		$this->rdb->select('id, depict');
+		$this->rdb->where_in('id', $vids);
+    	$query = $this->rdb->get('material_version');
+    	
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$versions = array();
+			if ($query->num_rows() > 0)
+			{
+				foreach($query->result_array() as $version)
+				{
+					$versions[$version['id']] = $version;
+				}
+			} 
+			return array('status' => 1, 'versions' => $versions);
+		}
+	}
+	
+	/**
+	 * 查询素材附件数
+	 * 
+	 * @param array $mids
+	 */
+	public function get_material_attachments($mids)
+	{
+		if(empty($mids))
+		{
+			return json_encode(array('status' => 0));
+		}
+		
+		$this->rdb->select('mid, count(id) as num');
+		$this->rdb->where_in('mid', $mids);
+		$this->rdb->group_by('mid');
+    	$query = $this->rdb->get('material_attatch');
+    	
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$attachment_num = array();
+			if ($query->num_rows() > 0)
+			{
+				foreach($query->result_array() as $value)
+				{
+					$attachment_num[$value['mid']] = $value['num'];
+				}
+			} 
+			return array('status' => 1, 'attachment_num' => $attachment_num);
+		}
+	}
+	
+	/**
+	 * 批量设置素材状态
+	 * 
+	 * @param array $mids
+	 * @param int $status
+	 */
+	public function batch_set_status($mids, $status)
+	{
+		if(empty($mids))
+		{
+			return json_encode(array('status' => 0));
+		}
+		$this->wdb->where_in('id', $mids);
+		$query = $this->wdb->update('material_info',array('state' => $status));
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			return array('status' => 1);
+		}
+	}
+	
+	/**
+	 * 批量删除素材
+	 * 
+	 * @param array $mids
+	 */
+	public function batch_delete($mids)
+	{
+		if(empty($mids))
+		{
+			return json_encode(array('status' => 0));
+		}
+		$this->wdb->trans_start();
+		$this->wdb->where_in('id', $mids);
+		$this->wdb->delete('material_info');
+		$this->wdb->where_in('mid', $mids);
+		$this->wdb->delete('material_version');
+		$this->wdb->where_in('mid', $mids);
+		$this->wdb->update('material_attatch', array('stat' => 0));
+		$this->wdb->trans_complete();
+		$this->wdb->trans_off();
+		if ($this->wdb->trans_status() === FALSE)
+		{
+		    return array('status' => 0);
+		}
+		
+		return array('status' => 1);
 	}
 }
