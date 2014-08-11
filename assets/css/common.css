@@ -69,6 +69,12 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 	height: 0;
 	overflow: hidden;
 }
+.vertical-middle {
+    vertical-align: middle;
+}
+.inline-block {
+    display: inline-block;
+}
 .cl{
 	clear:both;
 }
@@ -81,12 +87,38 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 .mr5 {
     margin-right: 5px;
 }
+.b12{
+    font-size:12px;
+    font-weight:bold;
+}
+.b14{
+    font-size:14px;
+    font-weight:bold;
+}
 .b16{
 	font-size:16px;
 	font-weight:bold;
 }
+.font12{
+    font-size:12px;
+}
+.font14{
+    font-size:14px;
+}
+.font16{
+	font-size:16px;
+}
+.font-yahei{
+	font-family: "Microsoft Yahei";
+}
+.mt5{
+	margin-top:5px;
+}
 .mb10{
 	margin-bottom:10px;
+}
+.mb20{
+    margin-bottom:20px;
 }
 .mt10{
 	margin-top:10px;
@@ -102,6 +134,40 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 	width: 16px;
 	height: 15px;
 	background-position: 0px -276px;
+}
+
+.photo-ico {
+	width: 24px;
+	height: 18px;
+	background-position: 0px -26px;
+}
+.original-ico {
+	width: 21px;
+	height: 21px;
+	background-position: -1px -137px;
+}
+.media-ico {
+	width: 24px;
+	height: 18px;
+	background-position: 0px -46px;
+}
+.keywords-ico {
+    width: 24px;
+    height: 23px;
+    background-position: 0px -86px;
+}
+.download-ico2 {
+	width: 19px;
+	height: 19px;
+	background-position: 0px -331px;
+}
+.down-rank-ico {
+	width: 23px;
+	height: 18px;
+	background-position: 0px -67px;
+}
+.relative {
+    position: relative;
 }
 #header {
     height: 252px;
@@ -433,6 +499,41 @@ button.gray:active, .button_gray:active {
 	width:960px;
 	margin:0px auto;
 }
+/*990宽度页面设置*/
+#wcontainer{
+	width:990px;
+    margin:0px auto;
+}
+#wPageLeft{
+	float:left;
+	width:722px;
+	min-height:300px;
+}
+#wPageRight{
+	float:left;
+	margin-left:16px;
+    width:252px;
+    min-height:300px;
+}
+.wBoxLeft{
+	border:1px solid #ccc;
+	background:#fff;
+}
+.wBoxRight{
+	border: 1px solid #ccc;
+    background-color: #fff;
+}
+.w772{
+	width:772px;
+}
+.show-box-hd {
+	height: 20px;
+	margin: 9px 0px 0px 22px;
+	line-height: 20px;
+	z-index: 3;
+	background-color: transparent;
+}
+
 /*当前页导航*/
 .crumb{
     height: 15px;
@@ -444,8 +545,10 @@ button.gray:active, .button_gray:active {
 }
 
 .footer{
-    text-align:center;
-    margin-top:20px;
+	text-align: center;
+	margin-top: 50px;
+	padding-top: 20px;
+	border: 1px solid #ccc;
 }
 .footer a{
     font-size:14px;
