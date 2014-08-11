@@ -52,17 +52,67 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 		        </ul>
 		    </div>
 		
-		    <div class="pull-right container-fluid nav-horiz navbar-inner-right">
-		
-				<div id="navbar-signin" class="nav-link pull-left">
-					<a href="###">登录</a>
-				</div>
-				<div id="navbar-name" class="nav-link pull-left">
-					<a href="###">张三</a>
+		    <div id="userInfo" class="pull-right container-fluid nav-horiz navbar-inner-right">
+				<div style="padding-top:15px;">
+					<img src="/assets/img/long-loading.gif"/>
 				</div>
 			</div>
 		</div>
 	</header>
 </div>
+<?php if($cur !=0):?>
+<div id="search_interface">
+	<form name="keyword_form" autocomplete="off" method="get" action="/cat.mhtml" style="width:532px;margin:0px auto;">
+		<input type="hidden" name="search_source" value="search_form">                                     
+		<!-- main search container -->
+		<div class="main_search_container">
+			<div class="integrated_search_field">
+				<span class="keyword_input">
+					<input type="text" name="searchterm" placeholder="输入关键字，查找素材" value="" autocomplete="off">
+				</span>
+				<!-- 
+				<span class="media_types">
+					<span class="media_select">
+						<span class="media_selected">All Images</span>
+						<ul class="media_options hidden_radio_form shadow2 dropdown-menu" style="display: none;">
+								<li data-media-type="images">
+									All Images
+								</li>
+								
+								<li data-media-type="photos" class="indent">
+									Photos
+								</li>
+								
+								<li data-media-type="vectors" class="indent">
+									Vectors
+								</li>
+								
+								<li data-media-type="illustrations" class="indent">
+									Illustrations
+								</li>
+								<li class="line"></li>
+								<li data-media-type="footage">
+									Footage
+								</li>
+								<li class="line"></li>
+								<li data-media-type="music">
+									Music
+								</li>
+						</ul>
+					</span>
+				</span>
+				 -->
+				<span class="main_search_button">
+					<button class="gray btn-secondary no-max-width" type="submit" value="Search">
+						<img alt="Search" src="/assets/img/icn-search-mag-glass-16xp.png" width="16" height="16">
+					</button>
+				</span>
+			</div>
+			
+		</div>
+	<div class="cl"></div>
+	</form>
+</div>
+<?php endif;?>
 <div class="content">
     <div id="mainpage">
