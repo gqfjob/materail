@@ -641,7 +641,8 @@ class Material extends CI_Controller {
 	 */
 	public function detail($id,$ver=1)
 	{
-		$this->load->module("common/header",array('title'=>'列表'));
+		
+		$this->load->module("common/header",array('title'=>'素材详情','cur'=>999));
 		$this->load->view('mate/detail');
 		$this->load->module("common/footer");
 	}
