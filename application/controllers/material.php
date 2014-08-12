@@ -7,6 +7,12 @@
  *
  */
 class Material extends CI_Controller {
+	/**
+	 * 登录用户信息
+	 * @var array
+	 * @access private
+	 */
+	private $user_info;
 	
 	/**
 	 * Constructor
@@ -15,12 +21,21 @@ class Material extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('material_model', 'material');
-		//@todo 登录用户信息
-		$this->user = array('uid' => 1);
-		//@todo 用户素材操作权限(后台设置）
-		if( ! check_permission())
+		//登录用户信息
+		$this->user_info = checklogin();
+		if( ! $this->user_info)
 		{
-			exit('no premission');
+			show_error('no login');
+		}
+		if($this->user_info['status'] == 0)
+		{
+			show_error('disabled');
+		}
+		
+		//用户素材操作权限
+		if( ! check_permission($this->user_info))
+		{
+			show_error('no premission');
 		}
 	}
 	
@@ -41,7 +56,7 @@ class Material extends CI_Controller {
 		}
 		
 		$this->load->module("common/header",array('title'=>'新增素材'));
-		$this->load->view('material_add',$data);
+		$this->load->view('mate/material_add',$data);
 		$this->load->module("common/footer");
 	}
 	
@@ -107,12 +122,10 @@ class Material extends CI_Controller {
 		}
 		$material = array(
 			'mname'  => $post['material-name'],
-			'vernum' => 1,
 			'cid' => (int)$post['material-cate'],
 			'current_time' => time(),
-			'uid' => $this->user['uid'],
+			'uid' => $this->user_info['id'],
 			'state' => 1,
-			'cversion' => 1,
 			'logo' => trim($logo),
 			'vright' => trim($post['permission']),
 			'vright_user' => trim($post['permission-user']),
@@ -144,18 +157,10 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
-		}
-		else
-		{
-			show_error('出错l');
+			show_error('material out of user');
 		}
 		
 		//查询素材信息
@@ -183,7 +188,7 @@ class Material extends CI_Controller {
 		);
 		
 		$this->load->module("common/header",array('title'=>'管理素材'));
-		$this->load->view('material_manager',$data);
+		$this->load->view('mate/material_manager',$data);
 		$this->load->module("common/footer");
 	}
 	
@@ -200,17 +205,8 @@ class Material extends CI_Controller {
 			exit;
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
-		{
-			if($check_material_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0));
-				exit;
-			}
-		}
-		else
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
 			echo json_encode(array('status' => 0));
 			exit;
@@ -239,18 +235,10 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
-		}
-		else
-		{
-			show_error('出错l');
+			show_error('material out of user');
 		}
 		
 		//查询素材信息
@@ -264,7 +252,7 @@ class Material extends CI_Controller {
 		$data['material'] = $material;
 		$data['action_url'] = 'material/version_action_add';
 		$this->load->module("common/header",array('title'=>'上传新版本'));
-		$this->load->view('material_version_op',$data);
+		$this->load->view('mate/material_version_op',$data);
 		$this->load->module("common/footer");
 	}
 	
@@ -287,18 +275,10 @@ class Material extends CI_Controller {
 			show_error('请填入版本描述');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
-		}
-		else
-		{
-			show_error('出错了');
+			show_error('material out of user');
 		}
 		
 		//查询素材最大版本
@@ -314,7 +294,7 @@ class Material extends CI_Controller {
 		$version = array(
 			'mid' => $mid,
 			'vnum' => $max_version,
-			'uid' => $this->user['uid'],
+			'uid' => $this->user_info['id'],
 			'version_depict' => trim($post['version-depict']),
 			'attachment_ids' => trim($post['attachment-ids']),
 			'version_content' => trim($post['version-content']),
@@ -348,31 +328,15 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
-		{
-			if($check_material_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0));
-				exit;
-			}
-		}
-		else
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
 			echo json_encode(array('status' => 0));
 			exit;
 		}
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
-		{
-			if($check_version_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0));
-				exit;
-			}
-		}
-		else
+		
+		//检查版本所属
+		if( ! check_version_of_material($vid, $mid))
 		{
 			echo json_encode(array('status' => 0));
 			exit;
@@ -402,30 +366,16 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
+			show_error('material out of user');
 		}
-		else
+		
+		//检查版本所属
+		if( ! check_version_of_material($vid, $mid))
 		{
-			show_error('出错了');
-		}
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
-		{
-			if($check_version_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
-		}
-		else
-		{
-			show_error('出错了');
+			show_error('version out of material');
 		}
 		
 		//查询素材信息
@@ -461,7 +411,7 @@ class Material extends CI_Controller {
 		$data['action_url'] = 'material/version_action_edit';
 		
 		$this->load->module("common/header",array('title'=>'修改版本'));
-		$this->load->view('material_version_op',$data);
+		$this->load->view('mate/material_version_op',$data);
 		$this->load->module("common/footer");
 	}
 	
@@ -485,30 +435,16 @@ class Material extends CI_Controller {
 			show_error('请填入版本描述');
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
+			show_error('material out of user');
 		}
-		else
+		
+		//检查版本所属
+		if( ! check_version_of_material($vid, $mid))
 		{
-			show_error('出错了');
-		}
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
-		{
-			if($check_version_query['check'] == FALSE)
-			{
-				show_error('无权限');
-			}
-		}
-		else
-		{
-			show_error('出错了');
+			show_error('version out of material');
 		}
 		
 		$version = array(
@@ -547,33 +483,17 @@ class Material extends CI_Controller {
 			exit;
 		}
 		
-		//检查权限
-		$check_material_query = $this->material->check_material_of_user($mid, $this->user['uid']);
-		if($check_material_query['status'])
+		//检查素材所属
+		if( ! check_material_of_user($mid, $this->user_info['id']))
 		{
-			if($check_material_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0, 'msg' => '无权限'));
-				exit;
-			}
-		}
-		else
-		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0));
 			exit;
 		}
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
+		
+		//检查版本所属
+		if( ! check_version_of_material($vid, $mid))
 		{
-			if($check_version_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0 , 'msg' => '无权限'));
-				exit;
-			}
-		}
-		else
-		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0));
 			exit;
 		}
 		
@@ -614,13 +534,17 @@ class Material extends CI_Controller {
 	 */
 	public function search_user()
 	{
-		$user=array(
-			array('id' => 1, 'name' => '张三', 'company' => '小公司'),
-			array('id' => 2, 'name' => '李四', 'company' => '大公司'),
-			array('id' => 3, 'name' => '王二', 'company' => '中公司'),
-			array('id' => 4, 'name' => '赵一', 'company' => '集团公司'),
-		);
-		echo json_encode(array('status' => 1, 'result' => $user));
+		$this->load->model('user_model','user');
+		
+		$name = trim($this->input->post('name', TRUE));
+		if($name == '')
+		{
+			echo  json_encode(array('status' => 0, 'msg' => '请输入用户名称'));
+			exit;
+		}
+		
+		$users = $this->user->searchUserByField('realname', $name);
+		echo json_encode(array('status' => 1, 'result' => $users));
 	}
 
 	/**

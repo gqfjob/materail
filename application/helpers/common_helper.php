@@ -1173,8 +1173,68 @@ function checkAdminRight($user){
 	return false;
 }
 
-function check_permission()
+/**
+ * 检查用户是否具有上传素材权限
+ * @param array $user 用户信息
+ */
+function check_permission($user)
 {
+	if(is_array($user)){
+		if(($user['status'] == 1) && in_array($user['auth'], array(1,2,999))){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/**
+ * 检查素材是否属于用户
+ * 
+ * @param int $mid
+ * @param int $uid
+ */
+function check_material_of_user($mid, $uid)
+{
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	$check_material_query = $CI->material->check_material_of_user($mid, $uid);
+	if($check_material_query['status'])
+	{
+		if($check_material_query['check'] == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+	
 	return TRUE;
 }
 
+/**
+ * 检查版本是否属于素材
+ * 
+ * @param int $vid
+ * @param int $mid
+ */
+function check_version_of_material($vid, $mid)
+{
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	$check_version_query = $CI->material->check_version_of_material($vid, $mid);
+	if($check_version_query['status'])
+	{
+		if($check_version_query['check'] == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+	
+	return TRUE;
+}

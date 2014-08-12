@@ -133,7 +133,6 @@ class Material_Model extends CI_Model
 			'update_at' => $material['current_time'],
 			'uid' => $material['uid'],
 			'state' => $material['state'],
-			'cversion' => $material['cversion'],
 			'logo' => $material['logo'],
 			'vright' => $material['vright']
 		);
@@ -172,15 +171,15 @@ class Material_Model extends CI_Model
 			'upat' => $material['current_time']
 		);
 		$this->wdb->insert('material_version', $insert_material_version);
-		$mvid = $this->wdb->insert_id();
+		$vid = $this->wdb->insert_id();
 		
 		if( ! empty($material['attachment_ids']))
 		{
-			$update_sql = "UPDATE material_attatch SET mid = {$mid} , mvid = {$mvid} WHERE id IN ({$material['attachment_ids']})";
+			$update_sql = "UPDATE material_attatch SET mid = {$mid} , mvid = {$vid} WHERE id IN ({$material['attachment_ids']})";
 			$this->wdb->query($update_sql);
 		}
 		
-		$this->wdb->query("UPDATE material_info SET cversion=? WHERE id=?", array($mvid, $mid));
+		$this->wdb->query("UPDATE material_info SET cversion=?,vernum=1 WHERE id=?", array($vid, $mid));
 		$this->wdb->trans_complete();
 		$this->wdb->trans_off();
 		if ($this->wdb->trans_status() === FALSE)
@@ -188,7 +187,7 @@ class Material_Model extends CI_Model
 		    return array('status' => 0);
 		}
 		
-		return array('status' => 1, 'mid' => $mid);
+		return array('status' => 1, 'mid' => $mid, 'vid' => $vid);
 	}
 	
 	/**
