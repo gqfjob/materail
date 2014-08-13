@@ -12,7 +12,7 @@ class Material extends CI_Controller {
 	 * @var array
 	 * @access private
 	 */
-	private $user_info;
+	private $user_info = array();
 	
 	/**
 	 * Constructor
@@ -21,36 +21,42 @@ class Material extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->model('material_model', 'material');
+		
+		$current_method = $this->router->fetch_method();
+		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! $this->user_info)
+		if( ! in_array($current_method, array('search', 'detail', 'list')))
 		{
-			if($this->input->is_ajax_request()){
-    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
-    			exit;
-    		}else{
-    			redirect('user/login');
-    		}
-		}
-		if($this->user_info['status'] == 0)
-		{
-			if($this->input->is_ajax_request()){
-    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
-    			exit;
-    		}else{
-    			show_error('此用户已被禁用');
-    		}
-		}
-		
-		//用户素材操作权限
-		if( ! check_permission($this->user_info))
-		{
-			if($this->input->is_ajax_request()){
-    			echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
-    			exit;
-    		}else{
-    			show_error('您没有权限');
-    		}
+			if( ! $this->user_info)
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
+	    			exit;
+	    		}else{
+	    			redirect('user/login');
+	    		}
+			}
+			if($this->user_info['status'] == 0)
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
+	    			exit;
+	    		}else{
+	    			show_error('此用户已被禁用');
+	    		}
+			}
+			
+			//用户素材操作权限
+			if( ! check_permission($this->user_info))
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
+	    			exit;
+	    		}else{
+	    			show_error('您没有权限');
+	    		}
+			}
 		}
 	}
 	
@@ -70,7 +76,7 @@ class Material extends CI_Controller {
 			$data['material_cate'] = $material_cate_query['material_cate'];
 		}
 		
-		$this->load->module("common/header",array('title'=>'新增素材'));
+		$this->load->module("common/header",array('title'=>'上传素材', 'cur' => 999));
 		$this->load->view('mate/material_add',$data);
 		$this->load->module("common/footer");
 	}
@@ -226,7 +232,7 @@ class Material extends CI_Controller {
 			'user' => $this->user_info
 		);
 		
-		$this->load->module("common/header",array('title'=>'管理素材'));
+		$this->load->module("common/header",array('title'=>'管理素材', 'cur' => 999));
 		$this->load->view('mate/material_manager',$data);
 		$this->load->module("common/footer");
 	}
@@ -284,7 +290,8 @@ class Material extends CI_Controller {
 		
 		$data['material'] = $material;
 		$data['action_url'] = 'material/version_action_add';
-		$this->load->module("common/header",array('title'=>'上传新版本'));
+		$data['op_type'] = 'add';
+		$this->load->module("common/header",array('title'=>'上传新版本', 'cur' => 999));
 		$this->load->view('mate/material_version_op',$data);
 		$this->load->module("common/footer");
 	}
@@ -463,8 +470,9 @@ class Material extends CI_Controller {
 		$data['version'] = $version;
 		$data['version_attachment'] = $version_attachment;
 		$data['action_url'] = 'material/version_action_edit';
+		$data['op_type'] = 'edit';
 		
-		$this->load->module("common/header",array('title'=>'修改版本'));
+		$this->load->module("common/header",array('title'=>'修改版本', 'cur' => 999));
 		$this->load->view('mate/material_version_op',$data);
 		$this->load->module("common/footer");
 	}
@@ -598,7 +606,7 @@ class Material extends CI_Controller {
 		$material_query = $this->material->get_material($mid);
 		if( ! $material_query['status'] || empty($material_query['material']))
 		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0, 'msg' => '素材不存在'));
 			exit;
 		}
 		$material = $material_query['material'];
@@ -627,7 +635,7 @@ class Material extends CI_Controller {
 	}
 	
 	/**
-	 * 临时搜索用户
+	 * 搜索用户
 	 */
 	public function search_user()
 	{
@@ -662,6 +670,39 @@ class Material extends CI_Controller {
 	 */
 	public function detail($id,$ver=1)
 	{
+		//查询素材信息
+		$material_query = $this->material->get_material($id);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			show_error('素材不存在');
+		}
+		$material = $material_query['material'];
+		if($material['vright'] == 2)
+		{
+			if(empty($this->user_info))
+			{
+				show_error('登录后才能查看');
+			}
+		}
+		elseif($material['vright'] == 3)
+		{
+			//查询允许用户
+			$allow_uids = array();
+			$allow_users_query = $this->material->allow_users($id);
+			if($allow_users_query['status'])
+			{
+				$allow_users = $allow_users_query['users'];
+				foreach($allow_users as $allow_user)
+				{
+					$allow_uids[] = $allow_user['uid'];
+				}
+			}
+			
+			if(empty($this->user_info) || ! in_array($this->user_info['id'], $allow_uids))
+			{
+				show_error('您无权查看');
+			}
+		}
 		
 		$this->load->module("common/header",array('title'=>'素材详情','cur'=>999));
 		$this->load->view('mate/detail');

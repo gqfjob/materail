@@ -559,7 +559,6 @@ button.gray:active, .button_gray:active {
 	                                   素材上传样式开始
 ********************************************************/
 .container{
-	min-height:200px;
 	position:relative;
 	margin-bottom:18px;
 	font-size:13px;

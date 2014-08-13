@@ -1,3 +1,7 @@
+<div class="container crumb mb20 mt20">
+	<div class="fl ico crumb-ico mr5"></div>当前位置：
+    <a href="<?php echo base_url();?>" title="" hidefocus="true">首页</a>&nbsp;&gt;&nbsp;<span hidefocus="true">上传素材</span>
+</div>
 <div class="container container-border">
 	<div class="container-header"></div>
 	<div class="material-box">

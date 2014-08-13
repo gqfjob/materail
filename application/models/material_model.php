@@ -887,4 +887,32 @@ class Material_Model extends CI_Model
 			return array('status' => 1, 'attachments' => $attachments);
 		}
 	}
+	
+	/**
+	 * 查询允许用户
+	 * @param unknown_type $mid
+	 */
+	public function allow_users($mid)
+	{
+		if(empty($mid))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where(array('mid' => $mid, 'vr' => 2));
+		$query = $this->wdb->get('material_visit_right');
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$users= array();
+			if ($query->num_rows() > 0)
+			{
+				$users = $query->result_array();
+			} 
+			return array('status' => 1, 'users' => $users);
+		}
+	}
 }
