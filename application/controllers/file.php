@@ -7,15 +7,36 @@ class File extends CI_Controller{
 	 */
 	private $file_info = array();
 	
+	/**
+	 * 登录用户信息
+	 * @var array
+	 * @access private
+	 */
+	private $user_info;
+	
 	public function __construct()
 	{
 		parent::__construct();
-		//@todo 登录用户信息
-		$this->user = array('uid' => 1);
-		//@todo 用户素材操作权限(后台设置）
-		if( ! check_permission())
+		
+		//登录用户信息
+		$this->user_info = checklogin();
+		if( ! $this->user_info)
 		{
-			exit('no premission');
+			if($this->input->is_ajax_request()){
+    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
+    			exit;
+    		}else{
+    			redirect('user/login');
+    		}
+		}
+		if($this->user_info['status'] == 0)
+		{
+			if($this->input->is_ajax_request()){
+    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
+    			exit;
+    		}else{
+    			show_error('此用户已被禁用');
+    		}
 		}
 	}
 	
@@ -80,7 +101,7 @@ class File extends CI_Controller{
 			'mvid'  => 0,
 			'pfix'  => ltrim($this->file_info['file_ext'], '.'),
 			'uptime' => time(),
-			'upuser' => 0,
+			'upuser' => $this->user_info['id'],
 			'stat' => 1
 		);
 		$this->load->model('material_model', 'material');
@@ -114,10 +135,27 @@ class File extends CI_Controller{
 		$attachment_query = $this->material->get_attachment($attachment_id);
 		if( ! $attachment_query['status'] || empty($attachment_query['attachment']))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '文件不存在'));
 			exit;
 		}
 		$attachment= $attachment_query['attachment'];
+		if($attachment['mid'] != 0 && $attachment['mvid'] != 0)
+		{
+			//检查版本管理权限
+			if( ! check_manager_version($attachment['mvid'], $attachment['mid'], $this->user_info['id']))
+			{
+				echo json_encode(array('status' => 0, 'msg' => '没有权限'));
+				exit;
+			}
+		}
+		else
+		{
+			if($attachment['upuser'] != $this->user_info['id'])
+			{
+				echo json_encode(array('status' => 0, 'msg' => '没有权限'));
+				exit;
+			}
+		}
 		$res = $this->material->update_attachment($attachment_id, $attachment['mvid']);
 		if($res['status'])
 		{
@@ -125,7 +163,7 @@ class File extends CI_Controller{
 		}
 		else
 		{
-			echo json_encode($res);
+			echo json_encode(array('status' => 0, 'msg' => '删除失败'));
 		}
 	}
 	/**

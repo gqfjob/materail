@@ -739,21 +739,19 @@ button.gray:active, .button_gray:active {
 	background:#fcf8e3;
 }
 #material-versions .table .text-center{text-align:center;}
-#material-versions a,
-#material-op a{
+#material-versions a{
 	color:#08c;
+	font-size:13px !important;
+}
+#material-op a {
+	color:#fff;
 	font-size:13px !important;
 }
 .separator{color:#893389;font-size:12px;padding:0 2px;}
 #material-op{
 	min-height:0;
 	text-align:right;
-}
-#material-op .btn{
-	border-radius:0;
-	-moz-border-radius:0;
-	-wekit-border-radius:0;
-	border-color:#b3b3b3;
+	background:none;
 }
 #attachment-box{position:relative;}
 #up-down{

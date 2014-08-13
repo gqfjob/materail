@@ -24,8 +24,8 @@
 					    <label class="col-sm-2 control-label" for="">缩略图</label>
 					    <div id="thumb-box" class="col-xs-8">
 					    	<input type="hidden" id="thumb-path" name="thumb-path" autocomplete="off" />
-					    	<input type="hidden" id="thumb-type" name="thumb-type" value="" autocomplete="off" />
-					    	<button class="btn btn-default" id="select-thumb" type="button">系统自动生成缩略图</button>
+					    	<input type="hidden" id="thumb-type" name="thumb-type" value="1" autocomplete="off" />
+					    	<button class="btn btn-default btn-success" id="select-thumb" type="button">系统自动生成缩略图</button>
 					    	<span class="help-line">或</span>
 					    	<div class="upload-container"><input id="upload-thumb" type="file" name="material-thumb"/></div>
 					    	<span class="help-line">图片支持png、gif、jpg，大小不超过2M</span>
@@ -141,7 +141,7 @@
 		$("#upload-thumb").uploadify({
 			'formData'     : {
 				'<?php echo $this->config->item('csrf_token_name'); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>',
-				'cookie':'<?php echo json_encode(array($this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
+				'cookie':'<?php echo json_encode(array($this->config->item('user_login_cookie') => get_cookie($this->config->item('user_login_cookie')), $this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
 			},
 			'fileObjName' : 'upload_file',
 	        'swf'      : '/assets/js/uploadfy/uploadify.swf',
@@ -178,10 +178,10 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){},
+			'onUploadError' : function(){$('#thumb-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
 			'onUploadStart' : function(){$('#thumb-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
 			'onUploadSuccess' : function(file, data, response){
-				data = eval("(" + data + ")");
+				data = eval('(' + data + ')');
 				if(data.status){
 					$('#thumb-path').val(data.result['file_path']);
 					$('#thumb-msg').hide().find('span').text('');
@@ -194,7 +194,7 @@
 					$('#thumb-type').val('');
 					$('#thumb-image').show();
 				}else{
-					$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');
+					$('#thumb-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');
 				}
 				delete this.queueData.files[file.id];
 			}
@@ -204,7 +204,7 @@
 		$("#upload-attachment").uploadify({
 			'formData'     : {
 				'<?php echo $this->config->item('csrf_token_name'); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>',
-				'cookie':'<?php echo json_encode(array($this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
+				'cookie':'<?php echo json_encode(array($this->config->item('user_login_cookie') => get_cookie($this->config->item('user_login_cookie')), $this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
 			},
 			'fileObjName' : 'upload_file',
 	        'swf'      : '/assets/js/uploadfy/uploadify.swf',
@@ -241,7 +241,7 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){},
+			'onUploadError' : function(){$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
 			'onUploadStart' : function(){$('#attachment-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
 			'onUploadSuccess' : function(file, data, response){
 				data = eval("(" + data + ")");
@@ -285,7 +285,7 @@
 								$('#attachment-ids').val('');
 							}
 						}else{
-							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('删除失败');
+							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text(res.msg);
 						}
 						
 					},

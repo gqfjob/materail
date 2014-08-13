@@ -98,7 +98,7 @@
 		$("#upload-attachment").uploadify({
 			'formData'     : {
 				'<?php echo $this->config->item('csrf_token_name'); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>',
-				'cookie':'<?php echo json_encode(array($this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
+				'cookie':'<?php echo json_encode(array($this->config->item('user_login_cookie') => get_cookie($this->config->item('user_login_cookie')), $this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
 			},
 			'fileObjName' : 'upload_file',
 	        'swf'      : '/assets/js/uploadfy/uploadify.swf',
@@ -135,7 +135,7 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){},
+			'onUploadError' : function(){$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
 			'onUploadStart' : function(){$('#attachment-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
 			'onUploadSuccess' : function(file, data, response){
 				data = eval("(" + data + ")");
@@ -179,7 +179,7 @@
 								$('#attachment-ids').val('');
 							}
 						}else{
-							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('删除失败');
+							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text(res.msg);
 						}
 						
 					},

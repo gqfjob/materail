@@ -168,7 +168,8 @@ class Material_Model extends CI_Model
 			'anum' => count($attachments),
 			'uid' => $material['uid'],
 			'cat' => $material['current_time'],
-			'upat' => $material['current_time']
+			'upat' => $material['current_time'],
+			'zip_path' => $material['version_zip']
 		);
 		$this->wdb->insert('material_version', $insert_material_version);
 		$vid = $this->wdb->insert_id();
@@ -334,7 +335,8 @@ class Material_Model extends CI_Model
 			'anum' => count($attachments),
 			'uid' => $version['uid'],
 			'cat' => $version['current_time'],
-			'upat' => $version['current_time']
+			'upat' => $version['current_time'],
+			'zip_path' => $version['version_zip']
 		);
 		$this->wdb->insert('material_version', $insert_material_version);
 		$mvid = $this->wdb->insert_id();
@@ -375,9 +377,10 @@ class Material_Model extends CI_Model
 			$version['version_depict'],
 			count($attachments),
 			$version['current_time'],
+			$version['version_zip'],
 			$version['vid']
 		);
-		$this->wdb->query('UPDATE material_version SET content=?, nohtml=?, depict=?, anum=anum+?,upat=? WHERE id=?', $update_material_version);
+		$this->wdb->query('UPDATE material_version SET content=?, nohtml=?, depict=?, anum=anum+?,upat=?,zip_path=? WHERE id=?', $update_material_version);
 		if( ! empty($version['attachment_ids']))
 		{
 			$update_sql = "UPDATE material_attatch SET mid={$version['mid']} , mvid={$version['vid']} WHERE id IN ({$version['attachment_ids']})";
@@ -428,10 +431,44 @@ class Material_Model extends CI_Model
 	}
 	
 	/**
+	 * 检查版本所属用户
+	 * 
+	 * @param int $vid 版本ID
+	 * @param int $mid 素材ID
+	 * @param int $uid 用户ID
+	 */
+	public function check_version_of_user($vid, $mid, $uid)
+	{
+		if(empty($vid) || empty($mid) || empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT id FROM material_version WHERE id=? AND mid=? AND uid=?";
+		$query = $this->rdb->query($sql, array($vid, $mid, $uid));
+		if($query === FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			if ($query->num_rows() > 0)
+			{
+				return array('status' => 1, 'check' => TRUE);
+			}
+			else
+			{
+				return array('status' => 1, 'check' => FALSE);
+			}
+		}
+	}
+	
+	/**
 	 * 检查版本所属素材
 	 * 
 	 * @param int $vid 版本ID
 	 * @param int $mid 素材ID
+	 * @param int $uid 用户ID
 	 */
 	public function check_version_of_material($vid, $mid)
 	{
@@ -552,7 +589,7 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT * FROM material_attatch WHERE mvid = ? AND stat=1";
+		$sql = "SELECT * FROM material_attatch WHERE mvid = ? AND stat=1 ORDER BY id DESC";
 		$query = $this->rdb->query($sql, array($vid));
 		if($query == FALSE)
 		{
@@ -683,7 +720,7 @@ class Material_Model extends CI_Model
 	{
 		if(empty($vids))
 		{
-			return json_encode(array('status' => 0));
+			return array('status' => 0);
 		}
 		
 		$this->rdb->select('id, depict');
@@ -717,7 +754,7 @@ class Material_Model extends CI_Model
 	{
 		if(empty($mids))
 		{
-			return json_encode(array('status' => 0));
+			return array('status' => 0);
 		}
 		
 		$this->rdb->select('mid, count(id) as num');
@@ -753,7 +790,7 @@ class Material_Model extends CI_Model
 	{
 		if(empty($mids))
 		{
-			return json_encode(array('status' => 0));
+			return array('status' => 0);
 		}
 		$this->wdb->where_in('id', $mids);
 		$query = $this->wdb->update('material_info',array('state' => $status));
@@ -776,7 +813,7 @@ class Material_Model extends CI_Model
 	{
 		if(empty($mids))
 		{
-			return json_encode(array('status' => 0));
+			return array('status' => 0);
 		}
 		$this->wdb->trans_start();
 		$this->wdb->where_in('id', $mids);
@@ -805,7 +842,7 @@ class Material_Model extends CI_Model
 	{
 		if(empty($vid) || empty($mid))
 		{
-			return json_encode(array('status' => 0));
+			return array('status' => 0);
 		}
 		
 		$this->wdb->trans_start();
@@ -821,5 +858,33 @@ class Material_Model extends CI_Model
 		}
 		
 		return array('status' => 1);
+	}
+	
+	/**
+	 * 批量获取附件
+	 * @param array $aids
+	 */
+	public function batch_get_attachments($aids)
+	{
+		if(empty($aids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where_in('id', $aids);
+		$query = $this->wdb->get('material_attatch');
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$attachments= array();
+			if ($query->num_rows() > 0)
+			{
+				$attachments = $query->result_array();
+			} 
+			return array('status' => 1, 'attachments' => $attachments);
+		}
 	}
 }

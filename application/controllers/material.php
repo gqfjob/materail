@@ -25,17 +25,32 @@ class Material extends CI_Controller {
 		$this->user_info = checklogin();
 		if( ! $this->user_info)
 		{
-			show_error('no login');
+			if($this->input->is_ajax_request()){
+    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
+    			exit;
+    		}else{
+    			redirect('user/login');
+    		}
 		}
 		if($this->user_info['status'] == 0)
 		{
-			show_error('disabled');
+			if($this->input->is_ajax_request()){
+    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
+    			exit;
+    		}else{
+    			show_error('此用户已被禁用');
+    		}
 		}
 		
 		//用户素材操作权限
 		if( ! check_permission($this->user_info))
 		{
-			show_error('no premission');
+			if($this->input->is_ajax_request()){
+    			echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
+    			exit;
+    		}else{
+    			show_error('您没有权限');
+    		}
 		}
 	}
 	
@@ -131,8 +146,29 @@ class Material extends CI_Controller {
 			'vright_user' => trim($post['permission-user']),
 			'version_depict' => trim($post['version-depict']),
 			'attachment_ids' => $post['attachment-ids'],
-			'version_content' => trim($post['version-content'])
+			'version_content' => trim($post['version-content']),
+			'version_zip' => ''
 		);
+		
+		//附件生成zip压缩文件
+		if( ! empty($material['attachment_ids']))
+		{
+			//查询附件信息
+			$version_attachment_query = $this->material->batch_get_attachments(explode(',', $material['attachment_ids']));
+			if( ! $version_attachment_query['status'])
+			{
+				$version_attachment = array();
+			}
+			else
+			{
+				$version_attachment = $version_attachment_query['attachments'];
+			}
+			$version_zip = create_zip($version_attachment);
+			if($version_zip != '')
+			{
+				$material['version_zip'] = $version_zip;
+			}
+		}
 		
 		$material_insert = $this->material->insert_material($material);
 		if($material_insert['status'])
@@ -141,6 +177,10 @@ class Material extends CI_Controller {
 		}
 		else
 		{
+			if($version_zip && file_exists($version_zip))
+			{
+				unlink($version_zip);
+			}
 			show_error('上传素材失败');
 		}
 	}
@@ -157,11 +197,8 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
-		{
-			show_error('material out of user');
-		}
+		//检查素材管理权限
+		$manager_material =  check_manager_material($mid, $this->user_info['id']);
 		
 		//查询素材信息
 		$material_query = $this->material->get_material($mid);
@@ -184,7 +221,9 @@ class Material extends CI_Controller {
 		
 		$data = array(
 			'material' => $material, 
-			'material_versions' => $material_versions
+			'material_versions' => $material_versions,
+			'manager_material' => $manager_material,
+			'user' => $this->user_info
 		);
 		
 		$this->load->module("common/header",array('title'=>'管理素材'));
@@ -205,10 +244,10 @@ class Material extends CI_Controller {
 			exit;
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
+		//检查素材管理权限
+		if( ! check_manager_material($mid, $this->user_info['id']))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '没有权限'));
 			exit;
 		}
 		
@@ -233,12 +272,6 @@ class Material extends CI_Controller {
 		if( ! $mid)
 		{
 			show_error('参数错误');
-		}
-		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
-		{
-			show_error('material out of user');
 		}
 		
 		//查询素材信息
@@ -275,11 +308,6 @@ class Material extends CI_Controller {
 			show_error('请填入版本描述');
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
-		{
-			show_error('material out of user');
-		}
 		
 		//查询素材最大版本
 		$max_version_query = $this->material->get_max_version($mid);
@@ -298,8 +326,29 @@ class Material extends CI_Controller {
 			'version_depict' => trim($post['version-depict']),
 			'attachment_ids' => trim($post['attachment-ids']),
 			'version_content' => trim($post['version-content']),
-			'current_time' => time()
+			'current_time' => time(),
+			'version_zip' => ''
 		);
+		
+		//附件生成zip压缩文件
+		if( ! empty($version['attachment_ids']))
+		{
+			//查询附件信息
+			$version_attachment_query = $this->material->batch_get_attachments(explode(',', $version['attachment_ids']));
+			if( ! $version_attachment_query['status'])
+			{
+				$version_attachment = array();
+			}
+			else
+			{
+				$version_attachment = $version_attachment_query['attachments'];
+			}
+			$version_zip = create_zip($version_attachment);
+			if($version_zip != '')
+			{
+				$version['version_zip'] = $version_zip;
+			}
+		}
 		
 		$insert_version = $this->material->insert_version($version);
 		
@@ -310,6 +359,10 @@ class Material extends CI_Controller {
 		}
 		else
 		{
+			if($version_zip && file_exists($version_zip))
+			{
+				unlink($version_zip);
+			}
 			show_error('上传新版本失败');
 		}
 	}
@@ -328,17 +381,17 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
+		//检查素材管理权限
+		if( ! check_manager_material($mid, $this->user_info['id']))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '没有权限'));
 			exit;
 		}
 		
 		//检查版本所属
 		if( ! check_version_of_material($vid, $mid))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '版本不属于该素材'));
 			exit;
 		}
 		
@@ -366,16 +419,17 @@ class Material extends CI_Controller {
 			show_error('参数错误');
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
+		//检查版本管理权限
+		if( ! check_manager_version($vid, $mid, $this->user_info['id']))
 		{
-			show_error('material out of user');
+			show_error('没有权限');
+			
 		}
 		
 		//检查版本所属
 		if( ! check_version_of_material($vid, $mid))
 		{
-			show_error('version out of material');
+			show_error('版本不属于该素材');
 		}
 		
 		//查询素材信息
@@ -388,7 +442,7 @@ class Material extends CI_Controller {
 		
 		//查询版本信息
 		$version_query = $this->material->get_version($vid);
-		if( ! $material_query['status'] || empty($material_query['material']))
+		if( ! $version_query['status'] || empty($version_query['version']))
 		{
 			show_error('版本不存在');
 		}
@@ -435,17 +489,26 @@ class Material extends CI_Controller {
 			show_error('请填入版本描述');
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
+		//检查版本管理权限
+		if( ! check_manager_version($vid, $mid, $this->user_info['id']))
 		{
-			show_error('material out of user');
+			show_error('没有权限');
+			
 		}
 		
 		//检查版本所属
 		if( ! check_version_of_material($vid, $mid))
 		{
-			show_error('version out of material');
+			show_error('版本不属于该素材');
 		}
+		
+		//查询版本信息
+		$version_query = $this->material->get_version($vid);
+		if( ! $version_query['status'] || empty($version_query['version']))
+		{
+			show_error('版本不存在');
+		}
+		$old_zip_path = $version_query['version']['zip_path'];
 		
 		$version = array(
 			'mid' => $mid,
@@ -453,18 +516,51 @@ class Material extends CI_Controller {
 			'version_depict' => trim($post['version-depict']),
 			'attachment_ids' => trim($post['attachment-ids']),
 			'version_content' => trim($post['version-content']),
-			'current_time' => time()
+			'current_time' => time(),
+			'version_zip' => ''
 		);
+		
+		//附件生成zip压缩文件
+		$old_version_attachment = $new_version_attachment = array();
+		$old_attachment_query = $this->material->get_version_attachment($vid);
+		if($old_attachment_query['status'])
+		{
+			$old_version_attachment = $old_attachment_query['version_attachment'];
+		}
+		
+		if( ! empty($version['attachment_ids']))
+		{
+			//查询附件信息
+			$new_attachment_query = $this->material->batch_get_attachments(explode(',', $version['attachment_ids']));
+			if($new_attachment_query['status'])
+			{
+				$new_version_attachment = $new_attachment_query['attachments'];
+			}
+		}
+		$version_attachment = array_merge($old_version_attachment, $new_version_attachment);
+		$version_zip = create_zip($version_attachment);
+		if($version_zip != '')
+		{
+			$version['version_zip'] = $version_zip;
+		}
 		
 		$update_version = $this->material->update_version($version);
 		
 		if($update_version['status'])
 		{
+			if($old_zip_path && file_exists($old_zip_path))
+			{
+				unlink($old_zip_path);
+			}
 			redirect('material/manager/' . $mid);
 			
 		}
 		else
 		{
+			if($version_zip && file_exists($version_zip))
+			{
+				unlink($version_zip);
+			}
 			show_error('修改新版本失败');
 		}
 	}
@@ -483,17 +579,18 @@ class Material extends CI_Controller {
 			exit;
 		}
 		
-		//检查素材所属
-		if( ! check_material_of_user($mid, $this->user_info['id']))
+		//检查版本管理权限
+		if( ! check_manager_version($vid, $mid, $this->user_info['id']))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '没有权限'));
 			exit;
+			
 		}
 		
 		//检查版本所属
 		if( ! check_version_of_material($vid, $mid))
 		{
-			echo json_encode(array('status' => 0));
+			echo json_encode(array('status' => 0, 'msg' => '版本不属于该素材'));
 			exit;
 		}
 		
