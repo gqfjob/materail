@@ -915,4 +915,65 @@ class Material_Model extends CI_Model
 			return array('status' => 1, 'users' => $users);
 		}
 	}
+	
+	/**
+	 * 获取其他版本
+	 * @param int $vid
+	 * @param int $mid
+	 * @param int $page
+	 * @param int $per_page
+	 */
+	public function get_other_versions($vid, $mid)
+	{
+		if(empty($mid) || empty($vid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT * FROM material_version WHERE mid = ? AND id != ? ORDER BY id DESC";
+		$query = $this->rdb->query($sql, array($mid, $vid));
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$other_versions = array();
+			if ($query->num_rows() > 0)
+			{
+				$other_versions = $query->result_array();
+			} 
+			return array('status' => 1, 'other_versions' => $other_versions);
+		}
+	}
+	
+	/**
+	 * 查询同类型素材
+	 * @param int $cid
+	 * @param int $mid
+	 * @param int $limit
+	 */
+	public function get_same_materials($cid, $mid, $limit = 5)
+	{
+		if(empty($cid) || empty($mid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT * FROM material_info WHERE cid = ? AND id != ? ORDER BY id DESC LIMIT {$limit}";
+		$query = $this->rdb->query($sql, array($cid, $mid));
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$same_materials = array();
+			if ($query->num_rows() > 0)
+			{
+				$same_materials = $query->result_array();
+			} 
+			return array('status' => 1, 'same_materials' => $same_materials);
+		}
+	}
 }

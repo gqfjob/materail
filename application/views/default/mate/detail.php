@@ -61,33 +61,75 @@
 	color:#2EC4F9;
 	margin-right:5px;
 }
+.attachment-item{
+	padding:5px 0;
+	color:#2ec4f9;
+}
+.attachment-item .btn{
+	color:#2ec4f9;
+	font-size:13px !important;
+}
+.attachment-item .download{margin-left:5px;}
+.same-list .mlogo{
+	background: none repeat scroll 0 0 #f5f8fa;
+    border-color: #9a9a9a #eeeeee #eeeeee #9a9a9a;
+    border-style: solid;
+    border-width: 1px;
+    margin:0 auto;
+    height: 142px;
+    padding: 10px;
+    width: 142px;
+}
+.same-list .mname{
+	padding:5px;
+}
+.other-list,.same-list {
+	padding:10px;
+}
+.other-list{min-height:180px;}
+.other-list .other-item{
+	overflow:hidden;
+	padding:5px 0;
+	display:none;
+}
+.other-list .version-depict{
+	color:#08c;
+	max-width:145px;
+}
+.other-list .version-date{
+	color:#e3137b;
+}
+.pages{
+	overflow:hidden;
+	padding:5px 10px;
+}
 </style>
 <div id="wcontainer">
 	<div class="crumb mb20 mt20">
 		<div class="fl ico crumb-ico mr5"></div>当前位置：
-	    <a href="javascript:void(0);" title="" hidefocus="true">素材详情</a>&nbsp;&gt;&nbsp;<a href="javascript:void(0);" title="" hidefocus="true">缤纷世界，我的金彩</a>
+	    <a href="javascript:void(0);" title="" hidefocus="true">素材详情</a>&nbsp;&gt;&nbsp;<a href="javascript:void(0);" title="" hidefocus="true"><?php echo $material['mname']?></a>
 	</div>
 	<div id="wPageLeft">
 		<!-- 素材基本信息介绍 -->
 		<div class="oneMaterail">
 			<div class="mbasic">
 				<div class="mlogo">
-					<img src="/uploads/thumb/201408/1923edca95a28e3d808bd46d5899d255.png"/>
+					<img src="<?php echo base_url($material['logo']);?>"/>
 				</div>
 				<div class="mdetail">
-					<p class="mtitle"><span class="mtype"><a href="javascript:void(0);" style="color:#fff">图片</a></span><a href="">缤纷世界，我的金彩</a></p>
+					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/list/' . $material['cid']);?>" style="color:#fff">图片</a></span><span class="bold"><?php echo $material['mname']?></span></p>
 					<ul class="mtime">
-						<li style="width:220px">上传时间：2014-10-25 12:30</li>
-						<li style="width:90px">版本数：3</li>
+						<li style="width:220px">上传时间：<?php echo date('Y-m-d H:i', $material['create_at']);?></li>
+						<li style="width:90px">版本数：<?php echo $material['vernum']?></li>
 					</ul>
 					<div class="cl"></div>
 					<ul class="minfo">
-						<li style="width:220px">更新时间：2014-10-25 12:30</li>
-						<li style="width:300px;overflow:hidden">当前版本：V1.0开发预览版</li>
+						<li style="width:220px">更新时间：<?php echo date('Y-m-d H:i', $material['update_at']);?></li>
+						<li style="width:300px;overflow:hidden">当前版本：<?php echo $version['depict'];?></li>
 					</ul>
 					<div class="cl"></div>
 					<div class="mcontent">
-						提供23张使用说明素材相关设计图片、背景、模板、素材下载。... 相关“使用说明素材” 23 张图片 相关素材使用说明素材 蚊香使用说明示意图消防栓使用说明消防栓使
+						<?php echo cut_str($version['nohtml'], 70);?>
 					</div>
 				</div>
 				<div class="cl"></div>
@@ -101,7 +143,7 @@
             	<div class="cl"></div>
             </div>
             <div class="mvdetail font-yahei font14">
-            
+            	<?php echo $version['content']; ?>
             </div>
 		</div>
 		<!-- 素材附件-->
@@ -111,30 +153,110 @@
             	<h2 class="fl font-yahei b16">素材附件</h2>
             	<div class="cl"></div>
             </div>
-            <div class="mvdetail font-yahei font14">
-            
+            <div class="font-yahei font14" style="padding:0 20px;">
+            <?php if( ! empty($version_attachment)) : ?>
+            	<ul class="attachment-list">
+            		<?php foreach($version_attachment as $attachment) : ?>
+            		<li class="attachment-item">
+            			<span><?php echo $attachment['sname'];?></span>
+            			<a href="<?php echo base_url('file/download/attachment/' . $attachment['id']);?>" class="btn btn-default pull-right download" target="_blank">下载</a>
+            			<?php if(in_array($attachment['pfix'], array('jpg', 'gif', 'png', 'txt'))) : ?>
+            			<a href="<?php echo base_url('file/view/' . $attachment['id']);?>" class="btn btn-default pull-right" target="_blank">查看</a>
+            			<?php endif;?>
+            		</li>
+            		<?php endforeach;?>
+            	</ul>
+            <?php else:?>
+            	<div class="text-center" style="padding:10px 0">没有附件</div>
+            <?php endif;?>
             </div>
 		</div>
 		<!-- 打包下载 -->
 		<div class="works-manage-box mt20">
-            <a href="###" title="点击进入下载" class="fr hover-none works-manage-download" hidefocus="true"><em class="mr5">打包下载</em><span class="download-ico2 ico inline-block vertical-middle"></span></a>
+            <a href="<?php echo base_url('file/download/version/' . $version['id']);?>" title="点击进入下载" class="fr hover-none works-manage-download" hidefocus="true" target="_blank"><em class="mr5">打包下载</em><span class="download-ico2 ico inline-block vertical-middle"></span></a>
         </div>
 	</div>
 	<div id="wPageRight">
 		<div class="wBoxRight">
 			<div class="boxHd">
-				<div class="fl down-rank-ico ico" style="margin:5px 5px 0px 10px"></div><div class="fl b16 font-yahei mt5">其他版本下载</div><div class="fr mt5 font12 roundFont">版本数:5</div>
+				<div class="fl down-rank-ico ico" style="margin:5px 5px 0px 10px"></div><div class="fl b16 font-yahei mt5">其他版本下载</div><div class="fr mt5 font12 roundFont">版本数:<?php echo $material['vernum'] - 1;?></div>
 				<div class="cl"></div>
 			</div>
-			<div style="height: 200px"></div>
+			<div style="min-height: 200px">
+			<?php if( ! empty($other_versions)): ?>
+				<ul class="other-list">
+					<?php $i = 0?>
+					<?php foreach($other_versions as $other_version) : $i++;?>
+					<li class="other-item font14" data-page="<?php echo ceil($i/$per_page);?>">
+						<a href="<?php base_url('material/detail/'.$material['id'].'/'.$other_version['id']);?>" class="version-depict pull-left text-overflow" title="<?php echo $other_version['depict']?>" ><?php echo $other_version['depict']?></a>
+						<span class="version-date pull-right"><?php echo date('Y/m/d')?></span>
+					</li>
+					<?php endforeach;?>
+				</ul>
+				<?php if($pages > 1) : ?>
+				<div class="pages">
+					<input type="hidden" id="current-page" value="1" autocomplete="off" />
+					<input type="hidden" id="max-page" value="<?php echo $pages;?>" autocomplete="off" />
+					<button type="button" id="other-prev" class=" pull-left btn btn-default">上一页</button>
+					<button type="button" id="other-next" class="other-next pull-right btn btn-default">下一页</button>
+				</div>
+				<?php endif;?>
+			<?php else : ?>
+				<div class="text-center" style="padding:10px 0">没有其他版本</div>
+			<?php endif;?>
+			</div>
 		</div>
 		<div class="wBoxRight mt20">
 			<div class="boxHd">
 				<div class="fl keywords-ico ico" style="margin:5px 5px 0px 10px"></div><h2 class="fl b16 font-yahei">同类型素材</h2>
 				<div class="cl"></div>
 			</div>
-			<div style="height: 200px"></div>
+			<div style="min-height: 200px">
+			<?php if( ! empty($same_materials)): ?>
+				<ul class="same-list">
+					
+					<?php foreach($same_materials as $same_material) : ?>
+					<li class="same-item" >
+					 <div class="mlogo text-center"><a href="<?php echo base_url('material/detail/' . $same_material['id']);?>"  target="_blank"><img src="<?php echo base_url($same_material['logo']);?>" /></a></div>
+					 <div class="mname text-center font14 text-overflow"><a href="<?php echo base_url('material/detail/' . $same_material['id']);?>"  target="_blank" title="<?php echo $same_material['mname']?>"><?php echo $same_material['mname']?></a></div>
+					</li>
+					<?php endforeach;?>
+				</ul>
+			<?php else : ?>
+				<div class="text-center" style="padding:10px 0">没有同类型素材</div>
+			<?php endif;?>
+			</div>
 		</div>
 	</div>
 	<div class="cl"></div>
 </div>
+<script type="text/javascript">
+	$(function(){
+		$('.other-item[data-page="1"]').show();
+
+		$('#other-prev').click(function(){
+			var current_page = parseInt($('#current-page').val());
+			if(current_page == 1){
+				return false;
+			}else{
+				page = current_page - 1;
+				$('#current-page').val(page);
+				$('.other-item').hide();
+				$('.other-item[data-page="' + page + '"]').show();
+			}
+		});
+
+		$('#other-next').click(function(){
+			var current_page = parseInt($('#current-page').val());
+			var max_page = parseInt($('#max-page').val());
+			if(current_page == max_page){
+				return false;
+			}else{
+				page = current_page + 1;
+				$('#current-page').val(page);
+				$('.other-item').hide();
+				$('.other-item[data-page="' + page + '"]').show();
+			}
+		});
+	});
+</script>

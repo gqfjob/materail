@@ -34,7 +34,7 @@ class Material extends CI_Controller {
 	    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
 	    			exit;
 	    		}else{
-	    			redirect('user/login');
+	    			redirect('user/login?callback=' . urlencode(base_url('material/' . $current_method)));
 	    		}
 			}
 			if($this->user_info['status'] == 0)
@@ -665,47 +665,92 @@ class Material extends CI_Controller {
 	}
 	/**
 	 * 素材详情
-	 * @param unknown $id 素材Id
-	 * @param unknown $ver 素材版本
+	 * @param int $mid 素材Id
+	 * @param int $vid 素材版本
 	 */
-	public function detail($id,$ver=1)
+	public function detail($mid,$vid = 0)
 	{
+		$mid = (int) $mid;
+		$vid = (int) $vid;
+		if(empty($mid))
+		{
+			show_error('参数错误');
+		}
+		
 		//查询素材信息
-		$material_query = $this->material->get_material($id);
+		$material_query = $this->material->get_material($mid);
 		if( ! $material_query['status'] || empty($material_query['material']))
 		{
 			show_error('素材不存在');
 		}
 		$material = $material_query['material'];
-		if($material['vright'] == 2)
+		if($material['state'] != 1)
 		{
-			if(empty($this->user_info))
-			{
-				show_error('登录后才能查看');
-			}
-		}
-		elseif($material['vright'] == 3)
-		{
-			//查询允许用户
-			$allow_uids = array();
-			$allow_users_query = $this->material->allow_users($id);
-			if($allow_users_query['status'])
-			{
-				$allow_users = $allow_users_query['users'];
-				foreach($allow_users as $allow_user)
-				{
-					$allow_uids[] = $allow_user['uid'];
-				}
-			}
-			
-			if(empty($this->user_info) || ! in_array($this->user_info['id'], $allow_uids))
-			{
-				show_error('您无权查看');
-			}
+			show_error('素材没有发布');
 		}
 		
+		//检查权限
+		check_view_down_material($material, $this->user_info);
+		
+		$vid = ($vid) ? $vid : $material['cversion'];
+		//检查版本所属
+		if( ! check_version_of_material($vid, $mid))
+		{
+			show_error('版本不属于该素材');
+		}
+		//查询版本信息
+		$version_query = $this->material->get_version($vid);
+		if( ! $version_query['status'] || empty($version_query['version']))
+		{
+			show_error('版本不存在');
+		}
+		$version = $version_query['version'];
+		
+		//查询版本附件
+		$version_attachment_query = $this->material->get_version_attachment($vid);
+		if( ! $version_attachment_query['status'])
+		{
+			$version_attachment = array();
+		}
+		else
+		{
+			$version_attachment = $version_attachment_query['version_attachment'];
+		}
+		
+		//查询其他版本
+		$per_page = 5;
+		$other_versions_query = $this->material->get_other_versions($vid, $mid);
+		if( ! $other_versions_query['status'])
+		{
+			$other_versions = array();
+		}
+		else
+		{
+			$other_versions = $other_versions_query['other_versions'];
+		}
+		$pages = ceil($material['vernum'] / $per_page);
+		
+		//查询同类型素材
+		$same_materials_query = $this->material->get_same_materials($material['cid'], $material['id'], 5);
+		if( ! $same_materials_query['status'])
+		{
+			$same_materials = array();
+		}
+		else
+		{
+			$same_materials = $same_materials_query['same_materials'];
+		}
+		
+		$data['material'] = $material;
+		$data['version'] = $version;
+		$data['version_attachment'] = $version_attachment;
+		$data['other_versions'] = $other_versions;
+		$data['same_materials'] = $same_materials;
+		$data['pages'] = $pages;
+		$data['per_page'] = $per_page;
+		
 		$this->load->module("common/header",array('title'=>'素材详情','cur'=>999));
-		$this->load->view('mate/detail');
+		$this->load->view('mate/detail', $data);
 		$this->load->module("common/footer");
 	}
 	/**

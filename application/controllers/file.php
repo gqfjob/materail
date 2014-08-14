@@ -18,25 +18,41 @@ class File extends CI_Controller{
 	{
 		parent::__construct();
 		
+		$current_method = $this->router->fetch_method();
+		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! $this->user_info)
+		if( ! in_array($current_method, array('download')))
 		{
-			if($this->input->is_ajax_request()){
-    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
-    			exit;
-    		}else{
-    			redirect('user/login');
-    		}
-		}
-		if($this->user_info['status'] == 0)
-		{
-			if($this->input->is_ajax_request()){
-    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
-    			exit;
-    		}else{
-    			show_error('此用户已被禁用');
-    		}
+			if( ! $this->user_info)
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
+	    			exit;
+	    		}else{
+	    			redirect('user/login?callback=' . urlencode(base_url('material/' . $current_method)));
+	    		}
+			}
+			if($this->user_info['status'] == 0)
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '此用户已被禁用'));
+	    			exit;
+	    		}else{
+	    			show_error('此用户已被禁用');
+	    		}
+			}
+			
+			//用户素材操作权限
+			if( ! check_permission($this->user_info))
+			{
+				if($this->input->is_ajax_request()){
+	    			echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
+	    			exit;
+	    		}else{
+	    			show_error('您没有权限');
+	    		}
+			}
 		}
 	}
 	
@@ -166,6 +182,7 @@ class File extends CI_Controller{
 			echo json_encode(array('status' => 0, 'msg' => '删除失败'));
 		}
 	}
+	
 	/**
 	 * 上传文件处理
 	 * 
@@ -188,5 +205,141 @@ class File extends CI_Controller{
 	  	} 
 		
 	  	$this->file_info = $this->upload->data();
+	}
+	
+	/**
+	 * 下载文件
+	 * 
+	 * @param unknown_type $type
+	 * @param unknown_type $id
+	 */
+	public function download($type = '', $id = 0)
+	{
+		$this->load->model('material_model', 'material');
+		
+		$type = trim($type);
+		$id = (int) $id;
+		
+		$types = array('version', 'attachment');
+		
+		if( ! in_array($type, $types) || empty($id))
+		{
+			show_error('无法访问');
+		}
+		
+		if($type == 'version')
+		{
+			//查询版本信息
+			$version_query = $this->material->get_version($id);
+			if( ! $version_query['status'] || empty($version_query['version']))
+			{
+				show_error('版本不存在');
+			}
+			$version = $version_query['version'];
+			$mid = $version['mid'];
+			$down_path = $version['zip_path'];
+			$filename = $version['depict'] . '.zip';
+		}
+		else
+		{
+			//查询附件信息
+			$attachment_query = $this->material->get_attachment($id);
+			if( ! $attachment_query['status'] || empty($attachment_query['attachment']))
+			{
+				show_error('附件不存在');
+			}
+			$attachment= $attachment_query['attachment'];
+			$mid = $attachment['mid'];
+			$down_path = $attachment['rname'];
+			$filename = $attachment['sname'];
+		}
+		
+		//查询素材信息
+		$material_query = $this->material->get_material($mid);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			show_error('素材不存在');
+		}
+		$material = $material_query['material'];
+		
+		//判断权限
+		check_view_down_material($material, $this->user_info);
+		
+		if( ! file_exists($down_path))
+		{
+			show_error('下载文件不存在');
+		}
+		$mime = 'application/octet-stream';
+		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
+		{
+			header('Content-Type: "'.$mime.'"');
+			header('Content-Disposition: attachment; filename="'.rawurlencode($filename).'"');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header("Content-Transfer-Encoding: binary");
+			header('Pragma: public');
+			header("Content-Length: ".filesize($down_path));
+		}
+		else
+		{
+			header('Content-Type: "'.$mime.'"');
+			header('Content-Disposition: attachment; filename="'.$filename.'"');
+			header("Content-Transfer-Encoding: binary");
+			header('Expires: 0');
+			header('Pragma: no-cache');
+			header("Content-Length: ".filesize($down_path));
+		}
+		readfile($down_path);
+	}
+	
+	/**
+	 * 查看附件
+	 * 
+	 * @param int $id
+	 */
+	public function view($id)
+	{
+		$this->load->model('material_model', 'material');
+		
+		$id = (int) $id;
+		
+		$types = array('jpg', 'gif', 'png', 'txt');
+		
+		if(empty($id))
+		{
+			show_error('无法访问');
+		}
+		
+		//查询附件信息
+		$attachment_query = $this->material->get_attachment($id);
+		if( ! $attachment_query['status'] || empty($attachment_query['attachment']))
+		{
+			show_error('附件不存在');
+		}
+		$attachment= $attachment_query['attachment'];
+		if( ! in_array($attachment['pfix'], $types))
+		{
+			show_error('无法查看此类型文件,请下载后查看');
+		}
+		$mid = $attachment['mid'];
+		$view_path = $attachment['rname'];
+		$filename = $attachment['sname'];
+		
+		//查询素材信息
+		$material_query = $this->material->get_material($mid);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			show_error('素材不存在');
+		}
+		$material = $material_query['material'];
+		
+		//判断权限
+		check_view_down_material($material, $this->user_info);
+		
+		if( ! file_exists($view_path))
+		{
+			show_error('查看文件不存在');
+		}
+		redirect($view_path);
 	}
 } 

@@ -1299,14 +1299,52 @@ function create_zip($files)
 	{	
 		if(in_array($file['sname'], $has_exists))
 		{
-			$zip->addFile($file['rname'], $file['id'] . '_' .$file['sname']);
+			$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['id'] . '_' .$file['sname']));
 		}
 		else
 		{
-			$zip->addFile($file['rname'], $file['sname']);
+			$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['sname']));
 			$has_exists[] = $file['sname'];
 		}
 	}
 	$zip->close();
 	return $filename;
+}
+
+/**
+ * 检查用户查看/下载权限
+ * @param $material
+ * @param $user
+ */
+function check_view_down_material($material, $user)
+{
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	if($material['vright'] == 2)
+	{
+		if(empty($user))
+		{
+			show_error('登录后才能查看');
+		}
+	}
+	elseif($material['vright'] == 3)
+	{
+		//查询允许用户
+		$allow_uids = array();
+		$allow_users_query = $CI->material->allow_users($material['id']);
+		if($allow_users_query['status'])
+		{
+			$allow_users = $allow_users_query['users'];
+			foreach($allow_users as $allow_user)
+			{
+				$allow_uids[] = $allow_user['uid'];
+			}
+		}
+		
+		if(empty($user) || ! in_array($user['id'], $allow_uids))
+		{
+			show_error('您无权查看');
+		}
+	}
+		
 }
