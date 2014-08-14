@@ -1,3 +1,7 @@
+<div class="container crumb mb20 mt20">
+	<div class="fl ico crumb-ico mr5"></div>当前位置：
+    <a href="<?php echo base_url();?>" title="" hidefocus="true">首页</a>&nbsp;&gt;&nbsp;<span hidefocus="true">上传素材</span>
+</div>
 <div class="container container-border">
 	<div class="container-header"></div>
 	<div class="material-box">
@@ -24,8 +28,8 @@
 					    <label class="col-sm-2 control-label" for="">缩略图</label>
 					    <div id="thumb-box" class="col-xs-8">
 					    	<input type="hidden" id="thumb-path" name="thumb-path" autocomplete="off" />
-					    	<input type="hidden" id="thumb-type" name="thumb-type" value="" autocomplete="off" />
-					    	<button class="btn btn-default" id="select-thumb" type="button">系统自动生成缩略图</button>
+					    	<input type="hidden" id="thumb-type" name="thumb-type" value="1" autocomplete="off" />
+					    	<button class="btn btn-default btn-success" id="select-thumb" type="button">系统自动生成缩略图</button>
 					    	<span class="help-line">或</span>
 					    	<div class="upload-container"><input id="upload-thumb" type="file" name="material-thumb"/></div>
 					    	<span class="help-line">图片支持png、gif、jpg，大小不超过2M</span>
@@ -48,6 +52,7 @@
 					    	<button class="btn btn-default" data-type="3" type="button" >指定用户可下载</button>
 					    	<input type="hidden" name="permission" id="permission" value="2" autocomplete="off" />
 					    	<input type="hidden" name="permission-user" id="permission-user" value="1,2" autocomplete="off" />
+					    	<ul></ul>
 					    </div>
 					    
 				    </div>
@@ -98,7 +103,7 @@
 		<div class="modal-dialog">
 	    	<div class="modal-content">
 	      		<div class="modal-header">
-			    	<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+			    	<button type="button" class="close cancel-select" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
 			        <h4 class="modal-title" id="myModalLabel">指定用户</h4>
 			    </div>
 			    <div class="modal-body">
@@ -107,24 +112,26 @@
 						    <label>
 						    	查找用户
 						    </label>
-						</div>
+					 	</div>
 			        	<div class="form-group">
 						    <label class="sr-only" for="serch-user">查找用户</label>
 						    <input type="text" class="form-control col-xs-4" id="search-user" placeholder="请输入用户名称">
 						</div>
 					</div>
-					<ul id="search-user-result" class="typeahead dropdown-menu"><li data-value="Alabama" class=""><a href="#"><strong>Ala</strong>bama</a></li><li data-value="Alaska" class="active"><a href="#"><strong>Ala</strong>ska</a></li></ul>
+					<ul id="search-user-result" class="typeahead dropdown-menu">
+					</ul>
 					<div class="clearfix"></div>
 					<div id="select-user-result">
-						  <div class="select-list-text">已选择</div>
-						  <div class="select-list">
+						<input id="selected-users" type="hidden" value="" autocomplete="off" />	
+						<div class="select-list-text">已选择</div>
+						<div class="select-list">
 						  	
-						  </div>
+						</div>
 					</div>
 			    </div>
 			    <div class="modal-footer">
-			    	<button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
-			    	<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+			    	<button type="button" class="btn btn-primary primary-select" data-dismiss="modal">确定</button>
+			    	<button type="button" class="btn btn-default cancel-select" data-dismiss="modal">取消</button>
 			    </div>
 	    	</div>
 	  </div>
@@ -138,7 +145,7 @@
 		$("#upload-thumb").uploadify({
 			'formData'     : {
 				'<?php echo $this->config->item('csrf_token_name'); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>',
-				'cookie':'<?php echo json_encode(array($this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
+				'cookie':'<?php echo json_encode(array($this->config->item('user_login_cookie') => get_cookie($this->config->item('user_login_cookie')), $this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
 			},
 			'fileObjName' : 'upload_file',
 	        'swf'      : '/assets/js/uploadfy/uploadify.swf',
@@ -175,10 +182,10 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){},
+			'onUploadError' : function(){$('#thumb-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
 			'onUploadStart' : function(){$('#thumb-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
 			'onUploadSuccess' : function(file, data, response){
-				data = eval("(" + data + ")");
+				data = eval('(' + data + ')');
 				if(data.status){
 					$('#thumb-path').val(data.result['file_path']);
 					$('#thumb-msg').hide().find('span').text('');
@@ -191,7 +198,7 @@
 					$('#thumb-type').val('');
 					$('#thumb-image').show();
 				}else{
-					$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');
+					$('#thumb-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');
 				}
 				delete this.queueData.files[file.id];
 			}
@@ -201,7 +208,7 @@
 		$("#upload-attachment").uploadify({
 			'formData'     : {
 				'<?php echo $this->config->item('csrf_token_name'); ?>' : '<?php echo $this->security->get_csrf_hash(); ?>',
-				'cookie':'<?php echo json_encode(array($this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
+				'cookie':'<?php echo json_encode(array($this->config->item('user_login_cookie') => get_cookie($this->config->item('user_login_cookie')), $this->config->item('csrf_cookie_name') => $this->security->get_csrf_hash())); ?>'
 			},
 			'fileObjName' : 'upload_file',
 	        'swf'      : '/assets/js/uploadfy/uploadify.swf',
@@ -238,7 +245,7 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){},
+			'onUploadError' : function(){$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
 			'onUploadStart' : function(){$('#attachment-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
 			'onUploadSuccess' : function(file, data, response){
 				data = eval("(" + data + ")");
@@ -282,7 +289,7 @@
 								$('#attachment-ids').val('');
 							}
 						}else{
-							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('删除失败');
+							$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text(res.msg);
 						}
 						
 					},
@@ -315,12 +322,14 @@
 		});
 
 		//选择权限
+		var selected_user_html = '';
 		$('#select-permission .btn').click(function(){
 			$(this).addClass('btn-success').siblings('.btn').removeClass('btn-success');
 			var type = parseInt($(this).attr('data-type'));
 			if(type == 3){
 				$('#myModal').addClass('select-user-box').modal();
 				$('#search-user').val('');
+				selected_user_html = $('#select-user-result .select-list').html();
 			}
 			$('#permission').val(type);
 		});
@@ -337,21 +346,60 @@
 					if(res.status){
 						var li_html = '';
 						for(var i = 0 ; i < res.result.length; i++){
-							li_html += '<li><a href="#" data-id="' + res.result[i]['id'] + '" data-name="' + res.result[i]['name'] + '" >' + res.result[i]['name'] + '&nbsp;&nbsp;&nbsp;&nbsp;' + res.result[i]['company'] + '</a></li>'
+							li_html += '<li><a href="#" data-id="' + res.result[i]['id'] + '" data-name="' + res.result[i]['realname'] + '" >' + res.result[i]['realname'] + '</a></li>'
+						}
+						if(li_html.length){
+							$('#search-user-result').show().html(li_html);
+						}else{
+							$('#search-user-result').hide().html('');
 						}
 					}
-					$('#search-user-result').show().html(li_html);
 				}
 			});
-			$('#search-user-result').show();
 		});
 		$('body').on('click','#search-user-result li a', function(){
 			var _this = $(this);
-			$('#select-user-result .select-list').prepend('<div class="select-list-item">' + _this.attr('data-name') + '<span class="close">&times;</span></div>');
-			$('#search-user-result').hide();
+			var selected_users = $('#selected-users').val();
+			if(selected_users.length){
+				var arr_users = selected_users.split(',');
+				for(i = 0; i < arr_users.length; i++){
+					if(arr_users[i] == _this.attr('data-id')){
+						alert('此用户已选择');
+						return false;
+					}
+				}
+				arr_users.push(_this.attr('data-id'));
+				$('#selected-users').val(arr_users.join());
+			}else{
+				$('#selected-users').val(_this.attr('data-id'));
+			}
+			$('#select-user-result .select-list').prepend('<div class="select-list-item">' + _this.attr('data-name') + '<span class="close" data-id="' + _this.attr('data-id') + '">&times;</span></div>');
+			$('#search-user-result').hide().html('');
+			
 		});
+		
 		$('body').on('click','#select-user-result .close', function(){
-			$(this).parents('.select-list-item').remove();
+			var _this = $(this);
+			var selected_users = $('#selected-users').val();
+			if(selected_users.length){
+				var arr_users = selected_users.split(',');
+				for(i = 0; i < arr_users.length; i++){
+					if(arr_users[i] == _this.attr('data-id')){
+						arr_users.splice(i,1);
+					}
+				}
+				$('#selected-users').val(arr_users.join());
+			}
+			_this.parents('.select-list-item').remove();
+		});
+		$('.cancel-select').click(function(){
+			var selected_users = $('#permission-user').val();
+			$('#search-user-result').hide().html('');
+			$('#selected-users').val(selected_users);
+			$('#select-user-result .select-list').html(selected_user_html);
+		});
+		$('.primary-select').click(function(){
+			$('#permission-user').val($('#selected-users').val());
 		});
 		//表单提交
 		$('#material-add').submit(function(){

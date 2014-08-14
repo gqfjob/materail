@@ -1173,8 +1173,140 @@ function checkAdminRight($user){
 	return false;
 }
 
-function check_permission()
+/**
+ * 检查用户是否具有上传素材权限
+ * @param array $user 用户信息
+ */
+function check_permission($user)
 {
+	if(is_array($user)){
+		if(($user['status'] == 1) && in_array($user['auth'], array(1,2,999))){
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+/**
+ * 检查用户管理素材权限
+ * 
+ * @param int $mid
+ * @param int $uid
+ */
+function check_manager_material($mid, $uid)
+{
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	
+	$check_material_query = $CI->material->check_material_of_user($mid, $uid);
+	if($check_material_query['status'])
+	{
+		if($check_material_query['check'] == FALSE)
+		{
+			/*$CI->load->model('user_model', 'user');
+			$user = $this->user->getUser($uid);
+			if(is_array($user) && in_array($user['auth'], array(999)))
+			{
+				return TRUE;
+			}*/
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
 	return TRUE;
 }
 
+/**
+ * 检查用户管理版本权限
+ * 
+ * @param int $vid
+ * @param int $mid
+ * @param int $uid
+ */
+function check_manager_version($vid, $mid, $uid)
+{
+	if(check_manager_material($mid, $uid))
+	{
+		return TRUE;
+	}
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	$check_version_query = $CI->material->check_version_of_user($vid, $mid, $uid);
+	if($check_version_query['status'])
+	{
+		if($check_version_query['check'] == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+/**
+* 检查版本是否属于素材
+*
+* @param int $vid
+* @param int $mid
+*/
+function check_version_of_material($vid, $mid)
+{
+	$CI = &get_instance();
+	$CI->load->model('material_model', 'material');
+	$check_version_query = $CI->material->check_version_of_material($vid, $mid);
+	if($check_version_query['status'])
+	{
+		if($check_version_query['check'] == FALSE)
+		{
+			return FALSE;
+		}
+	}
+	else
+	{
+		return FALSE;
+	}
+	return TRUE;
+}
+
+/**
+ * 生成zip文件
+ * @param array $files
+ */
+function create_zip($files)
+{
+	if(empty($files))
+	{
+		return '';
+	}
+	
+	$zip = new ZipArchive();
+	$filename = 'uploads/zip/' . md5(uniqid()) . '.zip';
+	
+	if($zip->open($filename, ZIPARCHIVE::CREATE) !== TRUE)
+	{
+		return '';
+	}
+	
+	$has_exists = array();
+	foreach($files as $file)
+	{	
+		if(in_array($file['sname'], $has_exists))
+		{
+			$zip->addFile($file['rname'], $file['id'] . '_' .$file['sname']);
+		}
+		else
+		{
+			$zip->addFile($file['rname'], $file['sname']);
+			$has_exists[] = $file['sname'];
+		}
+	}
+	$zip->close();
+	return $filename;
+}

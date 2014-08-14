@@ -1,3 +1,7 @@
+<div class="container crumb mb20 mt20">
+	<div class="fl ico crumb-ico mr5"></div>当前位置：
+    <a href="<?php echo base_url();?>" title="" hidefocus="true">首页</a>&nbsp;&gt;&nbsp;<span hidefocus="true">管理素材</span>
+</div>
 <div class="box">
 	<div id="material-detail" class="container">
 		<div class="material-thumb-box pull-left">
@@ -30,16 +34,23 @@
 	   		<?php if(empty($material_versions)):?>
 	   		<tr><td colspan="4" class="text-center">无版本信息</td></tr>
 	   		<?php else:?>
+	   		<?php $disabled = ( ! $manager_material) ? 'disabled="disabled"' : '';?>
 	   		<?php foreach($material_versions as $version) : ?>
 	   		<tr>
 	   			<td><a href="<?php echo base_url('/material/edit_version/' . $material['id'] . '/' .$version['id']);?>" title=""><?php echo $version['depict']?></a></td>
 	   			<td class="text-center"><?php echo date('Y-m-d H:i:s',$version['cat']);?></td>
-	   			<td class="text-center"><a href="<?php echo base_url('/material/edit_version/' . $material['id'] . '/' .$version['id']);?>" title="" >修改</a><span class="separator">|</span><a href="###" class="delete-version" data-vid="<?php echo  $version['id'];?>" data-mid="<?php echo $material['id'];?>">删除</a></td>
+	   			<td class="text-center">
+	   				<?php if($manager_material || $version['uid'] == $user['id']) : ?>
+		   			<a href="<?php echo base_url('/material/edit_version/' . $material['id'] . '/' .$version['id']);?>" title="" >修改</a>
+		   			<span class="separator">|</span>
+		   			<a href="###" class="delete-version" data-vid="<?php echo  $version['id'];?>" data-mid="<?php echo $material['id'];?>">删除</a>
+		   			<?php endif;?>
+	   			</td>
 	   			<td class="text-center">
 	   				<?php if($material['cversion'] == $version['id']):?>
-	   				<input type="radio" name="current-version" autocomplete="off" checked="checked" value="<?php echo  $version['id'];?>" data-mid="<?php echo $material['id'];?>" />
+	   				<input type="radio" name="current-version" autocomplete="off" checked="checked" value="<?php echo  $version['id'];?>" data-default="1" data-mid="<?php echo $material['id'];?>"  <?php echo $disabled; ?> />
 	   				<?php else:?>
-	   				<input type="radio" name="current-version" autocomplete="off" value="<?php echo  $version['id'];?> " data-mid="<?php echo $material['id'];?>" />
+	   				<input type="radio" name="current-version" autocomplete="off" value="<?php echo  $version['id'];?> " data-default="0" data-mid="<?php echo $material['id'];?>" <?php echo $disabled; ?> />
 	   				<?php endif;?>
 	   			</td>
 	   		</tr>
@@ -48,49 +59,72 @@
 	    </table>
 	</div>
 	<div id="material-op" class="container">
-		<a id="set-draft" class="btn" data-id="<?php echo $material['id']?>" data-status="0">设为草稿</a>
-		<a id="set-publish" class="btn" data-id="<?php echo $material['id']?>" data-status="1">发布</a>
-		<a href="<?php echo base_url('material/add_version/' . $material['id'])?>" class="btn">上传新版本</a>
+		<?php if($manager_material) :?>
+		<a id="set-draft" class="btn btn-default btn-primary" data-id="<?php echo $material['id']?>" data-status="0">转为草稿</a>
+		<a id="set-publish" class="btn btn-default btn-success" data-id="<?php echo $material['id']?>" data-status="1">发布</a>
+		<?php endif;?>
+		<a href="<?php echo base_url('material/add_version/' . $material['id'])?>" class="btn btn-default btn-info">上传新版本</a>
 	</div>
 </div>
+<?php if($manager_material) :?>
 <script type="text/javascript">
 	$(function(){
 		//设置状态
 		$('#set-draft,#set-publish').click(function(){
 			var _this = $(this);
+			var mid = parseInt(_this.attr('data-id'));
+			var status = parseInt(_this.attr('data-status'));
+			var text = (status) ? '发布' : '转为草稿';
+			_this.addClass('disabled');
 			$.ajax({
 				url      : '/material/set_material_status',
 				type     : 'post',
 				dataType : 'json',
-				data     : {mid:_this.attr('data-id'),status:parseInt(_this.attr('data-status')),<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+				data     : {mid:mid,status:status,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
 				success  : function(res){
+					_this.removeClass('disabled');
 					if(res.status){
-						alert('操作成功');
+						notice(text + '成功', 300);
 					}else{
-						alert('操作失败');
+						if(res.msg){
+							notice(msg, 300);
+						}else{
+							notice(text + '失败', 300);
+						}
 					}
 				},
-				error    : function(){}
+				error    : function(){
+					_this.removeClass('disabled');
+					notice('出错了', 300);
+				}
 			});
 		});
 
 		//设置默认版本
 		$('input[name="current-version"]').click(function(){
 			var _this = $(this);
+			if(_this.attr('data-default') == '1'){
+				return false;
+			}
+			_this.addClass('disabled');
 			$.ajax({
 				url      : '/material/set_default_version',
 				type     : 'post',
 				dataType : 'json',
 				data     : {vid:parseInt(_this.val()),mid:parseInt(_this.attr('data-mid')),<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
 				success  : function(res){
+					_this.removeClass('disabled');
 					if(res.status){
-						alert('操作成功');
-						window.location.reload();
+						notice('操作成功',300);
+						$('#msgModal button[data-dismiss="modal"],.modal-open').click(function(){window.location.reload();});
 					}else{
-						alert('操作失败');
+						notice(res.msg,300);
 					}
 				},
-				error    : function(){}
+				error    : function(){
+					_this.removeClass('disabled');
+					notice('出错了', 300);
+				}
 			});
 		});
 
@@ -107,7 +141,7 @@
 						if(res.status){
 							_this.parents('tr').remove();
 						}else{
-							alert(res.msg);
+							notice(res.msg,300);
 						}
 					},
 					error:function(){}
@@ -117,3 +151,4 @@
 		});
 	});
 </script>
+<?php endif;?>

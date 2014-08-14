@@ -524,4 +524,21 @@ class User_model extends CI_Model
     	}
     	$this->wdb->insert_batch('identity_user',$user);
     }
+    
+    /**
+     * 根据字段查询用户
+     * @param string $field
+     * @param string $search
+     */
+    public function searchUserByField($field, $like)
+    {
+    	$users = array();
+    	$this->wdb->like($field, $like);
+    	$query = $this->wdb->get('identity_user');
+    	if($query && $query->num_rows() > 0)
+    	{
+    		$users = $query->result_array();
+    	}
+    	return $users;
+    }
 }
