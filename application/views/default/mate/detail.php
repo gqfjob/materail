@@ -188,7 +188,7 @@
 					<?php $i = 0?>
 					<?php foreach($other_versions as $other_version) : $i++;?>
 					<li class="other-item font14" data-page="<?php echo ceil($i/$per_page);?>">
-						<a href="<?php base_url('material/detail/'.$material['id'].'/'.$other_version['id']);?>" class="version-depict pull-left text-overflow" title="<?php echo $other_version['depict']?>" ><?php echo $other_version['depict']?></a>
+						<a href="<?php echo base_url('material/detail/'.$material['id'].'/'.$other_version['id']);?>" class="version-depict pull-left text-overflow" title="<?php echo $other_version['depict']?>" ><?php echo $other_version['depict']?></a>
 						<span class="version-date pull-right"><?php echo date('Y/m/d')?></span>
 					</li>
 					<?php endforeach;?>
