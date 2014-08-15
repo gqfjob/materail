@@ -96,7 +96,7 @@ class Admin extends CI_Controller {
      	$material_query = $this->material->get_all_materials($page, $config['per_page'], $search);
      	if( ! $material_query['status'])
      	{
-     		show_error("数据库查询出错了",500,"出错了");
+     		show_error("查询出错了",500,"出错了");
      	}
      	
      	$this->load->library('pagination');
@@ -314,7 +314,7 @@ class Admin extends CI_Controller {
 		$material_query = $this->material->get_material($mid);
 		if( ! $material_query['status'] || empty($material_query['material']))
 		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
 			exit;
 		}
 		$material = $material_query['material'];
@@ -449,7 +449,7 @@ class Admin extends CI_Controller {
      	$userlist_query = $this->user->getUserList($page, $config['per_page'], $search);
      	if( ! $userlist_query['status'])
      	{
-     		show_error('数据库出错');
+     		show_error('出错了');
      	}
      	$users = $userlist_query['users'];
      	
@@ -472,6 +472,7 @@ class Admin extends CI_Controller {
      	$data['users'] = $users;
      	$data['user_material'] = $user_material;
      	$data['pages'] = $pages;
+     	$data['search'] = $search;
      	 
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/user",$data);
@@ -499,7 +500,7 @@ class Admin extends CI_Controller {
      		echo json_encode(array('status' => 0, 'msg' => $can_op_user['msg']));
      		exit;
      	}
-     	$delete_query = $this->user->batchDeleteUser(explode(',',$uids));
+     	$delete_query = $this->user->batchDeleteUser($uids);
      	
      	if($delete_query['status'])
      	{
@@ -509,6 +510,41 @@ class Admin extends CI_Controller {
      	{
      		echo json_encode(array('status' => 0));
      	}
+     }
+     
+     /**
+      * 
+      */
+     public function set_user_status()
+     {
+     	$this->load->model('user_model', 'user');
+     	$post = $this->input->post(NULL, TRUE);
+     	$post['uids'] = trim($post['uids']);
+     	$post['status'] = (int) $post['status'];
+     	if(empty($post['uids']))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$uids = explode(',', $post['uids']);
+     	//判断权限
+     	$can_op_user = $this->_can_op_user($uids);
+     	if( ! $can_op_user['check'])
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => $can_op_user['msg']));
+     		exit;
+     	}
+     	$update_query = $this->user->batchSetUserStatus($uids, $post['status']);
+     	
+     	if($update_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0));
+     	}
+     	
      }
      
      /**
@@ -535,7 +571,7 @@ class Admin extends CI_Controller {
      			}
      			else
      			{
-     				return array('check' => FALSE, 'msg' => '数据库出错了');
+     				return array('check' => FALSE, 'msg' => '出错了');
      			}
      		}
      		else 

@@ -609,4 +609,90 @@ class User_model extends CI_Model
 			return array('status' => 1, 'total' => $result['total']);
 		}
 	}
+	
+	/**
+	 * 根据权限筛选用户
+	 * @param array $auth
+	 * @param array $uids
+	 */
+	public function getUserByAuth($auth, $uids)
+	{
+		if(empty($auth) || empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->rdb->where_in('auth', $auth);
+		$this->rdb->where_in('id', $uids);
+		$this->rdb->order_by('id', 'DESC');
+		$this->rdb->limit(1);
+		$query = $this->rdb->get('identity_user');
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$user = 0;
+			if ($query->num_rows() > 0)
+			{
+				$user = $query->row_array();
+			} 
+			return array('status' => 1, 'user' => $user);
+		}
+	}
+	
+	/**
+	 * 批量删除用户
+	 * 
+	 * @param unknown_type $uids
+	 */
+	public function batchDeleteUser($uids)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->trans_start();
+		$this->wdb->where_in('id', $uids);
+		$this->wdb->delete('identity_user');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_session');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_credential');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_password');
+		$this->wdb->trans_complete();
+		$this->wdb->trans_off();
+		if ($this->wdb->trans_status() === FALSE)
+		{
+		    return array('status' => 0);
+		}
+		
+		return array('status' => 1);
+	}
+	
+	/**
+	 * 批量设置用户状态
+	 * @param array $uids
+	 * @param int $status
+	 */
+	public function batchSetUserStatus($uids, $status)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		$this->wdb->where_in('id', $uids);
+		$query = $this->wdb->update('identity_user',array('status' => $status));
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			return array('status' => 1);
+		}
+	}
 }
