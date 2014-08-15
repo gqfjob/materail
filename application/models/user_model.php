@@ -541,4 +541,72 @@ class User_model extends CI_Model
     	}
     	return $users;
     }
+    
+    /**
+     * 查询用户列表
+     * @param int $page
+     * @param int $pre_page
+     * @param string $search
+     */
+    public function getUserList($page = 1, $pre_page = 10, $search = '' )
+	{
+		$offset = ($page - 1) * $pre_page;
+		if(empty($search))
+		{
+			$sql = "SELECT * FROM identity_user ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$query = $this->rdb->query($sql);
+		}
+		else
+		{
+			$sql = "SELECT * FROM identity_user WHERE realname LIKE ? ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$users = array();
+			if ($query->num_rows() > 0)
+			{
+				$users = $query->result_array();
+			} 
+			return array('status' => 1, 'users' => $users);
+		}
+	}
+	
+	/**
+	 * 查询用户总数
+	 * 
+	 * @param string $search
+	 */
+	public function getTotalUser($search = '')
+	{
+		if(empty($search))
+		{
+			$sql = "SELECT COUNT(*) as total FROM identity_user";
+			$query = $this->rdb->query($sql);
+		}
+		else
+		{
+			$sql = "SELECT COUNT(*) as total FROM identity_user WHERE realname LIKE ?";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$total = 0;
+			if ($query->num_rows() > 0)
+			{
+				$result = $query->row_array();
+			} 
+			return array('status' => 1, 'total' => $result['total']);
+		}
+	}
 }

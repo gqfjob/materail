@@ -646,7 +646,7 @@ class Material_Model extends CI_Model
 	/**
 	 * 查询素材总数
 	 * 
-	 * @param unknown_type $search
+	 * @param string $search
 	 */
 	public function get_total_material($search = '')
 	{
@@ -974,6 +974,40 @@ class Material_Model extends CI_Model
 				$same_materials = $query->result_array();
 			} 
 			return array('status' => 1, 'same_materials' => $same_materials);
+		}
+	}
+	
+	/**
+	 * 统计用户素材数
+	 * 
+	 * @param array $uids
+	 */
+	public function get_user_material($uids)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->rdb->select('uid,COUNT(id) AS num');
+		$this->rdb->where_in($uids);
+		$this->rdb->group_by('uid');
+		$query = $this->rdb->get('material_info');
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$user_material = array();
+			if ($query->num_rows() > 0)
+			{
+				 foreach($query->result_array() as $value)
+				 {
+				 	$user_material[$value['uid']] = $value;
+				 }
+			} 
+			return array('status' => 1, 'user_material' => $user_material);
 		}
 	}
 }

@@ -269,17 +269,8 @@ class Admin extends CI_Controller {
 			exit;
 		}
 		
-		//检查权限
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
-		{
-			if($check_version_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0));
-				exit;
-			}
-		}
-		else
+		//检查版本是否属于素材
+		if( ! check_version_of_material($vid, $mid))
 		{
 			echo json_encode(array('status' => 0));
 			exit;
@@ -312,18 +303,10 @@ class Admin extends CI_Controller {
 			exit;
 		}
 		
-		$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
+     	//检查版本是否属于素材
+		if( ! check_version_of_material($vid, $mid))
 		{
-			if($check_version_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0 , 'msg' => '该版本不属于此素材，无法操作'));
-				exit;
-			}
-		}
-		else
-		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0));
 			exit;
 		}
 		
@@ -376,20 +359,13 @@ class Admin extends CI_Controller {
 			exit;
 		}
 		
-    	$check_version_query = $this->material->check_version_of_material($vid, $mid);
-		if($check_version_query['status'])
+    	//检查版本是否属于素材
+		if( ! check_version_of_material($vid, $mid))
 		{
-			if($check_version_query['check'] == FALSE)
-			{
-				echo json_encode(array('status' => 0 , 'msg' => '该版本不属于此素材，无法操作'));
-				exit;
-			}
-		}
-		else
-		{
-			echo json_encode(array('status' => 0, 'msg' => '数据库错误'));
+			echo json_encode(array('status' => 0));
 			exit;
 		}
+		
      	$update_version = $this->material->update_version_content($content, $vid, $mid);
 		if($update_version['status'])
 		{
@@ -433,5 +409,145 @@ class Admin extends CI_Controller {
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/system",$data);
      	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 用户管理
+      */
+     public function mgUser($page = 1)
+     {
+     	$page = (int) $page;
+     	
+     	$this->load->model('user_model', 'user');
+     	$this->load->model('material_model', 'material');
+     	
+		$search = $this->input->get('search', TRUE);
+     	$search = trim(urldecode($search));
+     	
+     	//查询总数
+     	$total = 0;
+     	$total_query = $this->user->getTotalUser($search);
+     	if($total_query['status'])
+     	{
+     		$total = $total_query['total'];
+     	}
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	if($search)
+     	{
+     		$config['suffix'] = '?search=' . urlencode($search);
+     		$config['first_url'] = base_url('admin/mgUser/1?search=' . urlencode($search));
+     	}
+     	$config['base_url'] = base_url('admin/mgUser');
+		$config['total_rows'] = $total;
+		$config['per_page'] = 2; 
+		$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$pages =  $this->pagination->create_links();
+     	
+		//查询用户
+     	$userlist_query = $this->user->getUserList($page, $config['per_page'], $search);
+     	if( ! $userlist_query['status'])
+     	{
+     		show_error('数据库出错');
+     	}
+     	$users = $userlist_query['users'];
+     	
+     	//查询用户素材数
+     	$uids = $user_material =  array();
+     	foreach($users as $user)
+     	{
+     		$uids[] = $user['id'];
+     	}
+     	if( ! empty($uids))
+     	{
+     		$user_material_query = $this->material->get_user_material($uids);
+     		if($user_material_query['status'])
+     		{
+     			$user_material = $user_material_query['user_material'];
+     		}
+     	}
+     	
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(6),true);
+     	$data['users'] = $users;
+     	$data['user_material'] = $user_material;
+     	$data['pages'] = $pages;
+     	 
+     	$this->load->module("common/bg_header");
+     	$this->load->view("admin/user",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 删除用户
+      */
+     public function delete_user()
+     {
+     	$this->load->model('user_model', 'user');
+     	$post = $this->input->post(NULL, TRUE);
+     	$post['uids'] = trim($post['uids']);
+     	if(empty($post['uids']))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$uids = explode(',', $post['uids']);
+     	//判断权限
+     	$can_op_user = $this->_can_op_user($uids);
+     	if( ! $can_op_user['check'])
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => $can_op_user['msg']));
+     		exit;
+     	}
+     	$delete_query = $this->user->batchDeleteUser(explode(',',$uids));
+     	
+     	if($delete_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0));
+     	}
+     }
+     
+     /**
+      * 判断是否有权限操作用户
+      * 
+      * @param array $uids
+      */
+     private function _can_op_user($uids)
+     {
+     	$this->load->model('user_model', 'user');
+     	$login = checklogin();
+     	if($login &&(is_array($login)))
+     	{
+     		if(in_array($login['auth'], array(2, 999)))
+     		{
+     			$auth = ($login['auth'] == 2) ? array(2, 999) : array(999);
+     			$auth_user_query = $this->user->getUserByAuth($auth, $uids);
+     			if($auth_user_query['status'])
+     			{
+     				if( ! empty($auth_user_query['user']))
+     				{
+     					return array('check' => FALSE, 'msg' => '无权操作用户  : ' . $auth_user_query['user']['realname']);
+     				}
+     			}
+     			else
+     			{
+     				return array('check' => FALSE, 'msg' => '数据库出错了');
+     			}
+     		}
+     		else 
+     		{
+     			return array('check' => FALSE, 'msg' => '无权限操作');
+     		}
+     	}
+     	else
+     	{
+     		return array('check' => FALSE, 'msg' => '未登录');
+     	}
+     	
+     	return array('check' => TRUE);
      }
 }
