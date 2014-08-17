@@ -440,7 +440,7 @@ class Admin extends CI_Controller {
      	}
      	$config['base_url'] = base_url('admin/mgUser');
 		$config['total_rows'] = $total;
-		$config['per_page'] = 2; 
+		$config['per_page'] = 10; 
 		$this->load->library('pagination');
      	$this->pagination->initialize($config); 
 		$pages =  $this->pagination->create_links();
@@ -513,7 +513,7 @@ class Admin extends CI_Controller {
      }
      
      /**
-      * 
+      * 设置用户状态
       */
      public function set_user_status()
      {
@@ -543,6 +543,455 @@ class Admin extends CI_Controller {
      	else
      	{
      		echo json_encode(array('status' => 0));
+     	}
+     	
+     }
+     
+     /**
+      * 用户详细内容
+      */
+     public function userDetail($uid = 0)
+     {
+     	$uid = (int) $uid;
+     	if(empty($uid))
+     	{
+     		show_error('参数错误');
+     	}
+     	$this->load->model('material_model', 'material');
+     	//获取用户信息
+     	$user = $this->user->getUserFull($uid);
+     	if( ! $user)
+     	{
+     		show_error('用户不存在');
+     	}
+     	
+     	$uids = $mids = $vids = array();
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	
+     	//查询可访问素材总数
+     	$view_total = 0;
+     	$view_total_query = $this->material->count_view_material($uid);
+     	if($view_total_query['status'])
+     	{
+     		$view_total = $view_total_query['total'];
+     	}
+     	
+     	//可访问素材分页配置
+     	$config['base_url'] = base_url('admin/get_view_material');
+     	$config['suffix'] = '?uid=' . $uid;
+     	$config['first_url'] = base_url('admin/get_view_material/1?uid=' . $uid);
+		$config['total_rows'] = $view_total;
+		$config['per_page'] = 10; 
+		$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$view_pages =  $this->pagination->create_links();
+		
+     	//查询可访问素材列表
+     	$view_materials = array();
+     	$view_materials_query = $this->material->get_view_material($uid, 1, $config['per_page']);
+     	if($view_materials_query['status'])
+     	{
+     		$view_materials = $view_materials_query['view_materials'];
+     		foreach($view_materials as $view_material)
+     		{
+     			$uids[] = $view_material['uid'];
+	     		$mids[] = $view_material['id'];
+	     		$vids[] = $view_material['cversion'];
+     		}
+     	}
+     	
+     	//查询上传素材总数
+     	$upload_total = 0;
+     	$upload_total_query = $this->material->count_upload_material($uid);
+     	if($upload_total_query['status'])
+     	{
+     		$upload_total = $upload_total_query['total'];
+     	}
+     	
+     	//可访问素材分页配置
+     	$config['base_url'] = base_url('admin/get_upload_material');
+     	$config['suffix'] = '?uid=' . $uid;
+     	$config['first_url'] = base_url('admin/get_upload_material/1?uid=' . $uid);
+		$config['total_rows'] = $upload_total;
+		$config['per_page'] = 10; 
+		$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$upload_pages =  $this->pagination->create_links();
+		
+     	//查询上传素材
+     	$upload_materials = array();
+     	$upload_materials_query = $this->material->get_upload_material($uid, 1, $config['per_page']);
+     	if($upload_materials_query['status'])
+     	{
+     		$upload_materials = $upload_materials_query['upload_materials'];
+     		foreach($upload_materials as $upload_material)
+     		{
+     			$uids[] = $upload_material['uid'];
+	     		$mids[] = $upload_material['id'];
+	     		$vids[] = $upload_material['cversion'];
+     		}
+     	}
+     	
+     	//查询用户信息
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser($uids);
+     	}
+     	
+     	//查询素材当前版本信息
+     	$versions = array();
+     	if( ! empty($vids))
+     	{
+     		$versions_query = $this->material->get_batch_verisions($vids);
+     		if($versions_query['status'])
+     		{
+     			$versions = $versions_query['versions'];
+     		}
+     	}
+     	
+     	//查询附件数
+     	$attachment_num = array();
+     	if( ! empty($mids))
+     	{
+	     	$attachment_num_query = $this->material->get_material_attachments($mids);
+     		if($attachment_num_query['status'])
+     		{
+     			$attachment_num = $attachment_num_query['attachment_num'];
+     		}
+     	}
+     	
+     	$data['bg_left'] = $this->load->module("common/bg_left",array(6),true);
+     	$data['user'] = (array)$user;
+     	$data['view_materials'] = $view_materials;
+     	$data['upload_materials'] = $upload_materials;
+     	$data['view_pages'] = $view_pages;
+     	$data['upload_pages'] = $upload_pages;
+     	$data['users'] = $users;
+     	$data['versions'] = $versions;
+     	$data['attachment_num'] = $attachment_num;
+     	 
+     	$this->load->module("common/bg_header");
+     	$this->load->view("admin/user_detail",$data);
+     	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 获取可访问素材
+      * 
+      * @param int $uid
+      * @param int $page
+      */
+     public function get_view_material($page = 1)
+     {
+     	$uid = (int) $this->input->get('uid', TRUE);
+     	if(empty($uid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$this->load->model('material_model', 'material');
+     	//获取用户信息
+     	$user = $this->user->getUserFull($uid);
+     	if( ! $user)
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '用户不存在'));
+     		exit;
+     	}
+     	
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	
+     	//查询可访问素材总数
+     	$view_total = 0;
+     	$view_total_query = $this->material->count_view_material($uid);
+     	if($view_total_query['status'])
+     	{
+     		$view_total = $view_total_query['total'];
+     	}
+     	
+     	//可访问素材分页配置
+     	$config['base_url'] = base_url('admin/get_view_material');
+     	$config['suffix'] = '?uid=' . $uid;
+     	$config['first_url'] = base_url('admin/get_view_material/1?uid=' . $uid);
+		$config['total_rows'] = $view_total;
+		$config['per_page'] = 10; 
+		$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$view_pages =  $this->pagination->create_links();
+		
+		$uids = $mids = $vids = array();
+     	//查询可访问素材列表
+     	$view_materials = array();
+     	$view_materials_query = $this->material->get_view_material($uid, $page, $config['per_page']);
+     	if($view_materials_query['status'])
+     	{
+     		$view_materials = $view_materials_query['view_materials'];
+     		foreach($view_materials as $view_material)
+     		{
+     			$uids[] = $view_material['uid'];
+	     		$mids[] = $view_material['id'];
+	     		$vids[] = $view_material['cversion'];
+     		}
+     	}
+     	
+     	//查询用户信息
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser($uids);
+     	}
+     	
+     	//查询素材当前版本信息
+     	$versions = array();
+     	if( ! empty($vids))
+     	{
+     		$versions_query = $this->material->get_batch_verisions($vids);
+     		if($versions_query['status'])
+     		{
+     			$versions = $versions_query['versions'];
+     		}
+     	}
+     	
+     	//查询附件数
+     	$attachment_num = array();
+     	if( ! empty($mids))
+     	{
+	     	$attachment_num_query = $this->material->get_material_attachments($mids);
+     		if($attachment_num_query['status'])
+     		{
+     			$attachment_num = $attachment_num_query['attachment_num'];
+     		}
+     	}
+     	
+     	$html = '';
+     	if( ! empty($view_materials))
+     	{
+     		foreach($view_materials as $material)
+     		{
+     			$html .= '<tr>';
+                $html .= '<td><input autocomplete="off" type="checkbox" name="view-material" data-id="' .  $material['id'] . '" value="" /></td>';
+                $html .= '<td><a href="' . base_url('admin/mgVersion/' . $material['id']) . '" target="_blank"  title="' . $material['mname'] . '" >' .$material['mname'] . '</a></td>';
+                $html .= '<td><a href="' . base_url('admin/userDetail/' . $material['uid']) . '" target="_blank">' . (empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname']) . '</a></td>';
+                $html .= '<td>' . (empty($material['cname']) ? '' : $material['cname']) . '</td>';
+                $html .= '<td>' . (empty($attachment_num[$material['id']]['num']) ? 0 : $attachment_num[$material['id']]['num']) . '</td>';
+                $html .= '<td>' . $material['vernum'] . '</td>';
+                $html .= '<td>' . (empty($versions[$material['cversion']]['depict']) ? '' : $versions[$material['cversion']]['depict']) . '</td>';
+                $html .= '<td>' . date('Y-m-d H:i:s', $material['create_at']) . '</td>';
+                $html .= '</tr>';
+     		}
+     	}
+     	else
+     	{
+     		$html = '<td colspan="8" class="text-center"><strong>暂无素材</strong></td>';
+     	}
+     	echo json_encode(array('status' => 1, 'html' => $html, 'pages' => $view_pages));
+     	exit;
+     }
+     
+     /**
+      * 获取上传素材
+      * @param int $uid
+      * @param int $page
+      */
+ 	 public function get_upload_material($page = 1)
+     {
+     	$uid = (int) $this->input->get('uid', TRUE);
+     	if(empty($uid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$this->load->model('material_model', 'material');
+     	//获取用户信息
+     	$user = $this->user->getUserFull($uid);
+     	if( ! $user)
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '用户不存在'));
+     		exit;
+     	}
+     	
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	//查询上传素材总数
+     	$upload_total = 0;
+     	$upload_total_query = $this->material->count_upload_material($uid);
+     	if($upload_total_query['status'])
+     	{
+     		$upload_total = $upload_total_query['total'];
+     	}
+     	
+     	//可访问素材分页配置
+     	$config['base_url'] = base_url('admin/get_upload_material');
+     	$config['suffix'] = '?uid=' . $uid;
+     	$config['first_url'] = base_url('admin/get_upload_material/1?uid=' . $uid);
+		$config['total_rows'] = $upload_total;
+		$config['per_page'] = 10; 
+		$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$upload_pages =  $this->pagination->create_links();
+		
+		$uids = $mids = $vids = array();
+     	//查询可访问素材列表
+     	$upload_materials = array();
+     	$upload_materials_query = $this->material->get_upload_material($uid, $page, $config['per_page']);
+     	if($upload_materials_query['status'])
+     	{
+     		$upload_materials = $upload_materials_query['upload_materials'];
+     		foreach($upload_materials as $upload_material)
+     		{
+     			$uids[] = $upload_material['uid'];
+	     		$mids[] = $upload_material['id'];
+	     		$vids[] = $upload_material['cversion'];
+     		}
+     	}
+     	
+     	//查询用户信息
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser($uids);
+     	}
+     	
+     	//查询素材当前版本信息
+     	$versions = array();
+     	if( ! empty($vids))
+     	{
+     		$versions_query = $this->material->get_batch_verisions($vids);
+     		if($versions_query['status'])
+     		{
+     			$versions = $versions_query['versions'];
+     		}
+     	}
+     	
+     	//查询附件数
+     	$attachment_num = array();
+     	if( ! empty($mids))
+     	{
+	     	$attachment_num_query = $this->material->get_material_attachments($mids);
+     		if($attachment_num_query['status'])
+     		{
+     			$attachment_num = $attachment_num_query['attachment_num'];
+     		}
+     	}
+     	
+     	$html = '';
+     	if( ! empty($upload_materials))
+     	{
+     		foreach($upload_materials as $material)
+     		{
+     			$html .= '<tr>';
+                $html .= '<td><input autocomplete="off" type="checkbox" name="upload-material" data-id="' .  $material['id'] . '" value="" /></td>';
+                $html .= '<td><a href="' . base_url('admin/mgVersion/' . $material['id']) . '" target="_blank"  title="' . $material['mname'] . '" >' .$material['mname'] . '</a></td>';
+                $html .= '<td>' . (empty($material['cname']) ? '' : $material['cname']) . '</td>';
+                $html .= '<td>' . (empty($attachment_num[$material['id']]['num']) ? 0 : $attachment_num[$material['id']]['num']) . '</td>';
+                $html .= '<td>' . $material['vernum'] . '</td>';
+                $html .= '<td>' . (empty($versions[$material['cversion']]['depict']) ? '' : $versions[$material['cversion']]['depict']) . '</td>';
+                $html .= '<td>' . date('Y-m-d H:i:s', $material['create_at']) . '</td>';
+                 $html .= '<td><a href="' . base_url('admin/userDetail/' . $material['uid']) . '" target="_blank">' . (empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname']) . '</a></td>';
+                $html .= '</tr>';
+     		}
+     	}
+     	else
+     	{
+     		$html = '<td colspan="8" class="text-center"><strong>暂无素材</strong></td>';
+     	}
+     	echo json_encode(array('status' => 1, 'html' => $html, 'pages' => $upload_pages));
+     	exit;
+     }
+     
+     /**
+      * 搜索素材
+      */
+     public function search_material()
+     {
+     	$name = $this->input->post('name', TRUE);
+     	$name = trim($name);
+     	if(empty($name))
+     	{
+     		echo json_encode(array('status' => 0));
+     		exit;
+     	}
+     	$this->load->model('material_model', 'material');
+     	$material_query = $this->material->get_all_materials(1,10, $name);
+     	if( ! $material_query['status'])
+     	{
+     		echo json_encode(array('status' => 0));
+     		exit;
+     	}
+     	echo json_encode(array('status' => 1, 'materials' => $material_query['materials']));
+     }
+     
+     /**
+      * 新增访问素材
+      */
+     public function add_view_material()
+     {
+     	$post = $this->input->post(NULL, TRUE);
+     	$mid = (int) $post['mid'];
+     	$uid = (int) $post['uid'];
+     	
+     	if(empty($mid) || empty($uid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$this->load->model('material_model', 'material');
+     	$check_query = $this->material->check_view_material($mid, $uid);
+     	if($check_query['status'])
+     	{
+     		if($check_query['check'])
+     		{
+     			echo json_encode(array('status' => 0, 'msg' => '此素材已经存在于访问列表中'));
+     			exit;
+     		}
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '出错了'));
+     		exit;
+     	}
+     	
+     	$add_view_query = $this->material->add_view_material($mid, $uid);
+     	if($add_view_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     		exit;
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '新增失败'));
+     		exit;
+     	}
+     	
+     }
+     
+     /**
+      * 删除可访问素材
+      */
+     public function remove_view_material()
+     {
+     	$post = $this->input->post(NULL, TRUE);
+     	$uid = (int) $post['uid'];
+     	$mids = trim($post['mids']);
+     	if(empty($mids) || empty($uid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	$this->load->model('material_model', 'material');
+     	
+     	$remove_view_query = $this->material->remove_view_material($mids, $uid);
+     	if($remove_view_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     		exit;
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '删除失败'));
+     		exit;
      	}
      	
      }

@@ -1,5 +1,3 @@
-<?php
-?>
 <!-- Content starts -->
 <div class="content">
 	<?php echo $bg_left;?>

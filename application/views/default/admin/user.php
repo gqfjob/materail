@@ -1,5 +1,3 @@
-<?php
-?>
 <!-- Content starts -->
 <div class="content">
 	<?php echo $bg_left;?>
@@ -151,7 +149,7 @@
 			});
 		});
 
-		//删除素材
+		//删除用户
 		$('#delete-user').click(function(){
 			var _this = $(this);
 			var user_checked = $('input[name="user"]:checked');
