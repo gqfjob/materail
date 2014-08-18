@@ -541,4 +541,206 @@ class User_model extends CI_Model
     	}
     	return $users;
     }
+    
+    /**
+     * 查询用户列表
+     * @param int $page
+     * @param int $pre_page
+     * @param string $search
+     */
+    public function getUserList($page = 1, $pre_page = 10, $search = '' )
+	{
+		$offset = ($page - 1) * $pre_page;
+		if(empty($search))
+		{
+			$sql = "SELECT * FROM identity_user ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$query = $this->rdb->query($sql);
+		}
+		else
+		{
+			$sql = "SELECT * FROM identity_user WHERE realname LIKE ? ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$users = array();
+			if ($query->num_rows() > 0)
+			{
+				$users = $query->result_array();
+			} 
+			return array('status' => 1, 'users' => $users);
+		}
+	}
+	
+	/**
+	 * 查询用户总数
+	 * 
+	 * @param string $search
+	 */
+	public function getTotalUser($search = '')
+	{
+		if(empty($search))
+		{
+			$sql = "SELECT COUNT(*) as total FROM identity_user";
+			$query = $this->rdb->query($sql);
+		}
+		else
+		{
+			$sql = "SELECT COUNT(*) as total FROM identity_user WHERE realname LIKE ?";
+			$query = $this->rdb->query($sql, array('%' . $search . '%'));
+		}
+		
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$total = 0;
+			if ($query->num_rows() > 0)
+			{
+				$result = $query->row_array();
+			} 
+			return array('status' => 1, 'total' => $result['total']);
+		}
+	}
+	
+	/**
+	 * 根据权限筛选用户
+	 * @param array $auth
+	 * @param array $uids
+	 */
+	public function getUserByAuth($auth, $uids)
+	{
+		if(empty($auth) || empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->rdb->where_in('auth', $auth);
+		$this->rdb->where_in('id', $uids);
+		$this->rdb->order_by('id', 'DESC');
+		$this->rdb->limit(1);
+		$query = $this->rdb->get('identity_user');
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$user = 0;
+			if ($query->num_rows() > 0)
+			{
+				$user = $query->row_array();
+			} 
+			return array('status' => 1, 'user' => $user);
+		}
+	}
+	
+	/**
+	 * 批量删除用户
+	 * 
+	 * @param unknown_type $uids
+	 */
+	public function batchDeleteUser($uids)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->trans_start();
+		$this->wdb->where_in('id', $uids);
+		$this->wdb->delete('identity_user');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_session');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_credential');
+		$this->wdb->where_in('uid', $uids);
+		$this->wdb->delete('identity_password');
+		$this->wdb->trans_complete();
+		$this->wdb->trans_off();
+		if ($this->wdb->trans_status() === FALSE)
+		{
+		    return array('status' => 0);
+		}
+		
+		return array('status' => 1);
+	}
+	
+	/**
+	 * 批量设置用户状态
+	 * @param array $uids
+	 * @param int $status
+	 */
+	public function batchSetUserStatus($uids, $status)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		$this->wdb->where_in('id', $uids);
+		$query = $this->wdb->update('identity_user',array('status' => $status));
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			return array('status' => 1);
+		}
+	}
+	
+	/**
+	 * 设置用户权限
+	 * @param int $auth
+	 * @param int $uid
+	 */
+	public function setAuth($auth, $uid)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where('id',$uid);
+		$query = $this->wdb->update('identity_user', array('auth' => $auth));
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 设置用户上传权限
+	 * @param int $auth
+	 * @param int $uid
+	 */
+	public function setUploadAuth($auth, $uid)
+	{
+		if( empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where('id',$uid);
+		$query = $this->wdb->update('identity_user', array('upload_auth' => $auth));
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
 }

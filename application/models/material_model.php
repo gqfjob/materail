@@ -646,7 +646,7 @@ class Material_Model extends CI_Model
 	/**
 	 * 查询素材总数
 	 * 
-	 * @param unknown_type $search
+	 * @param string $search
 	 */
 	public function get_total_material($search = '')
 	{
@@ -913,6 +913,314 @@ class Material_Model extends CI_Model
 				$users = $query->result_array();
 			} 
 			return array('status' => 1, 'users' => $users);
+		}
+	}
+	
+	/**
+	 * 获取其他版本
+	 * @param int $vid
+	 * @param int $mid
+	 * @param int $page
+	 * @param int $per_page
+	 */
+	public function get_other_versions($vid, $mid)
+	{
+		if(empty($mid) || empty($vid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT * FROM material_version WHERE mid = ? AND id != ? ORDER BY id DESC";
+		$query = $this->rdb->query($sql, array($mid, $vid));
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$other_versions = array();
+			if ($query->num_rows() > 0)
+			{
+				$other_versions = $query->result_array();
+			} 
+			return array('status' => 1, 'other_versions' => $other_versions);
+		}
+	}
+	
+	/**
+	 * 查询同类型素材
+	 * @param int $cid
+	 * @param int $mid
+	 * @param int $limit
+	 */
+	public function get_same_materials($cid, $mid, $limit = 5)
+	{
+		if(empty($cid) || empty($mid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT * FROM material_info WHERE cid = ? AND id != ? ORDER BY id DESC LIMIT {$limit}";
+		$query = $this->rdb->query($sql, array($cid, $mid));
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$same_materials = array();
+			if ($query->num_rows() > 0)
+			{
+				$same_materials = $query->result_array();
+			} 
+			return array('status' => 1, 'same_materials' => $same_materials);
+		}
+	}
+	
+	/**
+	 * 统计用户素材数
+	 * 
+	 * @param array $uids
+	 */
+	public function get_user_material($uids)
+	{
+		if(empty($uids))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->rdb->select('uid,COUNT(id) AS num');
+		$this->rdb->where_in($uids);
+		$this->rdb->group_by('uid');
+		$query = $this->rdb->get('material_info');
+		if($query == FALSE)
+		{
+			return array('status' => 0, 'msg' => '');
+		}
+		else
+		{
+			$user_material = array();
+			if ($query->num_rows() > 0)
+			{
+				 foreach($query->result_array() as $value)
+				 {
+				 	$user_material[$value['uid']] = $value;
+				 }
+			} 
+			return array('status' => 1, 'user_material' => $user_material);
+		}
+	}
+	
+	/**
+	 * 统计用户可查看素材列表
+	 * 
+	 * @param $uid
+	 */
+	public function count_view_material($uid)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT COUNT(*) as total
+				FROM material_visit_right
+				WHERE uid={$uid}";
+		$query = $this->rdb->query($sql);
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$total = 0;
+			if ($query->num_rows() > 0)
+			{
+				$result = $query->row_array();
+			} 
+			return array('status' => 1, 'total' => $result['total']);
+		}
+	}
+	
+	/**
+	 * 查询用户可查看素材列表
+	 * 
+	 * @param int $uid
+	 * @param int $page
+	 * @param int $per_page
+	 */
+	public function get_view_material($uid, $page, $per_page)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		$offset = ($page - 1) * $per_page;
+		
+		$sql = "SELECT DISTINCT m.*,mc.cname
+				FROM material_visit_right mv, material_info m 
+				LEFT JOIN material_cate mc ON m.cid=mc.id
+				WHERE mv.mid=m.id AND mv.uid={$uid} 
+				LIMIT {$offset},{$per_page}";
+		$query = $this->rdb->query($sql);
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$view_materials = array();
+			if ($query->num_rows() > 0)
+			{
+				$view_materials = $query->result_array();
+			} 
+			return array('status' => 1, 'view_materials' => $view_materials);
+		}
+	}
+	
+	/**
+	 * 统计用户上传素材列表
+	 * 
+	 * @param $uid
+	 */
+	public function count_upload_material($uid)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$sql = "SELECT COUNT(DISTINCT m.id) AS total
+				FROM  material_info m,material_version mv
+				WHERE m.id=mv.mid AND (m.uid={$uid} OR mv.uid={$uid})";
+		$query = $this->rdb->query($sql);
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$total = 0;
+			if ($query->num_rows() > 0)
+			{
+				$result = $query->row_array();
+			} 
+			return array('status' => 1, 'total' => $result['total']);
+		}
+	}
+	
+	/**
+	 * 查询用户上传素材列表
+	 * 
+	 * @param int $uid
+	 * @param int $page
+	 * @param int $per_page
+	 */
+	public function get_upload_material($uid, $page, $per_page)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		$offset = ($page - 1) * $per_page;
+		
+		$sql = "SELECT DISTINCT m.*,mc.cname
+				FROM  material_version mv,material_info m
+				LEFT JOIN material_cate mc ON m.cid=mc.id
+				WHERE m.id=mv.mid  AND (m.uid={$uid} OR mv.uid={$uid})
+				ORDER BY m.id DESC
+				LIMIT {$offset},{$per_page}";
+		$query = $this->rdb->query($sql);
+		if($query == FALSE)
+		{
+			return array('status' => 0);
+		}
+		else
+		{
+			$upload_materials = array();
+			if ($query->num_rows() > 0)
+			{
+				$upload_materials = $query->result_array();
+			} 
+			return array('status' => 1, 'upload_materials' => $upload_materials);
+		}
+	}
+	
+	/**
+	 * 新增用户访问素材
+	 * @param int $mid
+	 * @param int $uid
+	 */
+	public function add_view_material($mid, $uid)
+	{
+		if( empty($mid) || empty($uid) )
+		{
+			return array('status' => 0);
+		}
+		
+		$query = $this->wdb->insert('material_visit_right', array('mid' => $mid, 'uid' => $uid, 'vr' => 2));
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 删除用户访问素材
+	 * @param array $mids
+	 * @param int $uid
+	 */
+	public function remove_view_material($mids, $uid)
+	{
+		if( empty($mids) || empty($uid) )
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where('uid', $uid);
+		$this->wdb->where_in('mid', $mids);
+		$query = $this->wdb->delete('material_visit_right');
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 检查用户访问素材
+	 * @param int $mid
+	 * @param int $uid
+	 */
+	public function check_view_material($mid, $uid)
+	{
+		if( empty($mid) || empty($uid) )
+		{
+			return array('status' => 0);
+		}
+		$this->rdb->where(array('mid' => $mid, 'uid' => $uid));
+		$query = $this->rdb->get('material_visit_right');
+		if($query)
+		{
+			if($query->num_rows() > 0)
+			{
+				return array('status' => 1, 'check' => TRUE);
+			}
+			else
+			{
+				return array('status' => 1, 'check' => FALSE);
+			}
+		}
+		else
+		{
+			return array('status' => 0);
 		}
 	}
 }
