@@ -1180,7 +1180,7 @@ function checkAdminRight($user){
 function check_permission($user)
 {
 	if(is_array($user)){
-		if(($user['status'] == 1) && in_array($user['auth'], array(1,2,999))){
+		if(($user['status'] == 1) && $user['upload_auth'] == 1){
 			return TRUE;
 		}
 	}

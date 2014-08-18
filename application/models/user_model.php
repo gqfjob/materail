@@ -695,4 +695,52 @@ class User_model extends CI_Model
 			return array('status' => 1);
 		}
 	}
+	
+	/**
+	 * 设置用户权限
+	 * @param int $auth
+	 * @param int $uid
+	 */
+	public function setAuth($auth, $uid)
+	{
+		if(empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where('id',$uid);
+		$query = $this->wdb->update('identity_user', array('auth' => $auth));
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 设置用户上传权限
+	 * @param int $auth
+	 * @param int $uid
+	 */
+	public function setUploadAuth($auth, $uid)
+	{
+		if( empty($uid))
+		{
+			return array('status' => 0);
+		}
+		
+		$this->wdb->where('id',$uid);
+		$query = $this->wdb->update('identity_user', array('upload_auth' => $auth));
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
 }

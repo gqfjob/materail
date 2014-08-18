@@ -57,14 +57,14 @@
 			                		<div class="col-md-4">
 										<div class="checkbox">
 										    <label>
-										      <input type="checkbox"> <strong>后台管理员</strong>
+										      <input id="set-admin" type="checkbox" <?php echo ($user['auth'] == 2) ? 'checked="checked"' : '';?> autocomplete="off"> <strong>后台管理员</strong>
 										    </label>
 										</div>
 									</div>
 			                		<div class="col-md-8">
 			                			<div class="checkbox ">
 										    <label>
-										      <input type="checkbox"> <strong>可访问网站</strong>
+										      <input id="set-status" type="checkbox" <?php echo ($user['status'] == 1) ? 'checked="checked"' : '';?> autocomplete="off"> <strong>可访问网站</strong>
 										    </label>
 										</div>
 			                		</div>
@@ -73,7 +73,7 @@
 			                		<div class="col-md-4">
 			                			<div class="checkbox">
 										    <label>
-										      <input type="checkbox"> <strong>可上传素材</strong>
+										      <input id="set-upload" type="checkbox"  <?php echo ($user['upload_auth'] == 1) ? 'checked="checked"' : '';?> autocomplete="off"> <strong>可上传素材</strong>
 										    </label>
 										</div>
 									</div>
@@ -267,6 +267,99 @@
 			}else{
 				$('#check-upload-all').prop('checked', false);
 			}
+		});
+
+		//用户权限设置
+		$('#set-admin').click(function(){
+			var _this = $(this);
+			var auth;
+			if($('#set-admin:checked').length){
+				auth = 2;
+			}else{
+				auth = 1;
+			}
+			_this.attr('disabled','disabled');
+			$.ajax({
+				url:'/admin/set_auth',
+				type:'post',
+				dataType:'json',
+				data:{auth:auth,uid:<?php echo $user['id'];?>,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+				success:function(res){
+					_this.removeAttr('disabled');
+					if(res.status){
+						notice('操作成功',300);
+					}else{
+						notice(res.msg, 300);
+					}
+				},
+				error:function(){
+					_this.removeAttr('disabled');
+					notice('出错了', 300);
+				},
+				
+			});
+		});
+
+		//用户上传权限设置
+		$('#set-upload').click(function(){
+			var _this = $(this);
+			var upload_auth;
+			if($('#set-upload:checked').length){
+				upload_auth = 1;
+			}else{
+				upload_auth = 0;
+			}
+			_this.attr('disabled','disabled');
+			$.ajax({
+				url:'/admin/set_upload_auth',
+				type:'post',
+				dataType:'json',
+				data:{upload_auth:upload_auth,uid:<?php echo $user['id'];?>,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+				success:function(res){
+					_this.removeAttr('disabled');
+					if(res.status){
+						notice('操作成功',300);
+					}else{
+						notice(res.msg, 300);
+					}
+				},
+				error:function(){
+					_this.removeAttr('disabled');
+					notice('出错了', 300);
+				},
+				
+			});
+		});
+
+		//用户状态设置
+		$('#set-status').click(function(){
+			var _this = $(this);
+			var status;
+			if($('#set-status:checked').length){
+				status = 1;
+			}else{
+				status = 0;
+			}
+			_this.attr('disabled','disabled');
+			$.ajax({
+				url:'/admin/set_user_status',
+				type:'post',
+				dataType:'json',
+				data:{uids:'<?php echo $user['id'];?>',status:status,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+				success:function(res){
+					_this.removeAttr('disabled');
+					if(res.status){
+						notice('操作成功',300);
+					}else{
+						notice(res.msg, 300);
+					}
+				},
+				error:function(){
+					_this.removeAttr('disabled');
+					notice('出错了', 300);
+				},
+				
+			});
 		});
 		
 		//获取分页内容

@@ -982,7 +982,7 @@ class Admin extends CI_Controller {
      	}
      	$this->load->model('material_model', 'material');
      	
-     	$remove_view_query = $this->material->remove_view_material($mids, $uid);
+     	$remove_view_query = $this->material->remove_view_material(explode(',', $mids), $uid);
      	if($remove_view_query['status'])
      	{
      		echo json_encode(array('status' => 1));
@@ -991,6 +991,78 @@ class Admin extends CI_Controller {
      	else
      	{
      		echo json_encode(array('status' => 0, 'msg' => '删除失败'));
+     		exit;
+     	}
+     	
+     }
+     
+     /**
+      * 设置用户权限
+      */
+     public function set_auth()
+     {
+     	$post = $this->input->post(NULL, TRUE);
+     	$uid = (int) $post['uid'];
+     	$auth = (int) $post['auth'];
+     	if(empty($uid) || ! in_array($auth, array(1, 2)))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	//判断权限
+     	$can_op_user = $this->_can_op_user(array($uid));
+     	if( ! $can_op_user['check'])
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => $can_op_user['msg']));
+     		exit;
+     	}
+     	
+     	$set_auth_query = $this->user->setAuth($auth,$uid);
+        if($set_auth_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     		exit;
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '操作失败'));
+     		exit;
+     	}
+     	
+     }
+     
+	/**
+      * 设置用户权限
+      */
+     public function set_upload_auth()
+     {
+     	$post = $this->input->post(NULL, TRUE);
+     	$uid = (int) $post['uid'];
+     	$upload_auth = (int) $post['upload_auth'];
+     	if(empty($uid) || ! in_array($upload_auth, array(0, 1)))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	//判断权限
+     	$can_op_user = $this->_can_op_user(array($uid));
+     	if( ! $can_op_user['check'])
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => $can_op_user['msg']));
+     		exit;
+     	}
+     	
+     	$set_uploadauth_query = $this->user->setUploadAuth($upload_auth,$uid);
+        if($set_uploadauth_query['status'])
+     	{
+     		echo json_encode(array('status' => 1));
+     		exit;
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '操作失败'));
      		exit;
      	}
      	

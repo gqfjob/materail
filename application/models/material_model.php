@@ -1061,7 +1061,6 @@ class Material_Model extends CI_Model
 				FROM material_visit_right mv, material_info m 
 				LEFT JOIN material_cate mc ON m.cid=mc.id
 				WHERE mv.mid=m.id AND mv.uid={$uid} 
-				ORDER BY m.id DESC
 				LIMIT {$offset},{$per_page}";
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
