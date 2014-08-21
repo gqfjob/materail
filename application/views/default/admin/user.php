@@ -19,7 +19,7 @@
       	 <form class="navbar-form navbar-right" role="form" method="get" action="<?php echo base_url('admin/mgUser');?>">
 			  <div class="form-group">
 			    <label class="sr-only" for="exampleInputEmail2">用户名</label>
-			    <input type="text" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="请输入用户名">
+			    <input type="text" autocomplete="off" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="请输入用户名">
 			  </div>
 			  <div class="form-group">
 			  	<button type="submit" class="btn btn-default">查找</button>

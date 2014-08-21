@@ -83,5 +83,59 @@ class Visit_log_model extends CI_Model
         return $query->result_array();
     }
     
+    /**
+     * 获取访问记录总数
+     */
+    public function getTotal($start_time = 0, $end_time = 0)
+    {
+    	if($start_time > 0)
+		{
+			$this->rdb->where('time >', $start_time);
+		}
+		if($end_time > 0)
+		{
+			$this->rdb->where('time <', $end_time);
+		}
 
+		$total = $this->rdb->count_all_results('visit_log');
+		
+		return array('status' => 1, 'total' => $total);
+    }
+    
+    /**
+     * 查询访问记录
+     * @param $page
+     * @param $pre_page
+     * @param $start_time
+     * @param $end_time
+     */
+	public function getAllList($page = 1, $per_page = 10, $start_time = 0, $end_time = 0)
+	{
+		$offset = ($page - 1) * $per_page;
+		if($start_time > 0)
+		{
+			$this->rdb->where('time >', $start_time);
+		}
+		if($end_time > 0)
+		{
+			$this->rdb->where('time <', $end_time);
+		}
+		
+		$this->rdb->order_by('time', 'DESC');
+		$this->rdb->limit($per_page, $offset);
+		$query = $this->rdb->get('visit_log');
+		if($query)
+		{
+			$lists = array();
+			if($query->num_rows() > 0)
+			{
+				$lists = $query->result_array();
+			}
+			return array('status' => 1, 'lists' => $lists);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
 }

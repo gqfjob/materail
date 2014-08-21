@@ -269,6 +269,7 @@ class File extends CI_Controller{
 		{
 			show_error('下载文件不存在');
 		}
+		create_visit(3);
 		$mime = 'application/octet-stream';
 		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
 		{

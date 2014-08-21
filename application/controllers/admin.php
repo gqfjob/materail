@@ -62,11 +62,12 @@ class Admin extends CI_Controller {
     }
 
     /**
-    * 素材管理
+     * 素材管理
      */
      public function mgMaterial($page = 1)
      {
      	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	
      	$this->load->model('material_model', 'material');
      	$this->load->model('user_model', 'user');
@@ -380,9 +381,70 @@ class Admin extends CI_Controller {
      /**
       * 访问日志管理
       */
-     public function mgVisitor()
+     public function mgVisitor($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
+     	$start = $this->input->get('start', TRUE);
+     	$end= $this->input->get('end', TRUE);
+     	$where_time = array();
+     	$start_time = $end_time = 0;
+     	if($start_time !== FALSE)
+     	{
+     		$data['start'] = $where_time['start'] = trim($start);
+     		$start_time = strtotime($where_time['start']);
+     	}
+     	if($end_time !== FALSE)
+     	{
+     		$data['end'] = $where_time['end'] = trim($end);
+     		$end_time = strtotime($where_time['end']);
+     	}
+     	
+     	$this->load->model('visit_log_model', 'visit_log');
+     	//查询总数
+     	$total = 0;
+     	$total_query = $this->visit_log->getTotal($start_time, $end_time);
+     	if($total_query['status'])
+     	{
+     		$total = (int) $total_query['total'];
+     	}
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	if( ! empty($where_time))
+     	{
+     		$config['suffix'] = '?' . http_build_query($where_time);
+     		$config['first_url'] = base_url('admin/mgVisitor/1?' . http_build_query($where_time));
+     	}
+     	$config['base_url'] = base_url('admin/mgVisitor');
+		$config['total_rows'] = $total;
+		$config['per_page'] = 20; 
+     	$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$pages =  $this->pagination->create_links();
+		
+		//查询访问列表
+		$lists = $uids = array();
+		$lists_query = $this->visit_log->getAllList($page, $config['per_page'], $start_time, $end_time);
+		if($lists_query['status'])
+		{
+			$lists = $lists_query['lists'];
+			foreach($lists as $list)
+			{
+				$uids[] = $list['uid'];
+			}
+		}
+		
+     	//查询用户信息
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser($uids);
+     	}
+     	
      	$data['bg_left'] = $this->load->module("common/bg_left",array(3),true);
+     	$data['lists'] = $lists;
+     	$data['users'] = $users;
+     	$data['pages'] = $pages;
      
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/visitor",$data);
@@ -417,6 +479,7 @@ class Admin extends CI_Controller {
      public function mgUser($page = 1)
      {
      	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	
      	$this->load->model('user_model', 'user');
      	$this->load->model('material_model', 'material');
@@ -685,6 +748,8 @@ class Admin extends CI_Controller {
       */
      public function get_view_material($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	$uid = (int) $this->input->get('uid', TRUE);
      	if(empty($uid))
      	{
@@ -797,6 +862,8 @@ class Admin extends CI_Controller {
       */
  	 public function get_upload_material($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	$uid = (int) $this->input->get('uid', TRUE);
      	if(empty($uid))
      	{
