@@ -1307,4 +1307,27 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 	}
+	
+	/**
+	 * 修改分类
+	 * @param $cate
+	 */
+	public function update_cate($cate)
+	{
+		if(empty($cate))
+		{
+			return array('status' => 0);
+		}
+		$this->wdb->where('id', $cate['id']);
+		unset($cate['id']);
+		$query = $this->wdb->update('material_cate',$cate);
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
 }

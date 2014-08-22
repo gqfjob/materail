@@ -75,7 +75,7 @@
 		                         <?php else: ?>       
 		                         <?php foreach($cates as $cate) : ?>
 		                         <tr>
-		                         	<td><?php echo $cate['cname'];?></td>
+		                         	<td class="show-cname"><?php echo $cate['cname'];?></td>
 		                         	<td>
 		                         		<?php if($cate['cname'] != '其他') : ?>
 		                         		<a href="#" class="edit-cate" data-cid="<?php echo $cate['id']; ?>" data-name="<?php echo $cate['cname']; ?>" data-clogo="<?php echo $cate['clogo']; ?>">修改</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="#" class="delete-cate" data-cid="<?php echo $cate['id']; ?>">删除</a>
@@ -130,7 +130,7 @@
 					<div class="clearfix"></div>
 			    </div>
 			    <div class="modal-footer">
-			    	<button type="button" class="btn btn-primary primary-edit" data-dismiss="modal">确定</button>
+			    	<button type="button" class="btn btn-primary primary-edit">确定</button>
 			    	<button type="button" class="btn btn-default cancel-edit" data-dismiss="modal">取消</button>
 			    </div>
 	    	</div>
@@ -148,12 +148,14 @@
 				notice('请输入分类名',300);
 				return false;
 			}
+			_this.find('button[type="submit"]').addClass('disabled');
 			$.ajax({
 				url:_this.attr('action'),
 				type:'post',
 				dataType:'json',
 				data:{cate_name:cate_name,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
 				success:function(res){
+					_this.find('button[type="submit"]').removeClass('disabled');
 					if(res.status){
 						var html = '<tr>';
 						    html += '<td>' + cate_name + '</td>';
@@ -200,7 +202,18 @@
 			var cname = $('#edit-cate-name').val();
 			var clogo = $('#clogo-path').val();
 			$.ajax({
-				
+				url:'/admin/edit_cate',
+				type:'post',
+				dataType:'json',
+				data:{cid:cid,cname:cname,clogo:clogo,<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+				success:function(res){
+					if(res.status){
+						$('.edit-cate[data-cid="' + cid + '"]').attr({'data-name':cname,'data-clogo':clogo}).parents('tr').find('.show-cname').text(cname);
+						$('.cancel-edit').click();
+					}else{
+						alert(res.msg);
+					}
+				}
 			});
 		});
 		//删除分类

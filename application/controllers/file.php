@@ -22,7 +22,7 @@ class File extends CI_Controller{
 		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! in_array($current_method, array('download')))
+		if( ! in_array($current_method, array('download', 'upload_clogo')))
 		{
 			if( ! $this->user_info)
 			{
@@ -361,7 +361,7 @@ class File extends CI_Controller{
 			echo json_encode(array('status' => 0, 'msg' => '上传文件失败'));
 			exit;
 		}
-		
+		$this->load->library('Zebra_Image');
 		$source_path = $target_path = $config['upload_path'] . $this->file_info['file_name'];
 		$this->zebra_image->source_path = $source_path;
 		$this->zebra_image->target_path = $target_path;
