@@ -455,11 +455,153 @@ class Admin extends CI_Controller {
       */
      public function mgCategories()
      {
+     	$this->lang->load('upload');
+		$data['lang'] = $this->lang;
+     	$this->load->model('material_model', 'material');
+     	//素材分类
+		$data['cates'] = array();
+		$material_cate_query = $this->material->get_material_cate();
+		if($material_cate_query['status'])
+		{
+			$data['cates'] = $material_cate_query['material_cate'];
+		}
      	$data['bg_left'] = $this->load->module("common/bg_left",array(4),true);
      	 
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/category",$data);
      	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 创建分类
+      */
+     public function create_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cate_name = trim($this->input->post('cate_name', TRUE));
+     	if(empty($cate_name))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '请输入分类名'));
+     		exit;
+     	}
+     	$has_exists = $this->material->has_exists_cate($cate_name);
+     	if($has_exists['status'])
+     	{
+     		if($has_exists['exists'])
+     		{
+     			echo json_encode(array('status' => 0, 'msg' => '分类已经存在'));
+     			exit;
+     		}
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '出错了'));
+     		exit;
+     	}
+     	
+     	$create_cate = $this->material->create_cate($cate_name);
+     	if($create_cate['status'])
+     	{
+     		echo json_encode(array('status' => 1, 'cid' => $create_cate['cid']));
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '新增分类失败'));
+     	}
+     	exit;
+     }
+     
+     /**
+      * 检查分类
+      */
+     public function check_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cid = $this->input->post('cid', TRUE);
+     	$cid = (int) $cid;
+     	if(empty($cid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	$has_material = $this->material->has_material($cid);
+		if($has_material['status'])
+		{
+			echo json_encode(array('status' => 1, 'has' => $has_material['has']));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     }
+     
+     /**
+      * 删除分类
+      */
+     public function delete_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cid = $this->input->post('cid', TRUE);
+     	$cid = (int) $cid;
+     	
+     	if(empty($cid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	//查询默认分类
+     	$default_id = 0;
+     	$default_cate_query = $this->material->get_default_cate('其他');
+     	if($default_cate_query['status'] && ! empty($default_cate_query['cate']))
+     	{
+     		$default_id = $default_cate_query['cate']['id'];
+     	}
+     	if($default_id == $cid)
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '默认分类不能删除'));
+     		exit;
+     	}
+     	
+     	$delete_cate = $this->material->delete_cate($cid, $default_id);
+		if($delete_cate['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     }
+     
+     public function edit_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$post = $this->input->post(NULL, TRUE);
+     	$cid = (int) $post['cid'];
+     	$cname = trim($post['cname']);
+     	$clogo = trim($post['clogo']);
+     	if(empty($cid) || empty($cname))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	$update_cate = $this->material->update_cate(array('id' => $cid, 'cname' => $cname, 'clogo' => $clogo));
+     	if($update_cate['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     	
      }
      /**
       * 系统设置

@@ -5,7 +5,7 @@
 	<div class="mainbar">
 		<!-- Page heading -->
         <div class="page-head">
-        	<h2 class="pull-left"><i class="icon-file-alt"></i> 用户管理</h2>
+        	<h2 class="pull-left"><i class="icon-list-alt"></i> 用户管理</h2>
         	<!-- Breadcrumb -->
 	        <div class="bread-crumb pull-right">
 	        	<a href="<?php echo base_url('admin/index'); ?>"><i class="icon-home"></i> 首页</a> 
