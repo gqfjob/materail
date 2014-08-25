@@ -86,7 +86,7 @@ class Visit_log_model extends CI_Model
     /**
      * 获取访问记录总数
      */
-    public function getTotal($start_time = 0, $end_time = 0)
+    public function getTotal($start_time = 0, $end_time = 0, $type = 0)
     {
     	if($start_time > 0)
 		{
@@ -96,7 +96,10 @@ class Visit_log_model extends CI_Model
 		{
 			$this->rdb->where('time <', $end_time);
 		}
-
+		if($type > 0)
+		{
+			$this->rdb->where('type =', $type);
+		}
 		$total = $this->rdb->count_all_results('visit_log');
 		
 		return array('status' => 1, 'total' => $total);
