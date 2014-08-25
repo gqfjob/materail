@@ -41,20 +41,44 @@ class Admin extends CI_Controller {
      */
     public function index()
     {
-    	/*
-    	$user = checklogin();
-    	if($user){
-    		if(checkAdminRight($user)){//正常登录
-    			
-    		}else{
-    			show_error("您无后台管理权限",500,"出错啦");
-    		}
-    	}else{
-    		//未登录
-    		redirect(base_url('user/login/?callback='.urlencode(base_url('admin/index'))));
-    		exit(0);
-    	}*/
+    	$this->load->model('material_model','material');
+    	$this->load->model('user_model','user');
+    	$this->load->model('visit_log_model','visit_log');
+    	
+    	$total_material = $total_user = $total_visit = $total_download = 0;
+    	//查询素材总数
+    	$total_material_query = $this->material->get_total_material();
+     	if($total_material_query['status'])
+     	{
+     		$total_material = $total_material_query['total'];
+     	}
+     	
+     	//查询用户总数
+     	$total_user_query = $this->user->getTotalUser();
+     	if($total_user_query['status'])
+     	{
+     		$total_user = $total_user_query['total'];
+     	}
+    	
+     	//查询访问总数
+     	$total_visit_query = $this->visit_log->getTotal();
+     	if($total_visit_query['status'])
+     	{
+     		$total_visit = $total_visit_query['total'];
+     	}
+     	
+     	//查询下载总数
+     	$total_download_query = $this->visit_log->getTotal(0,0,3);
+     	if($total_download_query['status'])
+     	{
+     		$total_download = $total_download_query['total'];
+     	}
+     	
     	$data['bg_left'] = $this->load->module("common/bg_left",array(1),true);
+    	$data['total_material'] = $total_material;
+    	$data['total_user'] = $total_user;
+    	$data['total_visit'] = $total_visit;
+    	$data['total_download'] = $total_download;
 
     	$this->load->module("common/bg_header");
     	$this->load->view("admin/index",$data);
@@ -608,11 +632,58 @@ class Admin extends CI_Controller {
       */
      public function mgSystem()
      {
+     	//查询系统配置
+     	$this->load->model('site_config_model', 'site_config');
+     	$keys = array('SITE_TITLE', 'SITE_NOTICE', 'IS_NOTICE');
+     	$site_config = array();
+     	$site_config_query = $this->site_config->get_site_config($keys);
+     	if($site_config_query['status'])
+     	{
+     		$site_config = $site_config_query['site_config'];
+     	}
+     	
      	$data['bg_left'] = $this->load->module("common/bg_left",array(5),true);
-     	 
+     	$data['site_config'] = $site_config;
+     	
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/system",$data);
      	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 设置系统配置
+      */
+     public function set_site_config()
+     {
+     	$this->load->model('site_config_model', 'site_config');
+     	$title = $this->input->post('title', TRUE);
+     	$notice = $this->input->post('notice', TRUE);
+     	$is_notice = $this->input->post('is_notice', TRUE);
+     	
+     	$set_site_config = array(
+     		array(
+     			'skey' => 'SITE_TITLE',
+     			'svalue' => ($title) ? trim($title) : ''
+     		),
+     		array(
+     			'skey' => 'SITE_NOTICE',
+     			'svalue' => ($notice) ? trim($notice) : ''
+     		),
+     		array(
+     			'skey' => 'IS_NOTICE',
+     			'svalue' => ($is_notice) ? 1 : 0
+     		),
+     	);
+     	
+     	$set_query = $this->site_config->set_site_config($set_site_config);
+     	if($set_query['status'])
+     	{
+     		redirect('admin/mgSystem');
+     	}
+     	else
+     	{
+     		show_error('出错了');
+     	}
      }
      
      /**
