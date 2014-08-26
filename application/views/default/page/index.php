@@ -459,20 +459,35 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 	<!-- 切换 -->
 	<div id="infoLists">
 		<div id="info" class="usual">
+		<?php if( ! empty($cate)) : ?>
 			<ul id="infoTab">
-				<li><a href="#tabs1" class="selected first">图片</a></li>
-				<li><a href="#tabs2">文档</a></li>
-				<li><a href="#tabs3">源码</a></li>
-				<li><a href="#tabs4">应用</a></li>
-				<li><a href="#tabs5" class="last">其他</a></li>
+				<?php $i = 0;?>
+				<?php foreach($cate as $c) : $i++;?>
+				<?php if($i == 1) : ?>
+				<li><a href="#tabs<?php echo $c['id'];?>" class="selected first"><?php echo $c['cname'];?></a></li>
+				<?php elseif($i == count($cate)) : ?>
+				<li><a href="#tabs<?php echo $c['id'];?>" class="last"><?php echo $c['cname'];?></a></li>
+				<?php else: ?>
+				<li><a href="#tabs<?php echo $c['id'];?>"><?php echo $c['cname'];?></a></li>
+				<?php endif;?>
+				<?php endforeach;?>
 			</ul>
-			<div id="infoContain">
-				<div id="tabs1">取最热下载</div>
-				<div id="tabs2">More content in tab 2.</div>
-				<div id="tabs3">Tab 3 is always last!</div>
-				<div id="tabs4">Tab 4 is always last!</div>
-				<div id="tabs5">Tab 5 is always last!</div>
+			<div id="infoContain" style="padding:15px 7px;">
+				<?php foreach($cate_hot_material as $cid => $materials) : ?>
+				<div id="tabs<?php echo $cid;?>" class="padd">
+					<div class="row">
+					<?php foreach($materials as $material) : ?>
+						<div class="col-xs-3" style="padding-bottom:25px">
+							<a href="<?php echo base_url('material/detail/' . $material['id']);?>" target="_blank"><img src="<?php echo $material['logo']; ?>" alt="" class="img-thumbnail" /> </a>
+							<div class="text-center text-overflow"><a href="<?php echo base_url('material/detail/' . $material['id']);?>" target="_blank" title="<?php echo $material['mname'];?>"><?php echo $material['mname'];?></a></div>
+						</div>
+					<?php endforeach;?>
+					</div>
+				</div>
+				<?php endforeach; ?>
+				
 			</div>
+		<?php endif;?>
 		</div>
 		<div class="cl"></div>
 	</div>

@@ -1297,14 +1297,17 @@ function create_zip($files)
 	$has_exists = array();
 	foreach($files as $file)
 	{	
-		if(in_array($file['sname'], $has_exists))
+		if(file_exists($file['rname']))
 		{
-			$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['id'] . '_' .$file['sname']));
-		}
-		else
-		{
-			$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['sname']));
-			$has_exists[] = $file['sname'];
+			if(in_array($file['sname'], $has_exists))
+			{
+				$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['id'] . '_' .$file['sname']));
+			}
+			else
+			{
+				$zip->addFile($file['rname'], iconv("UTF-8","GB2312",$file['sname']));
+				$has_exists[] = $file['sname'];
+			}
 		}
 	}
 	$zip->close();

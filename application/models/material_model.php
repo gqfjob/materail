@@ -1330,4 +1330,62 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 	}
+	
+	/**
+	 * 自定义修改数据
+	 * @param int $vid
+	 * @param array $update
+	 */
+	public function custom_update_version($vid, $update)
+	{
+		if( empty($update))
+		{
+			return array('status' => 0);
+		}
+		$this->wdb->where('id', $vid);
+		foreach($update as $key => $value)
+		{
+			$this->wdb->set($key, $value, FALSE);
+		}
+		$query = $this->wdb->update('material_version');
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 获取分类最热素材
+	 * @param int $cid
+	 */
+	public function get_cate_hot_material($cid, $limit = 8)
+	{
+		if(empty($cid))
+		{
+			return array('status' => 0);
+		}
+		$sql = "SELECT m.id,m.mname,logo,SUM(mv.downnum) AS num FROM material_info m, material_version mv 
+				WHERE m.id=mv.mid AND m.cid={$cid} 
+				GROUP BY mv.mid 
+				ORDER BY num DESC, mv.id DESC
+				LIMIT {$limit}";
+		$query = $this->rdb->query($sql);
+		if($query)
+		{
+			$cate_hot_material = array();
+			if($query->num_rows())
+			{
+				$cate_hot_material = $query->result_array();
+			}
+			return array('status' => 1, 'cate_hot_material' => $cate_hot_material);
+		}
+		else 
+		{
+			return array('status' => 0);
+		}
+	}
 }

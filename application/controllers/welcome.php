@@ -21,8 +21,28 @@ class Welcome extends CI_Controller {
 	{
 		// 获取素材分类
 		$this->load->model ( "material_model" );
-		$allCate = $this->material_model->get_material_cate ();
-		$data ['cate'] = $allCate ['material_cate'];
+		$allCate = $this->material_model->get_material_cate();
+		$data ['cate'] = isset($allCate ['material_cate']) ? $allCate ['material_cate'] : array();
+		
+		//获取分类下的最热素材
+		if( ! empty($data['cate']))
+		{
+			$cate_hot_material = array();
+			foreach($data['cate'] as $c)
+			{
+				$cate_hot_query = $this->material_model->get_cate_hot_material($c['id']);
+				if($cate_hot_query['status'])
+				{
+					$cate_hot_material[$c['id']] = $cate_hot_query['cate_hot_material'];
+				}
+				else
+				{
+					$cate_hot_material[$c['id']] = array();
+				}
+			}
+			
+		}
+		$data ['cate_hot_material'] = $cate_hot_material;
 		
 		$this->load->module("common/header",array('title'=>'首页','cur'=>0));
 		$this->load->view('page/index',$data);

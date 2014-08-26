@@ -210,8 +210,8 @@ class File extends CI_Controller{
 	/**
 	 * 下载文件
 	 * 
-	 * @param unknown_type $type
-	 * @param unknown_type $id
+	 * @param string $type
+	 * @param int $id
 	 */
 	public function download($type = '', $id = 0)
 	{
@@ -237,6 +237,7 @@ class File extends CI_Controller{
 			}
 			$version = $version_query['version'];
 			$mid = $version['mid'];
+			$vid = $version['id'];
 			$down_path = $version['zip_path'];
 			$filename = $version['depict'] . '.zip';
 		}
@@ -250,6 +251,7 @@ class File extends CI_Controller{
 			}
 			$attachment= $attachment_query['attachment'];
 			$mid = $attachment['mid'];
+			$vid = $attachment['mvid'];
 			$down_path = $attachment['rname'];
 			$filename = $attachment['sname'];
 		}
@@ -270,6 +272,7 @@ class File extends CI_Controller{
 			show_error('下载文件不存在');
 		}
 		create_visit(3);
+		$this->material->custom_update_version($vid, array('downnum' => 'downnum+1'));
 		$mime = 'application/octet-stream';
 		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
 		{
@@ -323,6 +326,7 @@ class File extends CI_Controller{
 			show_error('无法查看此类型文件,请下载后查看');
 		}
 		$mid = $attachment['mid'];
+		$vid = $attachment['mvid'];
 		$view_path = $attachment['rname'];
 		$filename = $attachment['sname'];
 		
@@ -341,6 +345,7 @@ class File extends CI_Controller{
 		{
 			show_error('查看文件不存在');
 		}
+		$this->material->custom_update_version($vid, array('shownum' => 'shownum+1'));
 		redirect($view_path);
 	}
 	
