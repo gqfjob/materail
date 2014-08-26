@@ -44,6 +44,8 @@ class Material_Model extends CI_Model
 	/**
 	 * 删除素材附件
 	 * 
+	 * @param int $attachment_id
+	 * @param int $vid
 	 */
 	public function update_attachment($attachment_id, $vid)
 	{
@@ -65,6 +67,11 @@ class Material_Model extends CI_Model
 		
 	}
 	
+	/**
+	 * 获取附件信息
+	 * 
+	 * @param int $attachment_id
+	 */
 	public function get_attachment($attachment_id)
 	{
 		if(empty($attachment_id))
@@ -155,7 +162,10 @@ class Material_Model extends CI_Model
 					);
 				}
 			}
-			$this->wdb->insert_batch('material_visit_right', $insert_visit_vright);
+			if( ! empty($insert_visit_vright))
+			{
+			    $this->wdb->insert_batch('material_visit_right', $insert_visit_vright);
+			}
 		}
 		
 		$attachments = ($material['attachment_ids']) ? explode(',', $material['attachment_ids']) : array();
@@ -1387,5 +1397,92 @@ class Material_Model extends CI_Model
 		{
 			return array('status' => 0);
 		}
+	}
+	
+	/**
+	 * 获取素材的一个附件
+	 * @param int $mid
+	 * @param string $type
+	 */
+	public function get_mate_one_attachemt($mid, $type = array())
+	{
+	    $this->rdb->where('mid', $mid);
+	    if( ! empty($type))
+	    {
+	        $this->rdb->where_in('pfix', $type);
+	    }
+	    $this->rdb->limit(1);
+	    $query = $this->rdb->get('material_attatch');
+	    if($query)
+	    {
+	        $attachment = array();
+	        if($query->num_rows())
+	        {
+	            $attachment = $query->row_array();
+	        }
+	        return array('status' => 1, 'attachment' => $attachment);
+	    }
+	    else
+	    {
+	        return array('status' => 0);
+	    }
+	}
+	
+	/**
+	 * 修改素材
+	 * @param array $material
+	 */
+	public function edit_material($material)
+	{
+	    if(empty($material))
+	    {
+	        return array('status' => 0);
+	    }
+	    
+	    $this->wdb->trans_start();
+	    $update_material_info = array(
+	            'mname'  => $material['mname'],
+	            'cid' => $material['cid'],
+	            'update_at' => $material['update_time'],
+	            'logo' => $material['logo'],
+	            'vright' => $material['vright']
+	    );
+	    $this->wdb->where('id', $material['id']);
+	    $this->wdb->update('material_info', $update_material_info);
+	    
+	    $this->wdb->where('mid', $material['id']);
+	    $this->wdb->delete('material_visit_right');
+	    if($material['vright'] == 3)
+	    {
+	        $insert_visit_vright = array();
+	        $vright_users = explode(',', $material['vright_user']);
+	        foreach($vright_users as $value)
+	        {
+	            $uid = (int) $value;
+	            if($uid > 0)
+	            {
+	                $insert_visit_vright[] = array(
+	                        'mid' => $material['id'],
+	                        'uid' => $uid,
+	                        'vr' => 2
+	                );
+	            }
+	        }
+	        if( ! empty($insert_visit_vright))
+	        {
+	           $this->wdb->insert_batch('material_visit_right', $insert_visit_vright);
+	        }
+	    }
+	    
+	    $this->wdb->trans_complete();
+	    $this->wdb->trans_off();
+	    if ($this->wdb->trans_status() === FALSE)
+	    {
+	        return array('status' => 0);
+	    }
+	    else
+	    {
+	        return array('status' => 1);
+	    }
 	}
 }

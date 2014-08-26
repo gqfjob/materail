@@ -98,7 +98,7 @@ class File extends CI_Controller{
 	public function upload_attachment()
 	{
 		$config['upload_path'] = 'uploads/attachment/' . date('Ym') . '/';
-	    $config['allowed_types'] = 'doc|txt|ppt|zip|jpg|gif|png|ico';
+	    $config['allowed_types'] = '*';
 	    $config['max_size'] = '204800';
 	  	$config['overwrite'] = FALSE;
 	  	$config['encrypt_name'] = TRUE;

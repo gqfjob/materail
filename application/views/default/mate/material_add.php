@@ -51,7 +51,7 @@
 					    	<button class="btn btn-default btn-success" data-type="2" type="button" >登录用户可下载</button>
 					    	<button class="btn btn-default" data-type="3" type="button" >指定用户可下载</button>
 					    	<input type="hidden" name="permission" id="permission" value="2" autocomplete="off" />
-					    	<input type="hidden" name="permission-user" id="permission-user" value="1,2" autocomplete="off" />
+					    	<input type="hidden" name="permission-user" id="permission-user" value="" autocomplete="off" />
 					    	<ul></ul>
 					    </div>
 					    
@@ -63,7 +63,7 @@
 					    <div class="col-xs-8">
 					    	<input type="hidden" name="attachment-ids" id ="attachment-ids" value="" autocomplete="off" />
 					    	<div class="upload-container"><input id="upload-attachment" type="file" name="material-attachment"/></div>
-					    	<span class="help-line">&nbsp;素材大小不超过200M,格式支持doc,txt,ppt,zip,jpg,gif,png,ico</span>
+					    	<span class="help-line">&nbsp;素材大小不超过200M</span>
 					    	<div id="attachment-msg" class="alert alert-info msg-width">
 					    		<span></span>
 					   	 	</div>
@@ -220,8 +220,8 @@
 			'multi'    : false,
 			'progressData' : 'speed', 
 			'fileSizeLimit' : '200MB',
-			'fileTypeExts' : '*.doc;*.txt;*.ppt;*.zip;*.jpg;*.gif;*.png;*.ico',
-			'fileTypeDesc' : '格式仅支持doc,txt,ppt,zip,jpg,gif,png,ico',
+			'fileTypeExts' : '',
+			'fileTypeDesc' : '',
 			'overrideEvents' : ['onSelectError'],
 			'onSelectError' : function(file,errorCode,errorMsg){
 				var settings = this.settings;

@@ -1327,11 +1327,15 @@ function check_view_down_material($material, $user)
 	{
 		if(empty($user))
 		{
-			show_error('登录后才能查看');
+			redirect('user/login?callback=' . current_url());
 		}
 	}
 	elseif($material['vright'] == 3)
 	{
+	    if(empty($user))
+	    {
+	        redirect('user/login?callback=' . current_url());
+	    }
 		//查询允许用户
 		$allow_uids = array();
 		$allow_users_query = $CI->material->allow_users($material['id']);
@@ -1343,8 +1347,8 @@ function check_view_down_material($material, $user)
 				$allow_uids[] = $allow_user['uid'];
 			}
 		}
-		
-		if(empty($user) || ! in_array($user['id'], $allow_uids))
+		$allow_uids[] = $material['uid'];
+		if( ! in_array($user['id'], $allow_uids))
 		{
 			show_error('您无权查看');
 		}
