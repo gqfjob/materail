@@ -22,7 +22,7 @@ class File extends CI_Controller{
 		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! in_array($current_method, array('download')))
+		if( ! in_array($current_method, array('download', 'upload_clogo')))
 		{
 			if( ! $this->user_info)
 			{
@@ -269,6 +269,7 @@ class File extends CI_Controller{
 		{
 			show_error('下载文件不存在');
 		}
+		create_visit(3);
 		$mime = 'application/octet-stream';
 		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
 		{
@@ -341,5 +342,35 @@ class File extends CI_Controller{
 			show_error('查看文件不存在');
 		}
 		redirect($view_path);
+	}
+	
+	/**
+	 * 上传分类图片
+	 */
+	public function upload_clogo()
+	{
+		$config['upload_path'] = 'uploads/clogo/';
+	    $config['allowed_types'] = 'gif|jpg|png';
+	    $config['max_size'] = '2048';
+	  	$config['overwrite'] = FALSE;
+	  	$config['encrypt_name'] = TRUE;
+		$this->_upload($config);
+
+		if(empty($this->file_info))
+		{
+			echo json_encode(array('status' => 0, 'msg' => '上传文件失败'));
+			exit;
+		}
+		$this->load->library('Zebra_Image');
+		$source_path = $target_path = $config['upload_path'] . $this->file_info['file_name'];
+		$this->zebra_image->source_path = $source_path;
+		$this->zebra_image->target_path = $target_path;
+		if( ! $this->zebra_image->resize(128, 128))
+		{
+			echo json_encode(array('status' => 0, 'msg' => '生成缩略图失败'));
+			exit;
+		}
+		
+		echo json_encode(array('status' => 1, 'result' => array('file_path' => $source_path),'msg' => '操作成功'));
 	}
 } 

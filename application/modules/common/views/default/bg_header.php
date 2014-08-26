@@ -94,7 +94,7 @@
               </div>
               <div class="mcol-right">
                 <!-- Number of visitors -->
-                <p><a href="#">7000</a> <em>访问</em></p>
+                <p><a href="#"><?php echo $total_visit;?></a> <em>访问</em></p>
               </div>
               <div class="clearfix"></div>
             </div>
@@ -107,7 +107,7 @@
               </div>
               <div class="mcol-right">
                 <!-- Number of visitors -->
-                <p><a href="#">3000</a> <em>用户</em></p>
+                <p><a href="#"><?php echo $total_user;?></a> <em>用户</em></p>
               </div>
               <div class="clearfix"></div>
             </div>
@@ -120,7 +120,7 @@
               </div>
               <div class="mcol-right">
                 <!-- Number of visitors -->
-                <p><a href="#">5000</a><em>下载</em></p>
+                <p><a href="#"><?php echo $total_download;?></a><em>下载</em></p>
               </div>
               <div class="clearfix"></div>
             </div>                        

@@ -41,20 +41,44 @@ class Admin extends CI_Controller {
      */
     public function index()
     {
-    	/*
-    	$user = checklogin();
-    	if($user){
-    		if(checkAdminRight($user)){//正常登录
-    			
-    		}else{
-    			show_error("您无后台管理权限",500,"出错啦");
-    		}
-    	}else{
-    		//未登录
-    		redirect(base_url('user/login/?callback='.urlencode(base_url('admin/index'))));
-    		exit(0);
-    	}*/
+    	$this->load->model('material_model','material');
+    	$this->load->model('user_model','user');
+    	$this->load->model('visit_log_model','visit_log');
+    	
+    	$total_material = $total_user = $total_visit = $total_download = 0;
+    	//查询素材总数
+    	$total_material_query = $this->material->get_total_material();
+     	if($total_material_query['status'])
+     	{
+     		$total_material = $total_material_query['total'];
+     	}
+     	
+     	//查询用户总数
+     	$total_user_query = $this->user->getTotalUser();
+     	if($total_user_query['status'])
+     	{
+     		$total_user = $total_user_query['total'];
+     	}
+    	
+     	//查询访问总数
+     	$total_visit_query = $this->visit_log->getTotal();
+     	if($total_visit_query['status'])
+     	{
+     		$total_visit = $total_visit_query['total'];
+     	}
+     	
+     	//查询下载总数
+     	$total_download_query = $this->visit_log->getTotal(0,0,3);
+     	if($total_download_query['status'])
+     	{
+     		$total_download = $total_download_query['total'];
+     	}
+     	
     	$data['bg_left'] = $this->load->module("common/bg_left",array(1),true);
+    	$data['total_material'] = $total_material;
+    	$data['total_user'] = $total_user;
+    	$data['total_visit'] = $total_visit;
+    	$data['total_download'] = $total_download;
 
     	$this->load->module("common/bg_header");
     	$this->load->view("admin/index",$data);
@@ -62,11 +86,12 @@ class Admin extends CI_Controller {
     }
 
     /**
-    * 素材管理
+     * 素材管理
      */
      public function mgMaterial($page = 1)
      {
      	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	
      	$this->load->model('material_model', 'material');
      	$this->load->model('user_model', 'user');
@@ -380,9 +405,70 @@ class Admin extends CI_Controller {
      /**
       * 访问日志管理
       */
-     public function mgVisitor()
+     public function mgVisitor($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
+     	$start = $this->input->get('start', TRUE);
+     	$end= $this->input->get('end', TRUE);
+     	$where_time = array();
+     	$start_time = $end_time = 0;
+     	if($start_time !== FALSE)
+     	{
+     		$data['start'] = $where_time['start'] = trim($start);
+     		$start_time = strtotime($where_time['start']);
+     	}
+     	if($end_time !== FALSE)
+     	{
+     		$data['end'] = $where_time['end'] = trim($end);
+     		$end_time = strtotime($where_time['end']);
+     	}
+     	
+     	$this->load->model('visit_log_model', 'visit_log');
+     	//查询总数
+     	$total = 0;
+     	$total_query = $this->visit_log->getTotal($start_time, $end_time);
+     	if($total_query['status'])
+     	{
+     		$total = (int) $total_query['total'];
+     	}
+     	//分页配置
+     	$config = $this->config->item('pagination_config');
+     	if( ! empty($where_time))
+     	{
+     		$config['suffix'] = '?' . http_build_query($where_time);
+     		$config['first_url'] = base_url('admin/mgVisitor/1?' . http_build_query($where_time));
+     	}
+     	$config['base_url'] = base_url('admin/mgVisitor');
+		$config['total_rows'] = $total;
+		$config['per_page'] = 20; 
+     	$this->load->library('pagination');
+     	$this->pagination->initialize($config); 
+		$pages =  $this->pagination->create_links();
+		
+		//查询访问列表
+		$lists = $uids = array();
+		$lists_query = $this->visit_log->getAllList($page, $config['per_page'], $start_time, $end_time);
+		if($lists_query['status'])
+		{
+			$lists = $lists_query['lists'];
+			foreach($lists as $list)
+			{
+				$uids[] = $list['uid'];
+			}
+		}
+		
+     	//查询用户信息
+     	$users = array();
+     	if( ! empty($uids))
+     	{
+     		$users = $this->user->batchGetUser($uids);
+     	}
+     	
      	$data['bg_left'] = $this->load->module("common/bg_left",array(3),true);
+     	$data['lists'] = $lists;
+     	$data['users'] = $users;
+     	$data['pages'] = $pages;
      
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/visitor",$data);
@@ -393,22 +479,211 @@ class Admin extends CI_Controller {
       */
      public function mgCategories()
      {
+     	$this->lang->load('upload');
+		$data['lang'] = $this->lang;
+     	$this->load->model('material_model', 'material');
+     	//素材分类
+		$data['cates'] = array();
+		$material_cate_query = $this->material->get_material_cate();
+		if($material_cate_query['status'])
+		{
+			$data['cates'] = $material_cate_query['material_cate'];
+		}
      	$data['bg_left'] = $this->load->module("common/bg_left",array(4),true);
      	 
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/category",$data);
      	$this->load->module("common/bg_footer");
      }
+     
+     /**
+      * 创建分类
+      */
+     public function create_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cate_name = trim($this->input->post('cate_name', TRUE));
+     	if(empty($cate_name))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '请输入分类名'));
+     		exit;
+     	}
+     	$has_exists = $this->material->has_exists_cate($cate_name);
+     	if($has_exists['status'])
+     	{
+     		if($has_exists['exists'])
+     		{
+     			echo json_encode(array('status' => 0, 'msg' => '分类已经存在'));
+     			exit;
+     		}
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '出错了'));
+     		exit;
+     	}
+     	
+     	$create_cate = $this->material->create_cate($cate_name);
+     	if($create_cate['status'])
+     	{
+     		echo json_encode(array('status' => 1, 'cid' => $create_cate['cid']));
+     	}
+     	else
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '新增分类失败'));
+     	}
+     	exit;
+     }
+     
+     /**
+      * 检查分类
+      */
+     public function check_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cid = $this->input->post('cid', TRUE);
+     	$cid = (int) $cid;
+     	if(empty($cid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	$has_material = $this->material->has_material($cid);
+		if($has_material['status'])
+		{
+			echo json_encode(array('status' => 1, 'has' => $has_material['has']));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     }
+     
+     /**
+      * 删除分类
+      */
+     public function delete_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$cid = $this->input->post('cid', TRUE);
+     	$cid = (int) $cid;
+     	
+     	if(empty($cid))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	//查询默认分类
+     	$default_id = 0;
+     	$default_cate_query = $this->material->get_default_cate('其他');
+     	if($default_cate_query['status'] && ! empty($default_cate_query['cate']))
+     	{
+     		$default_id = $default_cate_query['cate']['id'];
+     	}
+     	if($default_id == $cid)
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '默认分类不能删除'));
+     		exit;
+     	}
+     	
+     	$delete_cate = $this->material->delete_cate($cid, $default_id);
+		if($delete_cate['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     }
+     
+     public function edit_cate()
+     {
+     	$this->load->model('material_model', 'material');
+     	
+     	$post = $this->input->post(NULL, TRUE);
+     	$cid = (int) $post['cid'];
+     	$cname = trim($post['cname']);
+     	$clogo = trim($post['clogo']);
+     	if(empty($cid) || empty($cname))
+     	{
+     		echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+     		exit;
+     	}
+     	
+     	$update_cate = $this->material->update_cate(array('id' => $cid, 'cname' => $cname, 'clogo' => $clogo));
+     	if($update_cate['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}  
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '出错了'));
+		}   	
+     	
+     }
      /**
       * 系统设置
       */
      public function mgSystem()
      {
+     	//查询系统配置
+     	$this->load->model('site_config_model', 'site_config');
+     	$keys = array('SITE_TITLE', 'SITE_NOTICE', 'IS_NOTICE');
+     	$site_config = array();
+     	$site_config_query = $this->site_config->get_site_config($keys);
+     	if($site_config_query['status'])
+     	{
+     		$site_config = $site_config_query['site_config'];
+     	}
+     	
      	$data['bg_left'] = $this->load->module("common/bg_left",array(5),true);
-     	 
+     	$data['site_config'] = $site_config;
+     	
      	$this->load->module("common/bg_header");
      	$this->load->view("admin/system",$data);
      	$this->load->module("common/bg_footer");
+     }
+     
+     /**
+      * 设置系统配置
+      */
+     public function set_site_config()
+     {
+     	$this->load->model('site_config_model', 'site_config');
+     	$title = $this->input->post('title', TRUE);
+     	$notice = $this->input->post('notice', TRUE);
+     	$is_notice = $this->input->post('is_notice', TRUE);
+     	
+     	$set_site_config = array(
+     		array(
+     			'skey' => 'SITE_TITLE',
+     			'svalue' => ($title) ? trim($title) : ''
+     		),
+     		array(
+     			'skey' => 'SITE_NOTICE',
+     			'svalue' => ($notice) ? trim($notice) : ''
+     		),
+     		array(
+     			'skey' => 'IS_NOTICE',
+     			'svalue' => ($is_notice) ? 1 : 0
+     		),
+     	);
+     	
+     	$set_query = $this->site_config->set_site_config($set_site_config);
+     	if($set_query['status'])
+     	{
+     		redirect('admin/mgSystem');
+     	}
+     	else
+     	{
+     		show_error('出错了');
+     	}
      }
      
      /**
@@ -417,6 +692,7 @@ class Admin extends CI_Controller {
      public function mgUser($page = 1)
      {
      	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	
      	$this->load->model('user_model', 'user');
      	$this->load->model('material_model', 'material');
@@ -685,6 +961,8 @@ class Admin extends CI_Controller {
       */
      public function get_view_material($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	$uid = (int) $this->input->get('uid', TRUE);
      	if(empty($uid))
      	{
@@ -797,6 +1075,8 @@ class Admin extends CI_Controller {
       */
  	 public function get_upload_material($page = 1)
      {
+     	$page = (int) $page;
+     	$page = ($page <= 0) ? 1 : $page;
      	$uid = (int) $this->input->get('uid', TRUE);
      	if(empty($uid))
      	{

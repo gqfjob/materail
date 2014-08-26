@@ -179,6 +179,7 @@ class Material extends CI_Controller {
 		$material_insert = $this->material->insert_material($material);
 		if($material_insert['status'])
 		{
+			create_visit(2);
 			redirect('material/manager/' . $material_insert['mid']);
 		}
 		else
@@ -361,6 +362,7 @@ class Material extends CI_Controller {
 		
 		if($insert_version['status'])
 		{
+			create_visit(2);
 			redirect('material/manager/' . $mid);
 			
 		}

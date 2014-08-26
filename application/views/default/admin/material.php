@@ -19,7 +19,7 @@
       	 <form class="navbar-form navbar-right" role="form" method="get" action="<?php echo base_url('admin/mgMaterial');?>">
 			  <div class="form-group">
 			    <label class="sr-only" for="exampleInputEmail2">搜索素材</label>
-			    <input type="text" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="搜索素材名">
+			    <input type="text" autocomplete="off" class="form-control col-lg-9" id="search" name="search" value="<?php echo isset($search) ? $search : '';?>" placeholder="搜索素材名">
 			  </div>
 			  <div class="form-group">
 			  	<button type="submit" class="btn btn-default">查找</button>
