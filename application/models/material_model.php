@@ -1223,4 +1223,111 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 	}
+	
+	/**
+	 * 检查分类是否存在
+	 * @param string $cate_name
+	 */
+	public function has_exists_cate($cate_name)
+	{
+		$this->rdb->where('cname', $cate_name);
+		$total = $this->rdb->count_all_results('material_cate');
+		return array('status' => 1, 'exists' => ($total > 0) ? TRUE : FALSE);
+	}
+	
+	/**
+	 * 新增分类
+	 * @param string $cate_name
+	 */
+	public function create_cate($cate_name)
+	{
+		$query = $this->wdb->insert('material_cate', array('cname' => $cate_name));
+		if($query)
+		{
+			return array('status' => 1, 'cid' => $this->wdb->insert_id());
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 检查分类下是否有素材
+	 * @param int $cid
+	 */
+	public function has_material($cid)
+	{
+		$this->rdb->where('cid', $cid);
+		$total = $this->rdb->count_all_results('material_info');
+		return array('status' => 1, 'has' => ($total > 0) ? TRUE : FALSE);
+	}
+	
+	/**
+	 * 删除分类
+	 * @param int $cid
+	 * @param int $default_id
+	 */
+	public function delete_cate($cid, $default_id)
+	{
+		$this->wdb->trans_start();
+		$this->wdb->where('id', $cid);
+		$this->wdb->delete('material_cate');
+		$this->wdb->where('cid', $cid);
+		$this->wdb->update('material_info', array('cid' => $default_id));
+		$this->wdb->trans_complete();
+		$this->wdb->trans_off();
+		if ($this->wdb->trans_status() === FALSE)
+		{
+		    return array('status' => 0);
+		}
+		
+		return array('status' => 1);
+	}
+	
+	/**
+	 * 查询默认分类
+	 * @param string $cate_name
+	 */
+	public function get_default_cate($cate_name)
+	{
+		$this->rdb->where('cname', $cate_name);
+		$query = $this->rdb->get('material_cate');
+		if($query)
+		{
+			$cate = array();
+			if($query->num_rows() > 0)
+			{
+				$cate = $query->row_array();
+			}
+			return array('status' => 1, 'cate' => $cate);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
+	
+	/**
+	 * 修改分类
+	 * @param $cate
+	 */
+	public function update_cate($cate)
+	{
+		if(empty($cate))
+		{
+			return array('status' => 0);
+		}
+		$this->wdb->where('id', $cate['id']);
+		unset($cate['id']);
+		$query = $this->wdb->update('material_cate',$cate);
+		if($query)
+		{
+			return array('status' => 1);
+		}
+		else
+		{
+			return array('status' => 0);
+		}
+	}
 }

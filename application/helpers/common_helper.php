@@ -1348,3 +1348,36 @@ function check_view_down_material($material, $user)
 	}
 		
 }
+
+/**
+ * 生成访问日志
+ * @param $type
+ */
+function create_visit($type)
+{
+	$CI = &get_instance();
+	$CI->load->library('user_agent');
+    $r['curl'] = $_SERVER['HTTP_REFERER'];//当前请求地址
+    $r['browser'] = $CI->agent->browser();//浏览器
+    $r['browserVer'] = $CI->agent->version();//浏览器版本
+    $r['browserAll'] = $CI->agent->browser().' '.$CI->agent->version();
+    $r['agent'] = $CI->agent->agent_string();
+    $r['ip'] = $CI->input->ip_address();
+    $r['reference'] = urldecode($CI->input->get('ur'));
+    $r['isrobot'] = ($CI->agent->is_robot())?1:0;
+    $r['robot'] = $CI->agent->robot();
+    $r['platform'] = $CI->agent->platform();
+    $r['time'] = mktime();
+    $r['ctitle'] = urldecode($CI->input->get('t'));
+    $user = checklogin();
+    if(!$user){
+    	$r['uid'] = 0;//匿名
+    }else{
+    	$r['uid'] = $user['id'];
+    }
+    $r['usign'] = get_cookie('sign',true);
+    $r['type'] = $type;
+    
+    $CI->load->model('visit_log_model');
+    $CI->visit_log_model->save($r);
+}
