@@ -548,7 +548,7 @@ button.gray:active, .button_gray:active {
 	text-align: center;
 	margin-top: 50px;
 	padding-top: 20px;
-	border: 1px solid #ccc;
+	border-top: 1px solid #ccc;
 }
 .footer a{
     font-size:14px;
