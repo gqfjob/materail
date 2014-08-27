@@ -26,7 +26,7 @@ class Material extends CI_Controller {
 		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! in_array($current_method, array('search', 'detail', 'list')))
+		if( ! in_array($current_method, array('search', 'detail', 'lists')))
 		{
 			if( ! $this->user_info)
 			{
