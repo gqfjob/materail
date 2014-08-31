@@ -45,7 +45,7 @@
 		<div class="cl"></div>
 		<ul id="page">
 			<?php if($pagePre):?>
-			<li class="fl"><a href="<?php echo base_url('material/search/'.$cid.'/?p='.$pageNext.'&searchterm='.urlencode($key))?>" class="mbtn mbtn-default">上一页</a></li>
+			<li class="fl"><a href="<?php echo base_url('material/search/'.$cid.'/?p='.$pagePre.'&searchterm='.urlencode($key))?>" class="mbtn mbtn-default">上一页</a></li>
 			<?php else:?>
 			<li class="fl"><a href="javascript:void(0);" class="mbtn mbtn-default disable">上一页</a></li>
 			<?php endif;?>
