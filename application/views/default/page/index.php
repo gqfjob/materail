@@ -412,7 +412,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 <div id="container">
 	<div>
 		<!-- 搜索 -->
-		<form class="form-search form-emphasis" id="site-search" method="post" action="/search/all"  onsubmit="return checkData();">
+		<form class="form-search form-emphasis" id="site-search" method="post" action="/material/search/all"  onsubmit="return checkData();">
 			<div class="input-group">
 				<div class="form-control"  id="search-input-box">
 					<div class="placeholder_parent">

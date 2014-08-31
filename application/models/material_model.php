@@ -1427,4 +1427,43 @@ class Material_Model extends CI_Model
 		$res = $query->row();
 		return $res;
 	}
+	/**
+	 * 模糊查询素材
+	 * @param unknown $key 关键词
+	 * @param unknown $page 第几页
+	 * @param unknown $perpage  每页数量
+	 * @param unknown $cur 分类 all表示全部
+	 */
+	public function get_materials_like($key, $page, $perpage, $cur)
+	{
+		if($page <=0){
+			$page = 1;
+		}
+		$start = ($page-1)*$perpage;
+		$end = $perpage;
+		
+		$sql = "select m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
+		$sql .= " left join material_cate as c on m.cid = c.id ";
+		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
+		if(($cur != 'all') && is_numeric($cur)){
+			$sql .= " and m.cid = ".$cur;
+		}
+		$sql .= " limit {$start},{$end}";
+		
+		$query = $this->rdb->query($sql);
+		$res = $query->result_array();
+		return $res;
+	}
+	
+	public function count_materials_like($key, $cur)
+	{
+		$sql = "select count(*) as num from material_info as m right join material_version as v  on m.id = v.mid ";
+		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
+		if(($cur != 'all') && is_numeric($cur)){
+			$sql .= " and m.cid = ".$cur;
+		}
+		$query = $this->rdb->query($sql);
+		$res = $query->row();
+		return $res->num;
+	}
 }

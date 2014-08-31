@@ -22,8 +22,14 @@ class Common_Header_module extends CI_Module {
 	 */
 	function index($title = "", $cur = 0, $description = "", $keywords = "") {
 		$data ['curl'] = urlencode ( current_url () );
+		
 		// 获取当前tab
 		$data ['cur'] = $cur;
+		if($cur == 0){
+			$data['tab'] = "all";
+		}else{
+			$data['tab'] = $cur;
+		}
 		// 自定义标题，描述等
 		$data ['title'] = $title;
 		$data ['description'] = $description;

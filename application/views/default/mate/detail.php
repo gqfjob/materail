@@ -117,7 +117,7 @@
 					<img src="<?php echo base_url($material['logo']);?>"/>
 				</div>
 				<div class="mdetail">
-					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/list/' . $material['cid']);?>" style="color:#fff">图片</a></span><span class="bold"><?php echo $material['mname']?></span></p>
+					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/lists/' . $material['cid']);?>" style="color:#fff">图片</a></span><span class="bold"><?php echo $material['mname']?></span></p>
 					<ul class="mtime">
 						<li style="width:220px">上传时间：<?php echo date('Y-m-d H:i', $material['create_at']);?></li>
 						<li style="width:90px">版本数：<?php echo $material['vernum']?></li>

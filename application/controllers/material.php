@@ -795,11 +795,62 @@ class Material extends CI_Controller {
 	/**
 	 * 素材搜索
 	 */
-	public function search()
+	public function search($id)
 	{
-		$key = $this->input->post('k',true);
-		$this->load->module("common/header",array('title'=>'搜索结果'));
-		$this->load->view('mate/searchRes');
+		if($id == 'all')
+		{
+			$cur = 0;
+		}else{
+			$cur = $id;
+		}
+		$data['cid'] = $id;
+		$key = urldecode($this->input->get_post('searchterm',true));
+		$page = $this->input->get_post('p',true);
+		if(!$page){
+			$page = 1;
+		}
+		$data['key'] = $key;
+		
+		$perpage = 2;//每页数
+		$num = $this->material->count_materials_like($key, $cur);//总查询结果数
+		$data['total'] = $num;
+		$total = $num;
+		if($total > $perpage)
+		{
+			$data['showPage'] = true;
+		}else{
+			$data['showPage'] = false;
+		}
+		//计算页码
+		if($total - ($page*$perpage)>0){
+			$data['pageNext'] = $page+1;
+		}else{
+			$data['pageNext'] = false;
+		}
+		if($page > 1){
+			$data['pagePre'] = $page-1;
+		}else{
+			$data['pagePre'] = false;
+		}
+		//TODO:用solr查询
+		$data['materials'] = array();
+		$res = $this->material->get_materials_like($key,$page,$perpage,$cur);
+		//关键词高亮处理
+		if(sizeof($res) > 0)
+		{
+			foreach ($res as $r)
+			{
+				if(strpos($r['mname'],$key)){
+					str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
+				}
+				if(strpos($r['nohtml'],$key)){
+					str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['nohtml']);
+				}
+				array_push($data['materials'],$r);
+			}
+		}
+		$this->load->module("common/header",array('title'=>'搜索结果','cur'=>$cur));
+		$this->load->view('mate/searchRes',$data);
 		$this->load->module("common/footer");
 	}
 	

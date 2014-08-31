@@ -59,8 +59,9 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 </div>
 <?php if($cur !=0):?>
 <div id="search_interface">
-	<form name="keyword_form" autocomplete="off" method="get" action="/cat.mhtml" style="width:532px;margin:0px auto;">
-		<input type="hidden" name="search_source" value="search_form">                                     
+	<form name="keyword_form" autocomplete="off" method="post" action="/material/search/<?php echo $tab;?>" style="width:532px;margin:0px auto;">
+		<input type="hidden" name="search_source" value="search_form">  
+		<input type="hidden" name="<?php echo $this->security->get_csrf_token_name();?>" value="<?php echo $this->security->get_csrf_hash();?>"/>              
 		<!-- main search container -->
 		<div class="main_search_container">
 			<div class="integrated_search_field">
