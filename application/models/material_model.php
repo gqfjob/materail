@@ -1388,4 +1388,43 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 	}
+	/**
+	 * 分页查询分类素材列表
+	 * @param unknown $cat 分类ID
+	 * @param unknown $page 第几页
+	 * @param unknown $perpage  每页数量
+	 */
+	public function getCateList($cat, $page, $perpage)
+	{	
+		if($page <=0){
+			$page = 1;
+		}
+		$start = ($page-1)*$perpage;
+		$end = $perpage;
+		if($cat == 0)
+		{
+			return array();
+		}else
+		{
+			$sql = "select m.*,i.* from material_info as m left join material_version as i 
+					on m.cversion = i.id
+					where m.cid = {$cat}
+					limit {$start},{$end}
+					";
+			$query = $this->rdb->query($sql);
+			return $query->result_array();
+		}
+		
+	}
+	/**
+	 * 查询分类下的素材数以及分类名称
+	 * @param unknown $cat 分类ID
+	 */
+	public function countCateList($cat)
+	{
+		$sql ="select count(*) as num,c.cname,c.clogo,c.id from material_info as m left join material_cate as c on m.cid = c.id where m.cid = {$cat}";
+		$query = $this->rdb->query($sql);
+		$res = $query->row();
+		return $res;
+	}
 }

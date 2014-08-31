@@ -265,8 +265,18 @@ class File extends CI_Controller{
 		$material = $material_query['material'];
 		
 		//判断权限
-		check_view_down_material($material, $this->user_info);
-		
+		$res = check_view_down_material($material, $this->user_info);
+		switch($res){
+			case 1:
+				redirect(base_url('/user/login/?callback=').urlencode(current_url()));
+				exit(0);
+				break;
+			case 2:
+				show_error("对不起，您无相关操作权限");
+				exit(0);
+				break;
+			default:
+		}
 		if( ! file_exists($down_path))
 		{
 			show_error('下载文件不存在');
@@ -339,8 +349,19 @@ class File extends CI_Controller{
 		$material = $material_query['material'];
 		
 		//判断权限
-		check_view_down_material($material, $this->user_info);
-		
+		unset($res);
+		$res = check_view_down_material($material, $this->user_info);
+		switch($res){
+			case 1:
+				redirect(base_url('/user/login/?callback=').urlencode(current_url()));
+				exit(0);
+				break;
+			case 2:
+				show_error("对不起，您无相关操作权限");
+				exit(0);
+				break;
+			default:
+		}
 		if( ! file_exists($view_path))
 		{
 			show_error('查看文件不存在');

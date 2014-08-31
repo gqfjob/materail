@@ -657,12 +657,39 @@ class Material extends CI_Controller {
 	/**
 	 * 素材分类列表
 	 */
-	public function lists($cat = 0 )
+	public function lists($cat = 0,$page=1 )
 	{
 		//查询当前分类下的素材
+		$perpage = 2;
+		//获取素材列表
+		$data['materials'] = $this->material->getCateList(intval($cat),intval($page),$perpage);
+		//获取分类信息及分类素材总数
+		$res = $this->material->countCateList(intval($cat));
+		$data['total'] = $res->num;
+		$data['cid'] = $res->id;
+		$total = $res->num;
+		if($total > $perpage) 
+		{
+			$data['showPage'] = true;
+		}else{
+			$data['showPage'] = false;
+		}
+		//计算页码
+		if($total - ($page*$perpage)>0){
+			$data['pageNext'] = $page+1;
+		}else{
+			$data['pageNext'] = false;
+		}
+		if($page > 1){
+			$data['pagePre'] = $page-1;
+		}else{
+			$data['pagePre'] = false;
+		}
 		
+		$data['cateName'] = $res->cname;
+		$data['clogo'] = $res->clogo;
 		$this->load->module("common/header",array('title'=>'列表','cur'=> $cat));
-		$this->load->view('mate/list');
+		$this->load->view('mate/list',$data);
 		$this->load->module("common/footer");	
 	}
 	/**
@@ -692,8 +719,18 @@ class Material extends CI_Controller {
 		}
 		
 		//检查权限
-		check_view_down_material($material, $this->user_info);
-		
+		$res = check_view_down_material($material, $this->user_info);
+		switch($res){
+			case 1:
+				redirect(base_url('/user/login/?callback=').urlencode(current_url()));
+				exit(0);
+				break;
+			case 2:
+				show_error("对不起，您无相关操作权限");
+				exit(0);
+				break;
+			default:
+		}
 		$vid = ($vid) ? $vid : $material['cversion'];
 		//检查版本所属
 		if( ! check_version_of_material($vid, $mid))

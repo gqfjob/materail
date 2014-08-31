@@ -1318,16 +1318,19 @@ function create_zip($files)
  * 检查用户查看/下载权限
  * @param $material
  * @param $user
+ * @return $res 1:需要登陆,2无权查看,3正常
  */
 function check_view_down_material($material, $user)
 {
 	$CI = &get_instance();
 	$CI->load->model('material_model', 'material');
+	$res = 3;
 	if($material['vright'] == 2)
 	{
 		if(empty($user))
 		{
-			show_error('登录后才能查看');
+			//show_error('登录后才能查看');
+			$res = 1;
 		}
 	}
 	elseif($material['vright'] == 3)
@@ -1346,9 +1349,13 @@ function check_view_down_material($material, $user)
 		
 		if(empty($user) || ! in_array($user['id'], $allow_uids))
 		{
-			show_error('您无权查看');
+			//show_error('您无权查看');
+			$res = 2;
+		}else{
+			$res = 3;
 		}
 	}
+	return $res;
 		
 }
 

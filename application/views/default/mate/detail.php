@@ -177,13 +177,13 @@
         </div>
 	</div>
 	<div id="wPageRight">
+		<?php if( ! empty($other_versions)): ?>
 		<div class="wBoxRight">
 			<div class="boxHd">
 				<div class="fl down-rank-ico ico" style="margin:5px 5px 0px 10px"></div><div class="fl b16 font-yahei mt5">其他版本下载</div><div class="fr mt5 font12 roundFont">版本数:<?php echo $material['vernum'] - 1;?></div>
 				<div class="cl"></div>
 			</div>
 			<div style="min-height: 200px">
-			<?php if( ! empty($other_versions)): ?>
 				<ul class="other-list">
 					<?php $i = 0?>
 					<?php foreach($other_versions as $other_version) : $i++;?>
@@ -201,12 +201,10 @@
 					<button type="button" id="other-next" class="other-next pull-right btn btn-default">下一页</button>
 				</div>
 				<?php endif;?>
-			<?php else : ?>
-				<div class="text-center" style="padding:10px 0">没有其他版本</div>
-			<?php endif;?>
 			</div>
 		</div>
-		<div class="wBoxRight mt20">
+	    <?php endif;?>
+		<div class="wBoxRight <?php if( ! empty($other_versions)) {echo ' mt20';}else{ echo ' mt10';}?>">
 			<div class="boxHd">
 				<div class="fl keywords-ico ico" style="margin:5px 5px 0px 10px"></div><h2 class="fl b16 font-yahei">同类型素材</h2>
 				<div class="cl"></div>

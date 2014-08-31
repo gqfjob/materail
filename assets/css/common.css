@@ -799,6 +799,7 @@ button.gray:active, .button_gray:active {
 	border:1px solid #ccc;
 	padding:10px;
 	background:#fff;
+	margin-top:10px;
 }
 .oneMaterail .mlogo{
     width:142px;
@@ -854,3 +855,15 @@ button.gray:active, .button_gray:active {
     overflow:hidden;
 }
 /*列表样式结束*/
+
+/*通用按钮样式*/
+.mbtn{
+	padding:10px 20px;
+	border:1px solid #ccc;
+	background:#fff;
+}
+.disable:hover{
+	color:#555;
+	cursor:default;
+}
+/*通用按钮样式结束*/

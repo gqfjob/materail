@@ -414,7 +414,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 		<!-- 搜索 -->
 		<form class="form-search form-emphasis" id="site-search" method="post" action="/search/all"  onsubmit="return checkData();">
 			<div class="input-group">
-				<div class="form-control">
+				<div class="form-control"  id="search-input-box">
 					<div class="placeholder_parent">
 						<span id="search_label" class="placeholder">请输入关键词</span>
 					</div>
@@ -477,10 +477,14 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 				<div id="tabs<?php echo $cid;?>" class="padd">
 					<div class="row">
 					<?php foreach($materials as $material) : ?>
+						<?php if($cid != 3):?>
 						<div class="col-xs-3" style="padding-bottom:25px">
 							<a href="<?php echo base_url('material/detail/' . $material['id']);?>" target="_blank"><img src="<?php echo $material['logo']; ?>" alt="" class="img-thumbnail" /> </a>
 							<div class="text-center text-overflow"><a href="<?php echo base_url('material/detail/' . $material['id']);?>" target="_blank" title="<?php echo $material['mname'];?>"><?php echo $material['mname'];?></a></div>
 						</div>
+						<?php else:?>
+						
+						<?php endif;?>
 					<?php endforeach;?>
 					</div>
 				</div>
@@ -517,4 +521,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 			return false;
 		}
 	}
+	$("#search-input-box").click(function(){
+		$("#index_keyword_input")[0].focus();
+	});
 </script>
