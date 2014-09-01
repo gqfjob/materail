@@ -1379,7 +1379,7 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		$sql = "SELECT m.id,m.mname,logo,SUM(mv.downnum) AS num FROM material_info m, material_version mv 
-				WHERE m.id=mv.mid AND m.cid={$cid} 
+				WHERE m.id=mv.mid AND m.state=1 AND m.cid={$cid} 
 				GROUP BY mv.mid 
 				ORDER BY num DESC, mv.id DESC
 				LIMIT {$limit}";
