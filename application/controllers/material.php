@@ -87,6 +87,9 @@ class Material extends CI_Controller {
 	public function material_action_add()
 	{
 		$post = $this->input->post(NULL, TRUE);
+		$post['material-cate'] = isset($post['material-cate']) ? trim($post['material-cate']) : '';
+		$post['material-name'] = isset($post['material-name']) ? trim($post['material-name']) : '';
+		$post['version-depict'] = isset($post['version-depict']) ? trim($post['version-depict']) : '';
 		
 		if( ! $post['material-cate'])
 		{
@@ -95,7 +98,7 @@ class Material extends CI_Controller {
 		
 		if( ! $post['material-name'])
 		{
-			show_error('请填入素材名称');;
+			show_error('请填入素材名称');
 		}
 		
 		if( ! $post['material-name'])
@@ -268,6 +271,152 @@ class Material extends CI_Controller {
 			echo json_encode(array('status' => 0));
 		}
 	}
+	
+	/**
+	 * 修改素材信息
+	 * @param int $mid
+	 */
+	public function material_edit($mid = 0)
+	{
+		$mid = (int)$mid;
+		if( ! $mid)
+		{
+			show_error('参数错误');
+		}
+		 
+		$this->lang->load('upload');
+		$data['lang'] = $this->lang;
+		 
+		//素材分类
+		$data['material_cate'] = array();
+		$material_cate_query = $this->material->get_material_cate();
+		if($material_cate_query['status'])
+		{
+			$data['material_cate'] = $material_cate_query['material_cate'];
+		}
+		 
+		//查询素材信息
+		$material_query = $this->material->get_material($mid);
+		if( ! $material_query['status'] || empty($material_query['material']))
+		{
+			show_error('素材不存在');
+		}
+		$data['material'] = $material_query['material'];
+		 
+		if($data['material']['vright'] == 3)
+		{
+			//查询允许用户
+			$allow_uids = array();
+			$allow_users_query = $this->material->allow_users($data['material']['id']);
+			if($allow_users_query['status'])
+			{
+				$allow_users = $allow_users_query['users'];
+				foreach($allow_users as $allow_user)
+				{
+					$allow_uids[] = $allow_user['uid'];
+				}
+			}
+		  
+			//查询用户信息
+			$users = array();
+			if( ! empty($allow_uids))
+			{
+				$this->load->model('user_model', 'user');
+				$users = $this->user->batchGetUser($allow_uids);
+			}
+			 
+			$data['allow_uids'] = $allow_uids;
+			$data['users'] = $users;
+		}
+		 
+		$this->load->module("common/header",array('title'=>'修改素材', 'cur' => 999));
+		$this->load->view('mate/material_edit',$data);
+		$this->load->module("common/footer");
+	}
+	
+	/**
+	 * 修改素材信息
+	 */
+	public function material_action_edit()
+	{
+		$post = $this->input->post(NULL, TRUE);
+		$post['mid'] = isset($post['mid']) ? intval($post['mid']) : 0;
+		$post['material-cate'] = isset($post['material-cate']) ? trim($post['material-cate']) : '';
+		$post['material-name'] = isset($post['material-name']) ? trim($post['material-name']) : '';
+		 
+		//检查素材管理权限
+		if( ! check_manager_material($post['mid'], $this->user_info['id']))
+		{
+			show_error('没有权限');
+		}
+		if( ! $post['mid'])
+		{
+			show_error('参数错误');
+		}
+		if( ! $post['material-cate'])
+		{
+			show_error('请选择素材类型');
+		}
+		 
+		if( ! $post['material-name'])
+		{
+			show_error('请填入素材名称');
+		}
+		 
+		$material = array(
+				'id'  => $post['mid'],
+				'mname'  => $post['material-name'],
+				'cid' => (int)$post['material-cate'],
+				'update_time' => time(),
+				'vright' => trim($post['permission']),
+				'vright_user' => trim($post['permission-user']),
+		);
+		 
+		$post['thumb-type'] = (int)$post['thumb-type'];
+		if($post['thumb-type'])
+		{
+			//获取附件信息
+			$attachment_query = $this->material->get_mate_one_attachemt($post['mid'],array('jpg','gif','png'));
+			if(($attachment_query['status'] && empty($attachment_query['attachment'])) || ! $attachment_query['status'])
+			{
+				$logo = 'assets/img/thumb-default.jpg';
+			}
+			else
+			{
+				//生成缩略图
+				$this->load->library('Zebra_Image');
+				$source_path = $attachment_query['attachment']['rname'];
+				$target_path = 'uploads/thumb/' . date('Ym') . '/' . end(explode('/', $attachment_query['attachment']['rname']));
+				$this->zebra_image->source_path = $source_path;
+				$this->zebra_image->target_path = $target_path;
+				if( ! $this->zebra_image->resize(118, 118))
+				{
+					show_error('生成缩略图失败');
+				}
+				else
+				{
+					$logo = $target_path;
+				}
+			}
+			$material['logo'] = $logo;
+		}
+		else
+		{
+			$logo = trim($post['thumb-path']);
+			$material['logo'] = $logo;
+		}
+	
+		$edit_material = $this->material->edit_material($material);
+		if($edit_material['status'])
+		{
+			redirect('material/manager/' . $post['mid']);
+		}
+		else
+		{
+			show_error('修改失败');
+		}
+	}
+	
 	
 	/**
 	 * 新增版本

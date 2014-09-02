@@ -1347,7 +1347,9 @@ function check_view_down_material($material, $user)
 			}
 		}
 		
-		if(empty($user) || ! in_array($user['id'], $allow_uids))
+		//if(empty($user) || ! in_array($user['id'], $allow_uids))
+		$allow_uids[] = $material['uid'];
+		if( ! in_array($user['id'], $allow_uids))
 		{
 			//show_error('您无权查看');
 			$res = 2;
