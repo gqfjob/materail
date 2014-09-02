@@ -60,7 +60,7 @@
 	</div>
 	<div id="material-op" class="container">
 		<?php if($manager_material) :?>
-		<a class="btn btn-default btn-primary" href="<?php echo base_url('material/material_edit/' . $material['id'])?>">修改</a>
+		<a class="btn btn-default btn-success" href="<?php echo base_url('material/material_edit/' . $material['id'])?>">修改</a>
 		<a id="set-draft" class="btn btn-default btn-primary" data-id="<?php echo $material['id']?>" data-status="0">转为草稿</a>
 		<a id="set-publish" class="btn btn-default btn-success" data-id="<?php echo $material['id']?>" data-status="1">发布</a>
 		<?php endif;?>
