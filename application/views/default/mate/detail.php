@@ -172,9 +172,11 @@
             </div>
 		</div>
 		<!-- 打包下载 -->
+		<?php if( ! empty($version_attachment)) : ?>
 		<div class="works-manage-box mt20">
             <a href="<?php echo base_url('file/download/version/' . $version['id']);?>" title="点击进入下载" class="fr hover-none works-manage-download" hidefocus="true" target="_blank"><em class="mr5">打包下载</em><span class="download-ico2 ico inline-block vertical-middle"></span></a>
         </div>
+        <?php endif;?>
 	</div>
 	<div id="wPageRight">
 		<?php if( ! empty($other_versions)): ?>

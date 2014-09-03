@@ -432,6 +432,36 @@ class Material extends CI_Controller {
 		}
 	}
 	
+	/**
+	 * 删除素材
+	 */
+	public function delete_material()
+	{
+		$mid = $this->input->post('mid', TRUE);
+		$mid = (int) $mid;
+		if( ! $mid)
+		{
+			echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+			exit;
+		}
+		//检查素材管理权限
+		if( ! check_manager_material($mid, $this->user_info['id']))
+		{
+			echo json_encode(array('status' => 0, 'msg' => '没有权限'));
+			exit;
+		}
+		$delete_query = $this->material->batch_delete(array($mid));
+		
+		if($delete_query['status'])
+		{
+			echo json_encode(array('status' => 1));
+		}
+		else
+		{
+			echo json_encode(array('status' => 0, 'msg' => '删除失败'));
+		}
+		exit;
+	}
 	
 	/**
 	 * 新增版本
@@ -551,7 +581,8 @@ class Material extends CI_Controller {
 		$vid = (int) $post['vid'];
 		if( ! $mid || ! $vid)
 		{
-			show_error('参数错误');
+			echo json_encode(array('status' => 0, 'msg' => '参数错误'));
+			exit;
 		}
 		
 		//检查素材管理权限
@@ -1018,5 +1049,84 @@ class Material extends CI_Controller {
 		$this->load->module("common/footer");
 	}
 	
+	/**
+	 * 我的素材
+	 */
+	public function my_material($page = 1)
+	{
+		$uid = $this->user_info['id'];
+		$perpage = 10;
+		//查询上传素材总数
+		$total = 0;
+		$total_query = $this->material->count_upload_material($uid);
+		if($total_query['status'])
+		{
+			$total = $total_query['total'];
+		}
+		$data['total'] = $total;
+		if($total > $perpage)
+		{
+			$data['showPage'] = true;
+		}
+		else
+		{
+			$data['showPage'] = false;
+		}
+		//计算页码
+		if($total - ($page*$perpage)>0)
+		{
+			$data['pageNext'] = $page+1;
+		}else
+		{
+			$data['pageNext'] = false;
+		}
+		if($page > 1)
+		{
+			$data['pagePre'] = $page-1;
+		}
+		else
+		{
+			$data['pagePre'] = false;
+		}
+		
+		//查询上传素材
+		$upload_materials = array();
+		$upload_materials_query = $this->material->get_upload_material($uid, $page, $perpage);
+		if($upload_materials_query['status'])
+		{
+			$upload_materials = $upload_materials_query['upload_materials'];
+			foreach($upload_materials as $upload_material)
+			{
+				$uids[] = $upload_material['uid'];
+				$mids[] = $upload_material['id'];
+				$vids[] = $upload_material['cversion'];
+			}
+		}
+		
+		//查询用户信息
+// 		$users = array();
+// 		if( ! empty($uids))
+// 		{
+// 			$users = $this->user->batchGetUser($uids);
+// 		}
+		
+		//查询素材当前版本信息
+		$versions = array();
+		if( ! empty($vids))
+		{
+			$versions_query = $this->material->get_batch_verisions($vids);
+			if($versions_query['status'])
+			{
+				$versions = $versions_query['versions'];
+			}
+		}
+		
+		$data['materials'] = $upload_materials;
+		$data['versions'] = $versions;
+		
+		$this->load->module("common/header",array('title'=>'我的素材','cur'=> 999));
+		$this->load->view('mate/my_material',$data);
+		$this->load->module("common/footer");
+	}
 }
 

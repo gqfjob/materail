@@ -733,7 +733,6 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$this->rdb->select('id, depict');
 		$this->rdb->where_in('id', $vids);
     	$query = $this->rdb->get('material_version');
     	
