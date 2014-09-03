@@ -34,7 +34,7 @@ class Material extends CI_Controller {
 	    			echo json_encode(array('status' => 0, 'msg' => '您未登录'));
 	    			exit;
 	    		}else{
-	    			redirect('user/login?callback=' . urlencode(base_url('material/' . $current_method)));
+	    			redirect('user/login?callback=' . urlencode(current_url()));
 	    		}
 			}
 			if($this->user_info['status'] == 0)
@@ -46,17 +46,20 @@ class Material extends CI_Controller {
 	    			show_error('此用户已被禁用');
 	    		}
 			}
-			
-			//用户素材操作权限
-			if( ! check_permission($this->user_info))
-			{
-				if($this->input->is_ajax_request()){
-	    			echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
-	    			exit;
-	    		}else{
-	    			show_error('您没有权限');
-	    		}
-			}
+		}
+		
+		if(in_array($current_method, array('material_add', 'material_action_add', 'add_version', 'version_action_add')))
+		{
+		    //用户素材操作权限
+		    if( ! check_permission($this->user_info))
+		    {
+		        if($this->input->is_ajax_request()){
+		            echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
+		            exit;
+		        }else{
+		            show_error('您没有权限');
+		        }
+		    }
 		}
 	}
 	
@@ -209,6 +212,17 @@ class Material extends CI_Controller {
 		
 		//检查素材管理权限
 		$manager_material =  check_manager_material($mid, $this->user_info['id']);
+		//检查上传素材权限
+		$can_upload = check_permission($this->user_info);
+		if( ! $manager_material && ! $can_upload)
+		{
+	        if($this->input->is_ajax_request()){
+	            echo json_encode(array('status' => 0, 'msg' => '您没有权限'));
+	            exit;
+	        }else{
+	            show_error('您没有权限');
+	        }
+		}
 		
 		//查询素材信息
 		$material_query = $this->material->get_material($mid);
@@ -233,6 +247,7 @@ class Material extends CI_Controller {
 			'material' => $material, 
 			'material_versions' => $material_versions,
 			'manager_material' => $manager_material,
+		    'can_upload' => $can_upload,
 			'user' => $this->user_info
 		);
 		

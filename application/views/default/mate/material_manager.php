@@ -64,7 +64,9 @@
 		<a id="set-draft" class="btn btn-default btn-primary" data-id="<?php echo $material['id']?>" data-status="0">转为草稿</a>
 		<a id="set-publish" class="btn btn-default btn-success" data-id="<?php echo $material['id']?>" data-status="1">发布</a>
 		<?php endif;?>
+		<?php if($can_upload):?>
 		<a href="<?php echo base_url('material/add_version/' . $material['id'])?>" class="btn btn-default btn-info">上传新版本</a>
+		<?php endif;?>
 	</div>
 </div>
 <?php if($manager_material) :?>
