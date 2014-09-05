@@ -60,11 +60,14 @@
 	</div>
 	<div id="material-op" class="container">
 		<?php if($manager_material) :?>
-		<a class="btn btn-default btn-primary" href="<?php echo base_url('material/material_edit/' . $material['id'])?>">修改</a>
+		<a id="delete-material" class="btn btn-default btn-danger" data-id="<?php echo $material['id']?>">删除</a>
+		<a class="btn btn-default btn-success" href="<?php echo base_url('material/material_edit/' . $material['id'])?>">修改</a>
 		<a id="set-draft" class="btn btn-default btn-primary" data-id="<?php echo $material['id']?>" data-status="0">转为草稿</a>
 		<a id="set-publish" class="btn btn-default btn-success" data-id="<?php echo $material['id']?>" data-status="1">发布</a>
 		<?php endif;?>
+		<?php if($can_upload):?>
 		<a href="<?php echo base_url('material/add_version/' . $material['id'])?>" class="btn btn-default btn-info">上传新版本</a>
+		<?php endif;?>
 	</div>
 </div>
 <?php if($manager_material) :?>
@@ -149,6 +152,28 @@
 				});
 		    }
 			return false;
+		});
+
+		//删除素材
+		$('#delete-material').click(function(){
+			if(confirm('确定删除此素材吗？')){
+				var _this = $(this);
+				$.ajax({
+					url : '/material/delete_material',
+					type : 'post',
+					dataType : 'json',
+					data : {mid:parseInt(_this.attr('data-id')),<?php echo $this->config->item('csrf_token_name'); ?>:'<?php echo $this->security->get_csrf_hash(); ?>'},
+					success : function(res){
+						if(res.status){
+							notice('删除成功',300);
+							$('#msgModal button[data-dismiss="modal"],.modal-open').click(function(){window.location.href='<?php echo base_url('material/my_material');?>';});
+						}else{
+							notice(res.msg,300);
+						}
+					},
+					error:function(){}
+				});
+			}
 		});
 	});
 </script>
