@@ -20,7 +20,7 @@
 					<img src="<?php echo base_url($m['logo']);?>"/>
 				</div>
 				<div class="mdetail">
-					<p class="mtitle"><a href="<?php echo base_url('/material/detail/'.$m['id']);?>"><?php echo $m['mname'];?></a></p>
+					<p class="mtitle"><a href="<?php echo base_url('/material/detail/'.$m['mid'].'/'.$m['vid']);?>"><?php echo $m['mname'];?></a></p>
 					<ul class="mtime">
 						<li style="width:150px">版本数：<?php echo $m['vernum']?></li>
 						<li style="width:250px">更新时间：<?php echo date('Y-m-d H:i:s',$m['upat'])?></li>
