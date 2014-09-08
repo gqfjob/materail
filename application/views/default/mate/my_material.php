@@ -6,9 +6,10 @@
 <div id="container">
 	<div class="crumb mb10 mt20">
 		<div class="fl ico crumb-ico mr5"></div>当前位置： 
-        <a href="<?php echo base_url();?>" target="_self" title="分类" hidefocus="true">首页</a>
+        <a href="<?php echo base_url();?>" target="_self" title="首页" hidefocus="true">首页</a>
 		&nbsp;&gt;&nbsp;
-        <a href="###" title="" hidefocus="true">我的素材</a>
+        <a href="javascript:void(0);" title="" hidefocus="true">我的素材</a>
+        <a href="/material/material_add" class="fr btn btn-info" style="margin-top: -8px;margin-right:10px">上传素材</a>
 	</div>
 	<?php //var_dump($materials);?>
 	<div id="allMaterial">
