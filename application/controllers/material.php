@@ -855,7 +855,7 @@ class Material extends CI_Controller {
 	public function lists($cat = 0,$page=1 )
 	{
 		//查询当前分类下的素材
-		$perpage = 2;
+		$perpage = 10;
 		//获取素材列表
 		$data['materials'] = $this->material->getCateList(intval($cat),intval($page),$perpage);
 		//获取分类信息及分类素材总数
@@ -1006,7 +1006,7 @@ class Material extends CI_Controller {
 		}
 		$data['key'] = $key;
 		
-		$perpage = 2;//每页数
+		$perpage = 10;//每页数
 		$num = $this->material->count_materials_like($key, $cur);//总查询结果数
 		$data['total'] = $num;
 		$total = $num;
