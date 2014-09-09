@@ -10,7 +10,7 @@
 		    	<input type="hidden" name="<?php echo $this->security->get_csrf_token_name(); ?>" value="<?php echo $this->security->get_csrf_hash(); ?>" autocomplete="off" />
 		    	<div class="filedset bottom-line">
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for=""><span class="color-red">*</span>素材类型</label>
+					    <label class="col-xs-2 control-label" for=""><span class="color-red">*</span>素材类型</label>
 					    <div class="col-xs-8 select-cate">
 					    	<?php foreach($material_cate as $value) : ?>
 					    	<button class="btn btn-default" type="button" data-cate="<?php echo $value['id']; ?>"><?php echo $value['cname']; ?></button>
@@ -19,13 +19,13 @@
 					    </div>
 				    </div>
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for=""><span class="color-red">*</span>素材名称</label>
+					    <label class="col-xs-2 control-label" for=""><span class="color-red">*</span>素材名称</label>
 					    <div class="col-xs-8">
 					    	<input type="text" class="form-control" id="material-name" name="material-name" placeholder="请填入素材名称" autocomplete="off"/>
 					    </div>
 				    </div>
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for="">缩略图</label>
+					    <label class="col-xs-2 control-label" for="">缩略图</label>
 					    <div id="thumb-box" class="col-xs-8">
 					    	<input type="hidden" id="thumb-path" name="thumb-path" autocomplete="off" />
 					    	<input type="hidden" id="thumb-type" name="thumb-type" value="1" autocomplete="off" />
@@ -39,13 +39,13 @@
 					    </div>
 				    </div>
 				     <div class="form-group">
-					    <label class="col-sm-2 control-label" for="inputPassword"><span class="color-red">*</span>版本描述</label>
+					    <label class="col-xs-2 control-label" for="inputPassword"><span class="color-red">*</span>版本描述</label>
 					    <div class="col-xs-8">
 					    	<input type="text" class="form-control" id="version-depict" name="version-depict" placeholder="一句话描述一下该版本主要内容" autocomplete="off" />
 					    </div>
 				    </div>
 				     <div class="form-group">
-					    <label class="col-sm-2 control-label" for="inputEmail">权限</label>
+					    <label class="col-xs-2 control-label" for="inputEmail">权限</label>
 					    <div id="select-permission" class="col-xs-8 ">
 					    	<button class="btn btn-default" data-type="1" type="button" >匿名可下载</button>
 					    	<button class="btn btn-default btn-success" data-type="2" type="button" >登录用户可下载</button>
@@ -59,7 +59,7 @@
 			    </div>
 			    <div class="filedset bottom-line">
 				    <div class="form-group">
-				    	 <label class="col-sm-2 control-label" for=""></label>
+				    	 <label class="col-xs-2 control-label" for=""></label>
 					    <div class="col-xs-8">
 					    	<input type="hidden" name="attachment-ids" id ="attachment-ids" value="" autocomplete="off" />
 					    	<div class="upload-container"><input id="upload-attachment" type="file" name="material-attachment"/></div>
@@ -75,7 +75,7 @@
 				</div>
 				<div class="filedset">
 				    <div class="form-group">
-				    	<label class="col-sm-2 control-label" for="inputEmail">素材说明</label>
+				    	<label class="col-xs-2 control-label" for="inputEmail">素材说明</label>
 					    <div class="col-xs-8">
 					    	<div id="myEditor"></div>
 					    	<link href="<?php echo base_url('assets/js/ueditor/themes/default/css/umeditor.css');?>" media="screen" rel="stylesheet" type="text/css">

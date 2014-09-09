@@ -14,19 +14,19 @@
 		    	<?php endif; ?>
 		    	<div id="material-detail-box" class="filedset  bottom-line">
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for="">素材类型</label>
+					    <label class="col-xs-2 control-label" for="">素材类型</label>
 					    <div class="col-xs-8 select-cate">
 					    	<button class="btn btn-success" type="button" data-cate="<?php echo $material['id']; ?>"><?php echo $material['cname']; ?></button>
 					    </div>
 				    </div>
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for="">素材名称</label>
+					    <label class="col-xs-2 control-label" for="">素材名称</label>
 					    <div class="col-xs-8">
 					    	<span class="help-line"><?php echo $material['mname']; ?></span>
 					    </div>
 				    </div>
 				    <div class="form-group">
-					    <label class="col-sm-2 control-label" for="">缩略图</label>
+					    <label class="col-xs-2 control-label" for="">缩略图</label>
 					    <div id="thumb-box" class="col-xs-8">
 					    	<div id="thumb-image">
 					    		<img src="/<?php echo $material['logo']; ?>" />
@@ -38,7 +38,7 @@
 			    	<div id="up-down" class="up"></div>
 			    	<br />
 				    <div class="form-group">
-				    	<label class="col-sm-2 control-label" for=""></label>
+				    	<label class="col-xs-2 control-label" for=""></label>
 					    <div class="col-xs-8">
 					    	<input type="hidden" name="attachment-ids" id ="attachment-ids" value="" autocomplete="off" />
 					    	<div class="upload-container"><input id="upload-attachment" type="file" name="material-attachment"/></div>
@@ -58,13 +58,13 @@
 				</div>
 				<div class="filedset">
 					<div class="form-group">
-					    <label class="col-sm-2 control-label" ><span class="color-red">*</span>版本描述</label>
+					    <label class="col-xs-2 control-label" ><span class="color-red">*</span>版本描述</label>
 					    <div class="col-xs-8">
 					    	<input value="<?php echo (empty($version['depict'])) ? '' : $version['depict'];?>" type="text" class="form-control" id="version-depict" name="version-depict" placeholder="一句话描述一下该版本主要内容" autocomplete="off" />
 					    </div>
 				    </div>
 				    <div class="form-group">
-				    	<label class="col-sm-2 control-label" for="inputEmail">素材说明</label>
+				    	<label class="col-xs-2 control-label" for="inputEmail">素材说明</label>
 					    <div class="col-xs-8">
 					    	<div id="myEditor"></div>
 					    	<link href="<?php echo base_url('assets/js/ueditor/themes/default/css/umeditor.css');?>" media="screen" rel="stylesheet" type="text/css">
