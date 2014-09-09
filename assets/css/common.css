@@ -575,7 +575,7 @@ button.gray:active, .button_gray:active {
 	border-radius:4px;
 	-moz-border-radius:4px;
 	-wekit-border-radius:4px;
-	padding:4px 0;
+	padding:0px;
 }
 .container-header{
 	background:#f4f4f4;
@@ -588,7 +588,7 @@ button.gray:active, .button_gray:active {
 	border-top:1px solid #c9c9c9;
 	position:absolute;
 	width:100%;
-	bottom:4px;
+	bottom:1px;
 }
 .material-box{padding:15px;}
 .material-box h2{

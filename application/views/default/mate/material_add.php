@@ -63,7 +63,7 @@
 					    <div class="col-xs-8">
 					    	<input type="hidden" name="attachment-ids" id ="attachment-ids" value="" autocomplete="off" />
 					    	<div class="upload-container"><input id="upload-attachment" type="file" name="material-attachment"/></div>
-					    	<span class="help-line">&nbsp;素材大小不超过2000M,格式支持doc,txt,ppt,zip,jpg,gif,png,ico</span>
+					    	<span class="help-line">&nbsp;素材大小不超过2000M</span>
 					    	<div id="attachment-msg" class="alert alert-info msg-width">
 					    		<span></span>
 					   	 	</div>

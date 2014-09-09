@@ -433,7 +433,10 @@ class User extends CI_Controller {
 		$res = array();
 		if($user){
 			$res['msg'] =  '<div id="navbar-signin" class="nav-link pull-left">
-					<a href="javascript:void(0);">'.$user['nickname'].'</a>
+					<a href="/material/my_material">'.$user['nickname'].'</a>
+				</div>
+			    <div id="navbar-signin" class="nav-link pull-left">
+					<a href="/material/material_add">上传素材</a>
 				</div>
 				<div id="navbar-name" class="nav-link pull-left">
 					<a href="/user/logout">注销</a>

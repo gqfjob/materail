@@ -1506,6 +1506,7 @@ class Material_Model extends CI_Model
 			$sql = "select m.*,i.* from material_info as m left join material_version as i 
 					on m.cversion = i.id
 					where m.cid = {$cat}
+					order by i.upat DESC 
 					limit {$start},{$end}
 					";
 			$query = $this->rdb->query($sql);
@@ -1539,7 +1540,7 @@ class Material_Model extends CI_Model
 		$start = ($page-1)*$perpage;
 		$end = $perpage;
 		
-		$sql = "select m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
+		$sql = "select v.id as vid, m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
 		$sql .= " left join material_cate as c on m.cid = c.id ";
 		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
 		if(($cur != 'all') && is_numeric($cur)){
