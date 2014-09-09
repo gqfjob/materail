@@ -217,7 +217,7 @@
 			'buttonText' : '上传素材',
 			'width' : 'auto',
 			'height' : 30,
-			'multi'    : false,
+			'multi'    : true,
 			'progressData' : 'speed', 
 			'fileSizeLimit' : '2000MB',
 			'fileTypeExts' : '',
@@ -245,8 +245,10 @@
 			},
 			'debug' : false,
 			'onDialogClose' : function(){},
-			'onUploadError' : function(){$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');},
-			'onUploadStart' : function(){$('#attachment-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('文件上传中...');},
+			'onUploadError' : function(file, errorCode, errorMsg, errorString){
+				$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text(file.name + '上传失败');
+			},
+			'onUploadStart' : function(file){$('#attachment-msg').removeClass('alert-warning').addClass('alert-info').show().find('span').text('正在上传：' + file.name);},
 			'onUploadSuccess' : function(file, data, response){
 				data = eval("(" + data + ")");
 				if(data.status){
@@ -257,7 +259,7 @@
 					var attachmet_html = '<li><span class="close pull-left" data-type="new" data-id="' + data.result['attachment_id'] + '">&times;</span>' + data.result['attachment_name'] + '</li>';
 					$('.attachment-list').prepend(attachmet_html);
 				}else{
-					$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text('上传失败');
+					$('#attachment-msg').removeClass('alert-info').addClass('alert-warning').find('span').text(file.name + '上传失败');
 				}
 				delete this.queueData.files[file.id];
 			}
