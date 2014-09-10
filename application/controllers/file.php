@@ -284,7 +284,7 @@ class File extends CI_Controller{
 		create_visit(3);
 		$this->material->custom_update_version($vid, array('downnum' => 'downnum+1'));
 		$mime = 'application/octet-stream';
-		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE)
+		if (strpos($_SERVER['HTTP_USER_AGENT'], "MSIE") !== FALSE || strpos($_SERVER['HTTP_USER_AGENT'], "Trident") !== FALSE)
 		{
 			header('Content-Type: "'.$mime.'"');
 			header('Content-Disposition: attachment; filename="'.rawurlencode($filename).'"');
