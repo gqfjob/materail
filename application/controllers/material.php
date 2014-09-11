@@ -965,7 +965,8 @@ class Material extends CI_Controller {
 		$pages = ceil($material['vernum'] / $per_page);
 		
 		//查询同类型素材
-		$same_materials_query = $this->material->get_same_materials($material['cid'], $material['id'], 5);
+		$limit = ($material['cname'] == '图片') ? 5 : 10;
+		$same_materials_query = $this->material->get_same_materials($material['cid'], $material['id'], $limit);
 		if( ! $same_materials_query['status'])
 		{
 			$same_materials = array();
