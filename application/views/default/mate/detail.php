@@ -78,7 +78,10 @@
     margin:0 auto;
     height: 142px;
     padding: 10px;
-    width: 142px;
+}
+.same-list .mlogo img{
+    width:208px;
+    height:122px;
 }
 .same-list .mname{
 	padding:5px;
@@ -117,7 +120,7 @@
 					<img src="<?php echo base_url($material['logo']);?>"/>
 				</div>
 				<div class="mdetail">
-					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/lists/' . $material['cid']);?>" style="color:#fff">图片</a></span><span class="bold"><?php echo $material['mname']?></span></p>
+					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/lists/' . $material['cid']);?>" style="color:#fff"><?php echo $material['cname'];?></a></span><span class="bold"><?php echo $material['mname']?></span></p>
 					<ul class="mtime">
 						<li style="width:220px">上传时间：<?php echo date('Y-m-d H:i', $material['create_at']);?></li>
 						<li style="width:90px">版本数：<?php echo $material['vernum']?></li>
@@ -191,7 +194,7 @@
 					<?php foreach($other_versions as $other_version) : $i++;?>
 					<li class="other-item font14" data-page="<?php echo ceil($i/$per_page);?>">
 						<a href="<?php echo base_url('material/detail/'.$material['id'].'/'.$other_version['id']);?>" class="version-depict pull-left text-overflow" title="<?php echo $other_version['depict']?>" ><?php echo $other_version['depict']?></a>
-						<span class="version-date pull-right"><?php echo date('Y/m/d')?></span>
+						<span class="version-date pull-right"><?php echo date('Y/m/d', $other_version['cat'])?></span>
 					</li>
 					<?php endforeach;?>
 				</ul>
@@ -212,13 +215,17 @@
 				<div class="cl"></div>
 			</div>
 			<div style="min-height: 200px">
-			<?php if( ! empty($same_materials)): ?>
+			<?php if( ! empty($same_materials)): $i = 0;?>
 				<ul class="same-list">
 					
-					<?php foreach($same_materials as $same_material) : ?>
+					<?php foreach($same_materials as $same_material) : $i++?>
 					<li class="same-item" >
+					<?php if($material['cname'] == '图片') :?>
 					 <div class="mlogo text-center"><a href="<?php echo base_url('material/detail/' . $same_material['id']);?>"  target="_blank"><img src="<?php echo base_url($same_material['logo']);?>" /></a></div>
 					 <div class="mname text-center font14 text-overflow"><a href="<?php echo base_url('material/detail/' . $same_material['id']);?>"  target="_blank" title="<?php echo $same_material['mname']?>"><?php echo $same_material['mname']?></a></div>
+					 <?php else : ?>
+					 <div class="mname font14 text-overflow"> <span class="badge"><?php echo $i;?></span>&nbsp;<a href="<?php echo base_url('material/detail/' . $same_material['id']);?>"  target="_blank" title="<?php echo $same_material['mname']?>"><?php echo $same_material['mname']?></a></div>
+					 <?php endif;?>
 					</li>
 					<?php endforeach;?>
 				</ul>

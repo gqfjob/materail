@@ -939,7 +939,7 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT * FROM material_version WHERE mid = ? AND id != ? ORDER BY id DESC";
+		$sql = "SELECT * FROM material_version WHERE mid = ? AND id != ? ORDER BY cat DESC";
 		$query = $this->rdb->query($sql, array($mid, $vid));
 		if($query == FALSE)
 		{
@@ -969,7 +969,11 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT * FROM material_info WHERE cid = ? AND id != ? ORDER BY id DESC LIMIT {$limit}";
+		$sql = "SELECT m.*, sum(mv.downnum) as downnum FROM material_info m 
+		        LEFT JOIN material_version mv ON m.id=mv.mid 
+		        WHERE m.cid = ? AND m.id != ? 
+		        GROUP BY m.id
+		        ORDER BY downnum DESC,create_at DESC LIMIT {$limit}";
 		$query = $this->rdb->query($sql, array($cid, $mid));
 		if($query == FALSE)
 		{
