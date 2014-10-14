@@ -404,15 +404,30 @@ border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc',endColorstr='#ff0044cc',GradientType=0);
 filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
-
+.logo{
+	width: 640px;
+	top: -129px;
+	left: 50%;
+	position: absolute;
+	margin: -55px 0 0 -320px;
+	text-align:center;
+}
+.logo img{
+	height:129px;
+	width:270px;
+}
 </style>
 
 <script type="text/javascript" src="<?php echo base_url('assets/js/tools/idTabs.js');?>"></script>
 
 <div id="container">
 	<div>
+		
 		<!-- 搜索 -->
 		<form class="form-search form-emphasis" id="site-search" method="post" action="/material/search/all"  onsubmit="return checkData();">
+			<div class="logo">
+			<img src="<?php echo base_url('assets/img/logo.png');?>" />
+		</div>
 			<div class="input-group">
 				<div class="form-control"  id="search-input-box">
 					<div class="placeholder_parent">
