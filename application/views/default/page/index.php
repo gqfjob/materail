@@ -1,7 +1,7 @@
 <style>
 #infoLists {
 	width: 800px;
-	margin: 400px auto 20px;
+	margin: 100px auto 20px;
 }
 
 #infoTab {
@@ -265,10 +265,7 @@
 /* LOHP Spcific CSS, these differ from the swig module  */
 .form-search{
 	width: 640px;
-	top: 50%;
-	left: 50%;
-	position: absolute;
-	margin: -55px 0 0 -320px;
+	margin:60px auto 0;
 }
 .form-search.form-emphasis .input-group {
 	border: 4px solid #595959;
@@ -311,8 +308,8 @@
 	background: rgba(89, 89, 89, 0.6);
 }
 .form-search .input-group-btn .btn {
-	padding-top: 12px;
-	padding-bottom: 13px;
+	padding-top: 16px;
+	padding-bottom: 9px;
 }
 #search-shutterstock .form-search .input-group-btn .btn img{
 	left: auto;
@@ -404,15 +401,27 @@ border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc',endColorstr='#ff0044cc',GradientType=0);
 filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
-
+.logo{
+	width: 640px;
+	text-align:center;
+	padding:0 0 5px;
+}
+.logo img{
+	height:138px;
+	width:311px;
+}
 </style>
 
 <script type="text/javascript" src="<?php echo base_url('assets/js/tools/idTabs.js');?>"></script>
 
 <div id="container">
 	<div>
+		
 		<!-- 搜索 -->
 		<form class="form-search form-emphasis" id="site-search" method="post" action="/material/search/all"  onsubmit="return checkData();">
+			<div class="logo">
+    			<img src="<?php echo base_url('assets/img/logo.png');?>" />
+    		</div>
 			<div class="input-group">
 				<div class="form-control"  id="search-input-box">
 					<div class="placeholder_parent">

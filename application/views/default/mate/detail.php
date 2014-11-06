@@ -122,12 +122,12 @@
 				<div class="mdetail">
 					<p class="mtitle"><span class="mtype"><a href="<?php echo base_url('material/lists/' . $material['cid']);?>" style="color:#fff"><?php echo $material['cname'];?></a></span><span class="bold"><?php echo $material['mname']?></span></p>
 					<ul class="mtime">
-						<li style="width:220px">上传时间：<?php echo date('Y-m-d H:i', $material['create_at']);?></li>
+						<li style="width:230px">上传时间：<?php echo date('Y-m-d H:i:s', $version['cat']);?></li>
 						<li style="width:90px">版本数：<?php echo $material['vernum']?></li>
 					</ul>
 					<div class="cl"></div>
 					<ul class="minfo">
-						<li style="width:220px">更新时间：<?php echo date('Y-m-d H:i', $material['update_at']);?></li>
+						<li style="width:230px">更新时间：<?php echo date('Y-m-d H:i:s', $version['upat']);?></li>
 						<li style="width:300px;overflow:hidden">当前版本：<?php echo $version['depict'];?></li>
 					</ul>
 					<div class="cl"></div>

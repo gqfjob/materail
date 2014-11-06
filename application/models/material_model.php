@@ -1507,7 +1507,7 @@ class Material_Model extends CI_Model
 			return array();
 		}else
 		{
-			$sql = "select m.*,i.* from material_info as m left join material_version as i 
+			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i 
 					on m.cversion = i.id
 					where m.cid = {$cat}
 					order by i.upat DESC 
