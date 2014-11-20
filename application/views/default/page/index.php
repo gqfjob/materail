@@ -419,9 +419,11 @@ filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 		
 		<!-- 搜索 -->
 		<form class="form-search form-emphasis" id="site-search" method="post" action="/material/search/all"  onsubmit="return checkData();">
+			<!--
 			<div class="logo">
     			<img src="<?php echo base_url('assets/img/logo.png');?>" />
     		</div>
+			-->
 			<div class="input-group">
 				<div class="form-control"  id="search-input-box">
 					<div class="placeholder_parent">
