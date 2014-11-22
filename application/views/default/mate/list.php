@@ -8,7 +8,7 @@
 		<div class="fl ico crumb-ico mr5"></div>当前位置： 
         <a href="###" target="_self" title="分类" hidefocus="true">分类列表</a>
 		&nbsp;&gt;&nbsp;
-        <a href="###" title="" hidefocus="true"><?php echo $cateName?></a>
+        <a href="###" title="" hidefocus="true"><?php echo ($cid == 0) ? '全部' : $cateName;?></a>
 	</div>
 	<?php //var_dump($materials);?>
 	<div id="allMaterial">
@@ -59,6 +59,12 @@
 		<div class="cl"></div>
 		<?php endif;?>
 		<?php else:?>
+		<div class="oneMaterail">
+			<div class="mbasic">
+				<div class="center">没有素材</div>
+				<div class="cl"></div>
+			</div>
+		</div>
 		<?php endif;?>
 	</div>
 </div>
