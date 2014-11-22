@@ -57,7 +57,7 @@
 		                         <?php foreach($users as $user) : ?>
 		                         <tr>
 		                         	<td><input autocomplete="off" type="checkbox" name="user" data-id="<?php echo $user['id'];?>" value="" /></td>
-		                         	<td><a href="<?php echo base_url('admin/userDetail/' . $user['id']);?>" target="_blank"><?php echo $user['realname']; ?></a></td>
+		                         	<td><a href="<?php echo base_url('admin/userDetail/1?uid=' . $user['id']);?>" target="_blank"><?php echo $user['realname']; ?></a></td>
 		                         	<td><?php echo isset($user_material[$user['id']]['num']) ? $user_material[$user['id']]['num'] : 0;?></td>
 		                         	<td><?php echo date('Y-m-d H:i:s', $user['last_login_time']);?></td>
 		                         </tr>

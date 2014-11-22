@@ -826,9 +826,9 @@ class Admin extends CI_Controller {
      /**
       * 用户详细内容
       */
-     public function userDetail($uid = 0)
+     public function userDetail($page = 1)
      {
-     	$uid = (int) $uid;
+     	$uid = (int) $this->input->get('uid', TRUE);
      	if(empty($uid))
      	{
      		show_error('参数错误');
@@ -885,7 +885,7 @@ class Admin extends CI_Controller {
      		$upload_total = $upload_total_query['total'];
      	}
      	
-     	//可访问素材分页配置
+     	//可上传素材分页配置
      	$config['base_url'] = base_url('admin/get_upload_material');
      	$config['suffix'] = '?uid=' . $uid;
      	$config['first_url'] = base_url('admin/get_upload_material/1?uid=' . $uid);

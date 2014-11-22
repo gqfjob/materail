@@ -115,7 +115,7 @@
 		                         <tr>
 		                         	<td><input autocomplete="off" type="checkbox" name="view-material" data-id="<?php echo $material['id'];?>" value="" /></td>
 		                         	<td><a href="<?php echo base_url('admin/mgVersion/' . $material['id']);?>" target="_blank"  title="<?php echo $material['mname'];?>" ><?php echo $material['mname'];?></a></td>
-		                         	<td><a href="<?php echo base_url('admin/userDetail/' . $material['uid']);?>" target="_blank"><?php echo empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname'];?></a></td>
+		                         	<td><a href="<?php echo base_url('admin/userDetail/1?uid=' . $material['uid']);?>" target="_blank"><?php echo empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname'];?></a></td>
 		                         	<td><?php echo empty($material['cname']) ? '' : $material['cname'];?></td>
 		                         	<td><?php echo empty($attachment_num[$material['id']]['num']) ? 0 : $attachment_num[$material['id']]['num']; ?></td>
 		                         	<td><?php echo $material['vernum'];?></td>
@@ -167,7 +167,7 @@
 		                      <tbody class="upload-material-box">
 		                         <?php if(empty($upload_materials)) : ?>
 		                         <tr>
-		                         	<td colspan="8" class="text-center"><strong>暂无用户</strong></td>
+		                         	<td colspan="8" class="text-center"><strong>暂无素材</strong></td>
 		                         </tr>
 		                         <?php else: ?>       
 		                         <?php foreach($upload_materials as $material) : ?>
@@ -179,7 +179,7 @@
 		                         	<td><?php echo $material['vernum'];?></td>
 		                         	<td><?php echo empty($versions[$material['cversion']]['depict']) ? '' : $versions[$material['cversion']]['depict'];?></td>
 		                         	<td><?php echo date('Y-m-d H:i:s', $material['create_at']); ?></td>
-		                         	<td><a href="<?php echo base_url('admin/userDetail/' . $material['uid']);?>" target="_blank"><?php echo empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname'];?></a></td>
+		                         	<td><a href="<?php echo base_url('admin/userDetail/1?uid=' . $material['uid']);?>" target="_blank"><?php echo empty($users[$material['uid']]['realname']) ? '' : $users[$material['uid']]['realname'];?></a></td>
 		                         </tr>
 		                         <?php endforeach;?>
 		                         <?php endif;?>                                            
@@ -455,6 +455,7 @@
 			var mid = parseInt($('#selected-material').val());
 			if(!mid){
 				alert('请选择素材');
+				return false;
 			}
 			$.ajax({
 				url:'/admin/add_view_material',

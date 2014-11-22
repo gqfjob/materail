@@ -62,7 +62,7 @@
 		                         <tr>
 		                         	<td><input autocomplete="off" type="checkbox" name="material" data-id="<?php echo $material['id'];?>" value="" /></td>
 		                         	<td><a href="<?php echo base_url('admin/mgVersion/' . $material['id']);?>"><?php echo $material['mname']; ?></a></td>
-		                         	<td><a href=""><?php echo isset($users[$material['uid']]['nickname']) ? $users[$material['uid']]['nickname'] : '';?></a></td>
+		                         	<td><a href="<?php echo base_url('admin/userDetail/1?uid=' . $material['uid']);?>"><?php echo isset($users[$material['uid']]['realname']) ? $users[$material['uid']]['realname'] : '';?></a></td>
 		                         	<td><?php echo $material['cname']; ?></td>
 		                         	<td><?php echo isset($attachment_num[$material['id']]) ? $attachment_num[$material['id']] : '';?></td>
 		                         	<td><?php echo $material['vernum']?></td>
