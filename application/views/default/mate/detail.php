@@ -19,6 +19,8 @@
 .mvdetail{
 	text-indent: 2em;
 	min-height:100px;
+	max-width:700px;
+	overflow:hidden;
 	padding-bottom:20px;
 	line-height:24px;
 	padding-left:20px;
