@@ -78,7 +78,7 @@
 		                         	<?php if(empty($users[$list['uid']])) : ?>
 		                         	<span>匿名</span>
 		                         	<?php else : ?>
-		                         	<a href="<?php echo base_url('admin/userDetail/' . $list['uid']); ?>" target="_blank"><?php echo empty($users[$list['uid']]['nickname']) ? $users[$list['uid']]['realname'] : $users[$list['uid']]['realname']; ?></a>
+		                         	<a href="<?php echo base_url('admin/userDetail/1?uid=' . $list['uid']); ?>" target="_blank"><?php echo empty($users[$list['uid']]['nickname']) ? $users[$list['uid']]['realname'] : $users[$list['uid']]['realname']; ?></a>
 		                         	<?php endif; ?>
 		                         	</td>
 		                         	<td><?php echo $list['ip']?></td>

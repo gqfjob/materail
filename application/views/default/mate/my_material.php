@@ -63,6 +63,12 @@
 		<div class="cl"></div>
 		<?php endif;?>
 		<?php else:?>
+		<div class="oneMaterail">
+			<div class="mbasic">
+				<div class="center">没有素材</div>
+				<div class="cl"></div>
+			</div>
+		</div>
 		<?php endif;?>
 	</div>
 </div>

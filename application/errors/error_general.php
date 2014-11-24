@@ -58,6 +58,13 @@ p {
 	<div id="container">
 		<h1><?php echo $heading; ?></h1>
 		<?php echo $message; ?>
+		<p>
+		<?php 
+			$CI = &get_instance(); 
+			$current_c = $CI->router->fetch_class();
+			echo ($current_c == 'admin') ? '<a href="' . base_url('admin') . '">返回后台首页</a>'  : '<a href="' . base_url() . '">返回首页</a>';
+		?>
+		</p>
 	</div>
 </body>
 </html>

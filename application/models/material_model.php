@@ -1504,7 +1504,11 @@ class Material_Model extends CI_Model
 		$end = $perpage;
 		if($cat == 0)
 		{
-			return array();
+			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i
+			on m.cversion = i.id
+			order by i.upat DESC
+			limit {$start},{$end}
+			";
 		}else
 		{
 			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i 
@@ -1513,10 +1517,9 @@ class Material_Model extends CI_Model
 					order by i.upat DESC 
 					limit {$start},{$end}
 					";
-			$query = $this->rdb->query($sql);
-			return $query->result_array();
 		}
-		
+		$query = $this->rdb->query($sql);
+		return $query->result_array();
 	}
 	/**
 	 * 查询分类下的素材数以及分类名称
@@ -1524,7 +1527,15 @@ class Material_Model extends CI_Model
 	 */
 	public function countCateList($cat)
 	{
-		$sql ="select count(*) as num,c.cname,c.clogo,c.id from material_info as m left join material_cate as c on m.cid = c.id where m.cid = {$cat}";
+		if($cat == 0)
+		{
+			$sql ="select count(*) as num,c.cname,c.clogo,c.id from material_info as m left join material_cate as c on m.cid = c.id";
+		}
+		else
+		{
+			$sql ="select count(*) as num,c.cname,c.clogo,c.id from material_info as m left join material_cate as c on m.cid = c.id where m.cid = {$cat}";
+		}
+		
 		$query = $this->rdb->query($sql);
 		$res = $query->row();
 		return $res;

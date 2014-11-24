@@ -41,6 +41,9 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 		            <li class="<?php if($cur == 0){echo "active ";}?>fl b16">
 		                <a href="/">首页</a>
 		            </li >
+		            <li class="<?php if($cur == -1){echo "active ";}?>fl b16">
+		                <a href="<?php echo base_url('material/lists');?>">全部</a>
+		            </li >
 		            <?php foreach($cate as $c):?>
 		            <li class="<?php if($cur == $c['id']){echo "active ";}?>fl b16">
 		                <a href="/material/lists/<?php echo $c['id'];?>"><?php echo $c['cname']?></a>

@@ -861,7 +861,7 @@ class Material extends CI_Controller {
 		//获取分类信息及分类素材总数
 		$res = $this->material->countCateList(intval($cat));
 		$data['total'] = $res->num;
-		$data['cid'] = $res->id;
+		$data['cid'] = $cat;
 		$total = $res->num;
 		if($total > $perpage) 
 		{
@@ -883,7 +883,7 @@ class Material extends CI_Controller {
 		
 		$data['cateName'] = $res->cname;
 		$data['clogo'] = $res->clogo;
-		$this->load->module("common/header",array('title'=>'列表','cur'=> $cat));
+		$this->load->module("common/header",array('title'=>'列表','cur'=> ($cat == 0) ? -1 : $cat));
 		$this->load->view('mate/list',$data);
 		$this->load->module("common/footer");	
 	}

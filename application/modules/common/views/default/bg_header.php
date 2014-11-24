@@ -54,8 +54,8 @@
             
             <!-- Dropdown menu -->
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="icon-user"></i> 前台</a></li>
-              <li><a href="login.html"><i class="icon-off"></i> 退出</a></li>
+              <li><a href="<?php echo base_url();?>" target="_blank"><i class="icon-user"></i> 前台</a></li>
+              <li><a href="<?php echo base_url('user/logout');?>"><i class="icon-off"></i> 退出</a></li>
             </ul>
           </li>
           
