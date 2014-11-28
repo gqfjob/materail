@@ -171,7 +171,7 @@ class User extends CI_Controller {
 	}
 
 	public function ssologin(){
-	    //记录是否有callback，有则写入cookie
+	    /* //记录是否有callback，有则写入cookie
 	    $callback = $this->input->get_post('callback',true);
 	    if($callback){
 	        $domain = $this->config->item('cookie_domain');
@@ -179,7 +179,46 @@ class User extends CI_Controller {
 	    }
         //跳转到登录页面 ，带上callback? 
         $ssologinUrl = $this->config->item('ssologin');
-        redirect($ssologinUrl);
+        redirect($ssologinUrl); */
+	    $base65_aes_str = $this->input->get('auth', true);
+	    if(empty($base65_aes_str))
+	    {
+	        show_error('参数错误');
+	    }
+	    //更具密文获取用户信息
+	    $this->load->library('aes');
+	    $aes_str = base64_decode($base65_aes_str);
+	    $aes_str = pack("H*", $aes_str);
+	    $decode_aes_str = $this->aes->decrypt($aes_str);
+	    $user_info = explode(',',$decode_aes_str);
+	    if(is_array($user_info))
+	    {
+	       $uname = isset($user_info[0]) ? $user_info[0] : '';
+	       $umobile = isset($user_info[1]) ? $user_info[1] : '';
+	       $uemail = isset($user_info[2]) ? $user_info[2] : '';
+	       if(! $uname)
+	       {
+	           show_error('无法获取用户信息');
+	       }
+	       
+	       //判断用户是否存在
+	       $checkName = $this->user->checkUsername('gaoxianyi');
+	       
+	       if($checkName)
+	       {
+	           $user = array(
+	               'uid' => $checkName->id,
+	               'type' => 'sso',
+	           );
+	           $this->_loginDo($user, FALSE);
+	       }
+	       
+	    }
+	    else
+	    {
+	        show_error('无法获取用户信息');
+	    }
+	    
 	}
 	
 	public function ssologinCallback(){
