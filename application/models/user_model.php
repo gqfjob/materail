@@ -62,6 +62,40 @@ class User_model extends CI_Model
 	    }
 	    return $uid;
 	}
+	
+	/**
+	 * sso用户注册
+	 * @param array $user
+	 */
+	public function sso_register($user)
+	{
+		$this->wdb->trans_start();
+		//注册基本信息
+		$this->wdb->insert('identity_user',$user);
+		$uid = $this->wdb->insert_id();
+		//创建凭证
+		$credit = array();
+		if(!empty($user['username'])){
+			array_push($credit,array(
+			'uid' => $uid,
+			'type' => 1,
+			'name' => $user['username']
+			) );
+		}
+		
+		if(sizeof($credit)>0){
+			$this->wdb->insert_batch('identity_credential',$credit);
+		}
+		//记录密码
+		$this->wdb->insert('identity_password',array('uid'=>$uid,'pwd'=>sha1($user['username'])));
+		$this->wdb->trans_complete();
+		if ($this->wdb->trans_status() === FALSE){
+			//注册失败
+			$uid = 0;
+		}
+		return $uid;
+	}
+	
 	/**
      * 创建两个凭证
 	 */
@@ -162,7 +196,7 @@ class User_model extends CI_Model
         $user_credit = $this->rdb->query($sql, array($name));
         if ($user_credit->num_rows() == 1){
            $row = $user_credit->row_array(); 
-           $query = $this->rdb->get('identity_user',array('id'=>$row['uid']));
+           $query = $this->rdb->get_where('identity_user',array('id'=>$row['uid']));
            $res = $query->result();
            if(sizeof($res) == 1)
            {
