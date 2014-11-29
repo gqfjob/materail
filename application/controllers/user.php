@@ -171,6 +171,7 @@ class User extends CI_Controller {
 	}
 
 	public function ssologin(){
+		/*
 	    //记录是否有callback，有则写入cookie
 	    $callback = $this->input->get_post('callback',true);
 	    if($callback){
@@ -179,7 +180,74 @@ class User extends CI_Controller {
 	    }
         //跳转到登录页面 ，带上callback? 
         $ssologinUrl = $this->config->item('ssologin');
-        redirect($ssologinUrl);
+        redirect($ssologinUrl); 
+        */
+		
+	    $base65_aes_str = $this->input->get('auth', true);
+	    if(empty($base65_aes_str))
+	    {
+	        show_error('参数错误');
+	    }
+	    
+	    //更具密文获取用户信息
+	    $this->load->library('aes');
+	    $aes_str = base64_decode($base65_aes_str);
+	    $aes_str = pack("H*", $aes_str);
+	    $decode_aes_str = $this->aes->decrypt($aes_str);
+	    $user_info = explode(',',rtrim($decode_aes_str,"\6"));
+	    if(is_array($user_info))
+	    {
+	       $uname = isset($user_info[0]) ? $user_info[0] : '';
+	       $umobile = isset($user_info[1]) ? $user_info[1] : '';
+	       $uemail = isset($user_info[2]) ? $user_info[2] : '';
+	       if(! $umobile)
+	       {
+	           show_error('无法获取用户信息');
+	       }
+	       
+	       //判断用户是否存在
+	       $checkName = $this->user->checkUsername($umobile);
+	       if($checkName !== FALSE)
+	       {
+	           $user = array(
+	               'uid' => $checkName->id,
+	               'type' => 'sso',
+	           );
+	           $this->_loginDo($user, FALSE);
+	           redirect();
+	       }
+	       else 
+	       {
+	       		//注册新用户
+	       		$user = array(
+	       			'username' => $umobile,
+	       			'nickname' => $umobile,
+	       			'realname' => $uname,
+	       			'email' => $uemail,
+	       			'auth' => 1,
+	       		);
+	       		$uid = $this->user->sso_register($user);
+	       		if($uid)
+	       		{
+	       			$user = array(
+	       					'uid' => $uid,
+	       					'type' => 'sso',
+	       			);
+	       			$this->_loginDo($user, FALSE);
+	       			redirect();
+	       		}
+	       		else 
+	       		{
+	       			show_error('登录失败');
+	       		}
+	       }
+	       
+	    }
+	    else
+	    {
+	        show_error('无法获取用户信息');
+	    }
+	    
 	}
 	
 	public function ssologinCallback(){
