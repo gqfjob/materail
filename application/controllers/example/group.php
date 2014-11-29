@@ -22,7 +22,7 @@ class Group extends CI_Controller {
      * @ApiReturn(name="count", type="integer", description="data of page")
      */
 	function test(){
-		echo 'hello world';
+		echo 'hello world mytest';
 	}
 
 }
