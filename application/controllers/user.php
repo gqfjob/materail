@@ -200,13 +200,13 @@ class User extends CI_Controller {
 	       $uname = isset($user_info[0]) ? $user_info[0] : '';
 	       $umobile = isset($user_info[1]) ? $user_info[1] : '';
 	       $uemail = isset($user_info[2]) ? $user_info[2] : '';
-	       if(! $umobile)
+	       if(! $uname)
 	       {
 	           show_error('无法获取用户信息');
 	       }
 	       
 	       //判断用户是否存在
-	       $checkName = $this->user->checkUsername($umobile);
+	       $checkName = $this->user->checkUsername($uname);
 	       if($checkName !== FALSE)
 	       {
 	           $user = array(
@@ -220,9 +220,10 @@ class User extends CI_Controller {
 	       {
 	       		//注册新用户
 	       		$user = array(
-	       			'username' => $umobile,
-	       			'nickname' => $umobile,
+	       			'username' => $uname,
+	       			'nickname' => $uname,
 	       			'realname' => $uname,
+	       			'phone'=>$umobile,
 	       			'email' => $uemail,
 	       			'auth' => 1,
 	       		);
