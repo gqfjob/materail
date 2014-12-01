@@ -191,10 +191,12 @@ class User extends CI_Controller {
 	    
 	    //更具密文获取用户信息
 	    $this->load->library('AES');
+	    
 	    $aes_str = base64_decode($base65_aes_str);
 	    //$aes_str = pack("H*", $aes_str);平台去除hex加密解密
+	    //$decode_aes_str = $this->aes->decrypt($aes_str);
 	    $decode_aes_str = $this->aes->decrypt($aes_str);
-	    $user_info = explode(',',rtrim($decode_aes_str,"\6"));
+	    $user_info = explode(',',$decode_aes_str);
 	    if(is_array($user_info))
 	    {
 	       $uname = isset($user_info[0]) ? $user_info[0] : '';
@@ -572,4 +574,22 @@ class User extends CI_Controller {
     	$randval = rand(0,100); 
     	echo $randval;
     }
+    /**
+     * 测试解密
+     */
+    public function testDecode(){
+	     $real = "si,13900000001,wangyao@nj.fiberhome.com.cn";
+	     $encode = "JL5ZjkPzHuUjfC32r40woJv3HGnBeNMjAY5p5cXOnCBPpfrq6M60I95YhBn0fJwm";
+	     //更具密文获取用户信息
+	     $this->load->library('AES');
+	      
+	     $aes_str = base64_decode($encode);
+	     //$aes_str = pack("H*", $aes_str);平台去除hex加密解密
+	     $decode_aes_str = $this->aes->decrypt($aes_str);
+	     //$user_info = explode(',',rtrim($decode_aes_str,"\6"));
+	     $user_info = explode(',',$decode_aes_str);
+     	 echo $encode ."<br/>";
+     	 var_dump("$user_info");
+    }
+     
 }
