@@ -190,7 +190,7 @@ class User extends CI_Controller {
 	    }
 	    
 	    //更具密文获取用户信息
-	    $this->load->library('aes');
+	    $this->load->library('AES');
 	    $aes_str = base64_decode($base65_aes_str);
 	    $aes_str = pack("H*", $aes_str);
 	    $decode_aes_str = $this->aes->decrypt($aes_str);
