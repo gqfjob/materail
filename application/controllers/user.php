@@ -192,7 +192,7 @@ class User extends CI_Controller {
 	    //更具密文获取用户信息
 	    $this->load->library('AES');
 	    $aes_str = base64_decode($base65_aes_str);
-	    $aes_str = pack("H*", $aes_str);
+	    //$aes_str = pack("H*", $aes_str);平台去除hex加密解密
 	    $decode_aes_str = $this->aes->decrypt($aes_str);
 	    $user_info = explode(',',rtrim($decode_aes_str,"\6"));
 	    if(is_array($user_info))
