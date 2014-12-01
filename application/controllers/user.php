@@ -184,11 +184,13 @@ class User extends CI_Controller {
         */
 		
 	    $base65_aes_str = $this->input->get('auth', true);
+	    
 	    if(empty($base65_aes_str))
 	    {
 	        show_error('参数错误');
 	    }
-	    
+	    //字符替换
+	    $base65_aes_str = strtr($base65_aes_str, '-_*', '+/=');
 	    //更具密文获取用户信息
 	    $this->load->library('AES');
 	    
@@ -580,7 +582,8 @@ class User extends CI_Controller {
     public function testDecode(){
 	     $real = "si,13900000001,wangyao@nj.fiberhome.com.cn";
 	     $encode = "JL5ZjkPzHuUjfC32r40woJv3HGnBeNMjAY5p5cXOnCBPpfrq6M60I95YhBn0fJwm";
-	     //更具密文获取用户信息
+	     $encode = "http://ku.kfz.so/user/ssologin?auth=TBo56jEaE7oiuVP6oGipvg+5zKANn5U68iQR/64N3cft1xwKn8Bv7m7i99130VqO";
+	     $encode = "TBo56jEaE7oiuVP6oGipvg+5zKANn5U68iQR/64N3cft1xwKn8Bv7m7i99130VqO";
 	     $this->load->library('AES');
 	      
 	     $aes_str = base64_decode($encode);
