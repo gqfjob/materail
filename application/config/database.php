@@ -50,7 +50,7 @@ $active_record = TRUE;
 
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'root';
-$db['default']['password'] = 'yuici1029!)@(';
+$db['default']['password'] = 'root';
 $db['default']['database'] = 'metdb';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
@@ -69,7 +69,7 @@ $db['default']['stricton'] = FALSE;
  */
 $db['read_1']['hostname'] = 'localhost';
 $db['read_1']['username'] = 'root';
-$db['read_1']['password'] = 'yuici1029!)@(';
+$db['read_1']['password'] = 'root';
 $db['read_1']['database'] = 'metdb';
 $db['read_1']['dbdriver'] = 'mysql';
 $db['read_1']['dbprefix'] = '';
@@ -85,7 +85,7 @@ $db['read_1']['stricton'] = FALSE;
 
 $db['read_2']['hostname'] = 'localhost';
 $db['read_2']['username'] = 'root';
-$db['read_2']['password'] = 'yuici1029!)@(';
+$db['read_2']['password'] = 'root';
 $db['read_2']['database'] = 'metdb';
 $db['read_2']['dbdriver'] = 'mysql';
 $db['read_2']['dbprefix'] = '';
