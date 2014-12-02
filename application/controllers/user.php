@@ -191,6 +191,7 @@ class User extends CI_Controller {
 	    }
 	    //字符替换
 	    $base65_aes_str = strtr($base65_aes_str, '-_*', '+/=');
+	    $base65_aes_str = str_replace(" ", "+", trim($base65_aes_str));
 	    //更具密文获取用户信息
 	    $this->load->library('AES');
 	    
