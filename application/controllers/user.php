@@ -162,7 +162,8 @@ class User extends CI_Controller {
 		    }
 		    //生成的token保存在cookie中
 		    $token_name = $this->config->item('user_login_cookie');
-		    
+		    //清理旧cookie
+		    setcookie($token_name,"",time()-1);
 		    $res = set_cookie($token_name,$token,$exptime,$cookie_domain,$cookie_path,$cookie_prefix);
 		    //记录登录日志
 		    $this->config_model->insert_model("user_logs",array('uid'=>$uid,'ctime'=>mktime(),'ctype'=>1));
