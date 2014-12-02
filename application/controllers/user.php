@@ -183,7 +183,7 @@ class User extends CI_Controller {
         redirect($ssologinUrl); 
         */
 		
-	    $base65_aes_str = $this->input->get('auth', true);
+	    $base65_aes_str = urldecode($this->input->get('auth', true));
 	    
 	    if(empty($base65_aes_str))
 	    {
