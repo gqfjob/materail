@@ -32,7 +32,12 @@ var csrf_hash = '<?php echo $this->security->get_csrf_hash(); ?>';
 <![endif]-->
 </head>
 <body>
-
+<?php if($is_notice->svalue == "1"):?>
+<div class="alert show" style="margin-bottom: 0px">
+	<button type="button" class="close" data-dismiss="alert">&times;</button>
+	<strong><?php echo $notice->svalue; ?></strong>
+</div>
+<?php endif;?>
 <div id="headwrap">
 	<header>
 		<div class="navbar navbar-static-top navbar-shutterstock clearfix">

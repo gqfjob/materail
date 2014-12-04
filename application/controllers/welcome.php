@@ -23,11 +23,10 @@ class Welcome extends CI_Controller {
 		$this->load->model ( "material_model" );
 		$allCate = $this->material_model->get_material_cate();
 		$data ['cate'] = isset($allCate ['material_cate']) ? $allCate ['material_cate'] : array();
-		
+		$cate_hot_material = array();
 		//获取分类下的最热素材
 		if( ! empty($data['cate']))
 		{
-			$cate_hot_material = array();
 			foreach($data['cate'] as $c)
 			{
 				$cate_hot_query = $this->material_model->get_cate_hot_material($c['id']);

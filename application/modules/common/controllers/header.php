@@ -30,7 +30,13 @@ class Common_Header_module extends CI_Module {
 		}else{
 			$data['tab'] = $cur;
 		}
+		$this->load->model ( "config_model" );
+		//从数据库获取标题，通知配置
+		$tmpTitle = $this->config_model->getModelsBykey("skey","SITE_TITLE","*","site_config");//自定义标题
+		$data['is_notice'] = $this->config_model->getModelsBykey("skey","IS_NOTICE","*","site_config");//是否显示通知
+		$data['notice'] = $this->config_model->getModelsBykey("skey","SITE_NOTICE","*","site_config");//网站通知
 		// 自定义标题，描述等
+		if(!empty($tmpTitle->svalue))$title = $tmpTitle->svalue;
 		$data ['title'] = $title;
 		$data ['description'] = $description;
 		$data ['keywords'] = $keywords;
