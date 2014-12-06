@@ -993,7 +993,7 @@ class Material extends CI_Controller {
 	 */
 	public function search($id)
 	{
-		if($id == 'all')
+		if($id == 'all' || $id == -1)
 		{
 			$cur = 0;
 		}else{

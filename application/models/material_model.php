@@ -1557,12 +1557,13 @@ class Material_Model extends CI_Model
 		
 		$sql = "select v.id as vid, m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
 		$sql .= " left join material_cate as c on m.cid = c.id ";
-		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
+		$sql .= " LEFT JOIN material_attatch AS a ON m.id = a.mid ";
+		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%'  or a.sname like '%".$key."%') ";
 		if(($cur != 'all') && is_numeric($cur)){
 			$sql .= " and m.cid = ".$cur;
 		}
 		$sql .= " limit {$start},{$end}";
-		
+		//debug_log($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
