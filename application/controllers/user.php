@@ -514,13 +514,13 @@ class User extends CI_Controller {
 					<a href="/material/material_add">上传素材</a>
 				</div>
 				<div id="navbar-name" class="nav-link pull-left">
-					<a href="/user/logout">注销</a>
+					<a href="http/user/logout">注销</a>
 				</div>
 				';
 			$res['code'] = 1;
 		}else{
 			$res['msg'] =  '<div id="navbar-name" class="nav-link pull-left">
-					<a href="/user/login">登录</a>
+					<a href="http://kfz.so:8080/si">登录</a>
 				</div>';
 			$res['code'] = 1;
 		}
