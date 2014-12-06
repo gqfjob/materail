@@ -514,7 +514,7 @@ class User extends CI_Controller {
 					<a href="/material/material_add">上传素材</a>
 				</div>
 				<div id="navbar-name" class="nav-link pull-left">
-					<a href="http/user/logout">注销</a>
+					<a href="/user/logout">注销</a>
 				</div>
 				';
 			$res['code'] = 1;
