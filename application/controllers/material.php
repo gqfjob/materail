@@ -26,7 +26,7 @@ class Material extends CI_Controller {
 		
 		//登录用户信息
 		$this->user_info = checklogin();
-		if( ! in_array($current_method, array('search', 'detail', 'lists')))
+		if( ! in_array($current_method, array('search', 'detail', 'lists','getSnapshot')))
 		{
 			if( ! $this->user_info)
 			{
@@ -1037,14 +1037,15 @@ class Material extends CI_Controller {
 			foreach ($res as $r)
 			{
 				if(strpos($r['mname'],$key)){
-					str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
+					$r['mname'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
 				}
 				if(strpos($r['nohtml'],$key)){
-					str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['nohtml']);
+					$r['nohtml'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['nohtml']);
 				}
 				array_push($data['materials'],$r);
 			}
 		}
+		//批量获取素材附件的缩略图
 		$this->load->module("common/header",array('title'=>'搜索结果','cur'=>$cur));
 		$this->load->view('mate/searchRes',$data);
 		$this->load->module("common/footer");
@@ -1129,5 +1130,44 @@ class Material extends CI_Controller {
 		$this->load->view('mate/my_material',$data);
 		$this->load->module("common/footer");
 	}
+	
+	/**
+	 * 批量获取素材的附件缩略图
+	 */
+	public function getSnapshot(){
+		$mid = intval($this->input->post("mid", TRUE));
+		$vid = intval($this->input->post("vid", TRUE));
+
+		if(0 == $vid){
+			//获取素材的默认版本
+			$vid =  $this->material->getDefaultVersion($mid);
+		}
+		if($mid > 0 && $vid > 0){
+			$res = $this->material->getSnapshot($mid,$vid);
+			$array = array();
+			if(sizeof($res)>0){
+				foreach ($res as $r){
+					//if($this->ispic($r['rname'])){
+						array_push($array,base_url($r['rname']));
+					//}
+				}
+			}
+			echo RST($array,0,'success');
+		}else{
+			echo RST($array,1,'fault');
+		}
+	}
+	private function ispic($str){
+		$types = '.gif|.jpeg|.png|.bmp';//定义检查的图片类型
+		$filename = $_SERVER['DOCUMENT_ROOT']."/".$str;
+		if(file_exists($filename)){
+			$info = getimagesize($filename);
+			$ext = image_type_to_extension($info['2']);
+			return stripos($types,$ext);
+		}else{
+			return false;
+		}
+	}
+	
 }
 

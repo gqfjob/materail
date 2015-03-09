@@ -1584,4 +1584,31 @@ class Material_Model extends CI_Model
 		$res = $query->row();
 		return $res->num;
 	}
+	/**
+	 * 获取任意版本的附件信息
+	 * @param unknown $mid
+	 * @param unknown $vid
+	 * @return unknown
+	 */
+	public function getSnapshot($mid, $vid){
+		$sql = "select * from material_attatch where mid = $mid and mvid = $vid";
+		$query = $this->rdb->query($sql);
+		$res = $query->result_array();
+		return $res;
+		
+	}
+	/**
+	 * 获取素材的默认版本号
+	 * @param unknown $mid
+	 */
+	public function getDefaultVersion($mid){
+		
+		$sql = "select * from material_info where id = $mid";
+		$query = $this->rdb->query($sql);
+		$res = $query->result_array();
+		if(sizeof($res)>0){
+			return $res[0]['cversion'];
+		}
+		return 0;	
+	}
 }

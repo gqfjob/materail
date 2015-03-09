@@ -37,6 +37,29 @@
 					</div>
 				</div>
 				<div class="cl"></div>
+				<div id="snapshot_<?php echo $m['mid']."_".$m['vid'];?>" style="display: none;margin-top:10px"></div>
+				<script type="text/javascript">
+					$.post('/material/getSnapshot',
+					{
+						'mid':"<?php echo $m['mid'];?>",
+						'vid':"<?php echo $m['vid'];?>",
+						'<?php echo $this->config->item('csrf_token_name'); ?>':'<?php echo $this->security->get_csrf_hash();?>'
+					},
+					function(data){
+						var t = $("#snapshot_<?php echo $m['mid']."_".$m['vid'];?>");
+						var res = data.data;
+						if(res.length > 0){
+							var len = (10>res.length)?res.length:10;
+							var html="";
+							for(i=0;i<len;i++){
+								html +="<img src='"+res[i]+"' style='width:60px;height:60px;margin-right:20px'>";
+							}	
+							t.html(html);
+							t.show();
+						}
+					},"json");
+				</script>
+				<div class="cl"></div>
 			</div>
 		</div>
 		<?php endforeach;?>
