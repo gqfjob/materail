@@ -354,6 +354,7 @@ class Material_Model extends CI_Model
 		if( ! empty($version['attachment_ids']))
 		{
 			$update_sql = "UPDATE material_attatch SET mid = {$version['mid']} , mvid = {$mvid} WHERE id IN ({$version['attachment_ids']})";
+			$update_sql = $this->rdb->escape_str($update_sql);
 			$this->wdb->query($update_sql);
 		}
 		
@@ -394,6 +395,7 @@ class Material_Model extends CI_Model
 		if( ! empty($version['attachment_ids']))
 		{
 			$update_sql = "UPDATE material_attatch SET mid={$version['mid']} , mvid={$version['vid']} WHERE id IN ({$version['attachment_ids']})";
+			$update_sql = $this->rdb->escape_str($update_sql);
 			$this->wdb->query($update_sql);
 		}
 		
@@ -571,6 +573,7 @@ class Material_Model extends CI_Model
 		}
 		
 		$sql = "SELECT * FROM material_version WHERE id = ? ";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql, array($vid));
 		if($query == FALSE)
 		{
@@ -600,6 +603,7 @@ class Material_Model extends CI_Model
 		}
 		
 		$sql = "SELECT * FROM material_attatch WHERE mvid = ? AND stat=1 ORDER BY id DESC";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql, array($vid));
 		if($query == FALSE)
 		{
@@ -629,6 +633,7 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		$sql = "SELECT * FROM material_attatch WHERE id IN ({$ids}) AND pfix IN ({$type}) ORDER BY id DESC LIMIT 1";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
@@ -668,6 +673,7 @@ class Material_Model extends CI_Model
 		else
 		{
 			$sql = "SELECT COUNT(*) as total FROM material_info WHERE mname LIKE ?";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql, array('%' . $search . '%'));
 		}
 		
@@ -698,11 +704,13 @@ class Material_Model extends CI_Model
 		if(empty($search))
 		{
 			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id ORDER BY id DESC LIMIT {$record},{$pre_page}";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql);
 		}
 		else
 		{
 			$sql = "SELECT mi.*, mc.cname, mc.clogo FROM material_info mi LEFT JOIN  material_cate mc ON mi.cid=mc.id WHERE mi.mname LIKE ? ORDER BY id DESC LIMIT {$record},{$pre_page}";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql, array('%' . $search . '%'));
 		}
 		
@@ -940,6 +948,7 @@ class Material_Model extends CI_Model
 		}
 		
 		$sql = "SELECT * FROM material_version WHERE mid = ? AND id != ? ORDER BY cat DESC";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql, array($mid, $vid));
 		if($query == FALSE)
 		{
@@ -969,11 +978,8 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT m.*, sum(mv.downnum) as downnum FROM material_info m 
-		        LEFT JOIN material_version mv ON m.id=mv.mid 
-		        WHERE m.cid = ? AND m.id != ? 
-		        GROUP BY m.id
-		        ORDER BY downnum DESC,create_at DESC LIMIT {$limit}";
+		$sql = "SELECT m.*, sum(mv.downnum) as downnum FROM material_info m LEFT JOIN material_version mv ON m.id=mv.mid WHERE m.cid = ? AND m.id != ? GROUP BY m.id ORDER BY downnum DESC,create_at DESC LIMIT {$limit}";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql, array($cid, $mid));
 		if($query == FALSE)
 		{
@@ -1036,9 +1042,8 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT COUNT(*) as total
-				FROM material_visit_right
-				WHERE uid={$uid}";
+		$sql = "SELECT COUNT(*) as total FROM material_visit_right WHERE uid={$uid}";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
@@ -1070,11 +1075,8 @@ class Material_Model extends CI_Model
 		}
 		$offset = ($page - 1) * $per_page;
 		
-		$sql = "SELECT DISTINCT m.*,mc.cname
-				FROM material_visit_right mv, material_info m 
-				LEFT JOIN material_cate mc ON m.cid=mc.id
-				WHERE mv.mid=m.id AND mv.uid={$uid} 
-				LIMIT {$offset},{$per_page}";
+		$sql = "SELECT DISTINCT m.*,mc.cname FROM material_visit_right mv, material_info m LEFT JOIN material_cate mc ON m.cid=mc.id WHERE mv.mid=m.id AND mv.uid={$uid} LIMIT {$offset},{$per_page}";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
@@ -1103,9 +1105,8 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		
-		$sql = "SELECT COUNT(DISTINCT m.id) AS total
-				FROM  material_info m,material_version mv
-				WHERE m.id=mv.mid AND (m.uid={$uid} OR mv.uid={$uid})";
+		$sql = "SELECT COUNT(DISTINCT m.id) AS total FROM  material_info m,material_version mv WHERE m.id=mv.mid AND (m.uid={$uid} OR mv.uid={$uid})";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
@@ -1137,12 +1138,8 @@ class Material_Model extends CI_Model
 		}
 		$offset = ($page - 1) * $per_page;
 		
-		$sql = "SELECT DISTINCT m.*,mc.cname
-				FROM  material_version mv,material_info m
-				LEFT JOIN material_cate mc ON m.cid=mc.id
-				WHERE m.id=mv.mid  AND (m.uid={$uid} OR mv.uid={$uid})
-				ORDER BY m.id DESC
-				LIMIT {$offset},{$per_page}";
+		$sql = "SELECT DISTINCT m.*,mc.cname FROM  material_version mv,material_info m LEFT JOIN material_cate mc ON m.cid=mc.id WHERE m.id=mv.mid  AND (m.uid={$uid} OR mv.uid={$uid}) ORDER BY m.id DESC LIMIT {$offset},{$per_page}";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
@@ -1381,11 +1378,8 @@ class Material_Model extends CI_Model
 		{
 			return array('status' => 0);
 		}
-		$sql = "SELECT m.id,m.mname,logo,SUM(mv.downnum) AS num FROM material_info m, material_version mv 
-				WHERE m.id=mv.mid AND m.state=1 AND m.cid={$cid} 
-				GROUP BY mv.mid 
-				ORDER BY num DESC, mv.id DESC
-				LIMIT {$limit}";
+		$sql = "SELECT m.id,m.mname,logo,SUM(mv.downnum) AS num FROM material_info m, material_version mv WHERE m.id=mv.mid AND m.state=1 AND m.cid={$cid} GROUP BY mv.mid ORDER BY num DESC, mv.id DESC LIMIT {$limit}";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query)
 		{
@@ -1518,6 +1512,7 @@ class Material_Model extends CI_Model
 					limit {$start},{$end}
 					";
 		}
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		return $query->result_array();
 	}
@@ -1535,7 +1530,7 @@ class Material_Model extends CI_Model
 		{
 			$sql ="select count(*) as num,c.cname,c.clogo,c.id from material_info as m left join material_cate as c on m.cid = c.id where m.cid = {$cat}";
 		}
-		
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->row();
 		return $res;
@@ -1564,6 +1559,7 @@ class Material_Model extends CI_Model
 		}
 		$sql .= " limit {$start},{$end}";
 		//debug_log($sql);
+		$sql = $this->rdb->escape_str($sql, true);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
@@ -1580,6 +1576,7 @@ class Material_Model extends CI_Model
 		if(($cur != 'all') && is_numeric($cur)){
 			$sql .= " and m.cid = ".$cur;
 		}
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->row();
 		return $res->num;
@@ -1592,6 +1589,7 @@ class Material_Model extends CI_Model
 	 */
 	public function getSnapshot($mid, $vid){
 		$sql = "select * from material_attatch where mid = $mid and mvid = $vid";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
@@ -1604,6 +1602,7 @@ class Material_Model extends CI_Model
 	public function getDefaultVersion($mid){
 		
 		$sql = "select * from material_info where id = $mid";
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		if(sizeof($res)>0){
