@@ -1550,7 +1550,7 @@ class Material_Model extends CI_Model
 		}
 		$sql .= " limit {$start},{$end}";
 		//debug_log($sql);
-		$sql = $this->rdb->escape_str($sql, true);
+		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
