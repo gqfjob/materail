@@ -36,6 +36,7 @@ class Visit_log_model extends CI_Model
     	if($end > 0){
     		$where .= ' AND v.time <= '.$end.' ';
     	}
+    	
     	//独立访问数UV
     	$res_uv = $this->rdb->query("SELECT COUNT( DISTINCT v.usign) as num FROM visit_log as v $where");
     	if ($res_uv->num_rows() > 0){
@@ -67,7 +68,8 @@ class Visit_log_model extends CI_Model
      */
     function getVisitTop($ziduan, $limit){
     	$sql = "SELECT COUNT(*) as num,$ziduan FROM  $this->table WHERE 1=1 GROUP BY $ziduan ORDER BY num DESC LIMIT 0, $limit";
-        $query = $this->rdb->query($sql);
+    	$sql = $this->rdb->escape_str($sql);
+    	$query = $this->rdb->query($sql);
         return $query->result_array();
     }
     /**
@@ -79,6 +81,7 @@ class Visit_log_model extends CI_Model
      */
     function getRecord($ziduan,$order = 'DESC',$limit = 5){
         $sql = "SELECT * FROM  $this->table WHERE 1=1 ORDER BY $ziduan $order LIMIT 0, $limit";
+        $sql = $this->rdb->escape_str($sql);
         $query = $this->rdb->query($sql);
         return $query->result_array();
     }

@@ -443,6 +443,7 @@ class User_model extends CI_Model
         }
         
         $sql .=" LIMIT $start, $limit ";
+        $sql = $this->rdb->escape_str($sql);
         $query = $this->rdb->query($sql);
         return $query->result_array();
     }
@@ -588,11 +589,13 @@ class User_model extends CI_Model
 		if(empty($search))
 		{
 			$sql = "SELECT * FROM identity_user ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql);
 		}
 		else
 		{
 			$sql = "SELECT * FROM identity_user WHERE realname LIKE ? ORDER BY id DESC LIMIT {$offset},{$pre_page}";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql, array('%' . $search . '%'));
 		}
 		
@@ -621,11 +624,13 @@ class User_model extends CI_Model
 		if(empty($search))
 		{
 			$sql = "SELECT COUNT(*) as total FROM identity_user";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql);
 		}
 		else
 		{
 			$sql = "SELECT COUNT(*) as total FROM identity_user WHERE realname LIKE ?";
+			$sql = $this->rdb->escape_str($sql);
 			$query = $this->rdb->query($sql, array('%' . $search . '%'));
 		}
 		

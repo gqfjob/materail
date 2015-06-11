@@ -1498,19 +1498,10 @@ class Material_Model extends CI_Model
 		$end = $perpage;
 		if($cat == 0)
 		{
-			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i
-			on m.cversion = i.id
-			order by i.upat DESC
-			limit {$start},{$end}
-			";
+			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i on m.cversion = i.id order by i.upat DESC limit {$start},{$end}";
 		}else
 		{
-			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i 
-					on m.cversion = i.id
-					where m.cid = {$cat}
-					order by i.upat DESC 
-					limit {$start},{$end}
-					";
+			$sql = "select m.*,i.depict,i.cat,i.upat,i.nohtml from material_info as m left join material_version as i on m.cversion = i.id where m.cid = {$cat} order by i.upat DESC limit {$start},{$end}";
 		}
 		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
