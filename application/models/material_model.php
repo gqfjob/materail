@@ -1535,12 +1535,16 @@ class Material_Model extends CI_Model
 	 */
 	public function get_materials_like($key, $page, $perpage, $cur)
 	{
+		$page = intval($page);
+		$perpage = intval($perpage);
 		if($page <=0){
 			$page = 1;
 		}
 		$start = ($page-1)*$perpage;
 		$end = $perpage;
-		
+		$key = $this->rdb->escape_str($key);
+		$cur = $this->rdb->escape_str($cur)
+		;
 		$sql = "select v.id as vid, m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
 		$sql .= " left join material_cate as c on m.cid = c.id ";
 		$sql .= " LEFT JOIN material_attatch AS a ON m.id = a.mid ";
@@ -1550,7 +1554,6 @@ class Material_Model extends CI_Model
 		}
 		$sql .= " limit {$start},{$end}";
 		//debug_log($sql);
-		$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
@@ -1562,12 +1565,14 @@ class Material_Model extends CI_Model
 	 */
 	public function count_materials_like($key, $cur)
 	{
+		$key = $this->rdb->escape_str($key);
+		$cur = $this->rdb->escape_str($cur);
 		$sql = "select count(*) as num from material_info as m right join material_version as v  on m.id = v.mid ";
 		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
 		if(($cur != 'all') && is_numeric($cur)){
 			$sql .= " and m.cid = ".$cur;
 		}
-		$sql = $this->rdb->escape_str($sql);
+		
 		$query = $this->rdb->query($sql);
 		$res = $query->row();
 		return $res->num;
