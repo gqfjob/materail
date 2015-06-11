@@ -1147,9 +1147,11 @@ class Material extends CI_Controller {
 			$array = array();
 			if(sizeof($res)>0){
 				foreach ($res as $r){
-					//if($this->ispic($r['rname'])){
+					if($this->ispic($r['rname'])){
 						array_push($array,base_url($r['rname']));
-					//}
+					}else{
+						array_push($array,base_url("assets/img/nosrc.png"));
+					}
 				}
 			}
 			echo RST($array,0,'success');
@@ -1158,7 +1160,7 @@ class Material extends CI_Controller {
 		}
 	}
 	private function ispic($str){
-		$types = '.gif|.jpeg|.png|.bmp';//定义检查的图片类型
+		$types = '.gif|.jpeg|.png|.bmp|.jpg';//定义检查的图片类型
 		$filename = $_SERVER['DOCUMENT_ROOT']."/".$str;
 		if(file_exists($filename)){
 			$info = getimagesize($filename);
