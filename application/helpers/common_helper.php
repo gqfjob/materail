@@ -1325,6 +1325,7 @@ function check_view_down_material($material, $user)
 	$CI = &get_instance();
 	$CI->load->model('material_model', 'material');
 	$res = 3;
+	debug_log($material);
 	if($material['vright'] == 2)
 	{
 		if(empty($user))
@@ -1349,6 +1350,8 @@ function check_view_down_material($material, $user)
 		
 		//if(empty($user) || ! in_array($user['id'], $allow_uids))
 		$allow_uids[] = $material['uid'];
+		debug_log($allow_uids);
+		debug_log($user);
 		if( ! in_array($user['id'], $allow_uids))
 		{
 			//show_error('您无权查看');
