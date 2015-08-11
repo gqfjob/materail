@@ -266,6 +266,7 @@ class File extends CI_Controller{
 		
 		//判断权限
 		$res = check_view_down_material($material, $this->user_info);
+		debug_log($res);
 		switch($res){
 			case 1:
 				redirect(base_url('/user/login/?callback=').urlencode(current_url()));
