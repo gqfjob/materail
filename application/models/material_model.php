@@ -1553,7 +1553,8 @@ class Material_Model extends CI_Model
 			$sql .= " and m.cid = ".$cur;
 		}
 		$sql .= " limit {$start},{$end}";
-		//debug_log($sql);
+		
+		debug_log($sql);
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
