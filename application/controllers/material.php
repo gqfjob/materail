@@ -1034,8 +1034,10 @@ class Material extends CI_Controller {
 		//关键词高亮处理
 		if(sizeof($res) > 0)
 		{
+			debug_log($key);
 			foreach ($res as $r)
 			{
+				debug_log($r['mname']);
 				if(strpos($r['mname'],$key)){
 					$r['mname'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
 					debug_log($r['mname']);
