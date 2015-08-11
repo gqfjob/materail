@@ -1572,7 +1572,9 @@ class Material_Model extends CI_Model
 		$sql = "select count(*) as num from material_info as m right join material_version as v  on m.id = v.mid ";
 		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
 		if(($cur != 'all') && is_numeric($cur)){
-			$sql .= " and m.cid = ".$cur;
+			if($cur > 0){
+				$sql .= " and m.cid = ".$cur;
+			}
 		}
 		
 		$query = $this->rdb->query($sql);
