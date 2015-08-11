@@ -1037,7 +1037,6 @@ class Material extends CI_Controller {
 			debug_log($key);
 			foreach ($res as $r)
 			{
-				debug_log($r['mname']);
 				if(strpos($r['mname'],$key)){
 					$r['mname'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
 					debug_log($r['mname']);
