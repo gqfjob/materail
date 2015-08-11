@@ -1036,10 +1036,10 @@ class Material extends CI_Controller {
 		{
 			foreach ($res as $r)
 			{
-				if(mb_strpos($r['mname'],$key) !=false){
+				if(mb_strpos($r['mname'],$key) !== false){
 					$r['mname'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
 				}
-				if(strpos($r['nohtml'],$key) !=false){
+				if(mb_strpos($r['nohtml'],$key) !== false){
 					$r['nohtml'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['nohtml']);
 				}
 				array_push($data['materials'],$r);
