@@ -1569,8 +1569,10 @@ class Material_Model extends CI_Model
 		
 		$key = $this->rdb->escape_str($key);
 		$cur = $this->rdb->escape_str($cur);
-		$sql = "select count(*) as num from material_info as m right join material_version as v  on m.id = v.mid ";
-		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%') ";
+		$sql = "select v.id as vid, m.*,v.*,c.cname,c.clogo  from material_info as m right join material_version as v  on m.id = v.mid ";
+		$sql .= " left join material_cate as c on m.cid = c.id ";
+		$sql .= " LEFT JOIN material_attatch AS a ON m.id = a.mid ";
+		$sql .= " where (m.mname like '%".$key."%' or v.nohtml like '%".$key."%'  or a.sname like '%".$key."%') ";
 		if(($cur != 'all') && is_numeric($cur)){
 			if($cur > 0){
 				$sql .= " and m.cid = ".$cur;
