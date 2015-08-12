@@ -1204,6 +1204,7 @@ class Material_Model extends CI_Model
 		}
 	}
 	
+	
 	/**
 	 * 检查用户访问素材
 	 * @param int $mid
