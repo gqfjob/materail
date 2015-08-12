@@ -172,7 +172,7 @@ class User_model extends CI_Model
         $user_credit = $this->rdb->query($sql, array($name,sha1($pwd)));
         if ($user_credit->num_rows() == 1){
            $row = $user_credit->row_array(); 
-           $query = $this->rdb->get('identity_user',array('id'=>$row['uid']));
+           $query = $this->rdb->get_where('identity_user',array('id'=>$row['uid']));
            $res = $query->result();
            if(sizeof($res) == 1)
            {

@@ -72,7 +72,6 @@ class User extends CI_Controller {
 	public function loginDo(){
 	    $loginName = trim($this->input->post('loginName', true));
         $loginPwd = trim($this->input->post('loginPwd', true));
-        debug_log($loginName);
         if(isset($_POST['callback']) || isset($_GET['callback'])){
             $callback = urldecode($this->input->get_post('callback',true));
         }else{
