@@ -1038,6 +1038,7 @@ class Material extends CI_Controller {
 			{
 				if(mb_strpos($r['mname'],$key) !== false){
 					$r['mname'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['mname']);
+					debug_log($r['mname']);
 				}
 				if(mb_strpos($r['nohtml'],$key) !== false){
 					$r['nohtml'] =str_ireplace($key, '<span class="hightlight">'.$key.'</span>', $r['nohtml']);
