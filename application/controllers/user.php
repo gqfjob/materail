@@ -82,6 +82,7 @@ class User extends CI_Controller {
         $user = $this->user->checkWithUser($loginName, $loginPwd);
         $checkName = $this->user->checkUsername($loginName);
         if($user){
+        	debug_log($user);
         	if($user->status ==0){//用户被禁止登录
         		if($ajax){
         			echo RST(urlencode(base_url()),100002,'登录失败，您已被禁止登录');
