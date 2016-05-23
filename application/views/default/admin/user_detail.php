@@ -287,13 +287,29 @@
 				success:function(res){
 					_this.removeAttr('disabled');
 					if(res.status){
+						if(auth == 2){
+							$('#set-admin').prop('checked', true);
+						}else{
+							$('#set-admin').prop('checked', false);
+						}
 						notice('操作成功',300);
 					}else{
+						if(auth == 2){
+							$('#set-admin').prop('checked', false);
+						}else{
+							$('#set-admin').prop('checked', true);
+						}
 						notice(res.msg, 300);
+
 					}
 				},
 				error:function(){
 					_this.removeAttr('disabled');
+					if(auth == 2){
+						$('#set-admin').prop('checked', false);
+					}else{
+						$('#set-admin').prop('checked', true);
+					}
 					notice('出错了', 300);
 				},
 				
@@ -318,8 +334,18 @@
 				success:function(res){
 					_this.removeAttr('disabled');
 					if(res.status){
+						if(upload_auth == 1){
+							$('#set-upload').prop('checked', false);
+						}else{
+							$('#set-upload').prop('checked', true);
+						}
 						notice('操作成功',300);
 					}else{
+						if(upload_auth == 1){
+							$('#set-upload').prop('checked', true);
+						}else{
+							$('#set-upload').prop('checked', false);
+						}
 						notice(res.msg, 300);
 					}
 				},
@@ -349,13 +375,28 @@
 				success:function(res){
 					_this.removeAttr('disabled');
 					if(res.status){
+						if(status == 1){
+							$('#set-status').prop('checked', false);
+						}else{
+							$('#set-status').prop('checked', true);
+						}
 						notice('操作成功',300);
 					}else{
+						if(status == 1){
+							$('#set-status').prop('checked', true);
+						}else{
+							$('#set-status').prop('checked', false);
+						}
 						notice(res.msg, 300);
 					}
 				},
 				error:function(){
 					_this.removeAttr('disabled');
+					if(status == 1){
+						$('#set-status').prop('checked', true);
+					}else{
+						$('#set-status').prop('checked', false);
+					}
 					notice('出错了', 300);
 				},
 				
