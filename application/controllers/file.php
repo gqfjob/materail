@@ -66,7 +66,7 @@ class File extends CI_Controller{
 		$config['upload_path'] = 'uploads/thumb/' . date('Ym') . '/';
 	    $config['allowed_types'] = 'gif|jpg|png';
 	    $config['max_size'] = '2048';
-	  	$config['overwrite'] = FALSE;
+	  	$config['overwrite'] = TRUE;
 	  	$config['encrypt_name'] = TRUE;
 		$this->_upload($config);
 
