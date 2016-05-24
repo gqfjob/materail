@@ -633,7 +633,7 @@ class Material_Model extends CI_Model
 			return array('status' => 0);
 		}
 		$sql = "SELECT * FROM material_attatch WHERE id IN ({$ids}) AND pfix IN ({$type}) ORDER BY id DESC LIMIT 1";
-		$sql = $this->rdb->escape_str($sql);
+		//$sql = $this->rdb->escape_str($sql);
 		$query = $this->rdb->query($sql);
 		if($query == FALSE)
 		{
