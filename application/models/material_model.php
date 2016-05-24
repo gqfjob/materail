@@ -1556,6 +1556,8 @@ class Material_Model extends CI_Model
 			}
 		}
 		$sql .= " order by m.update_at DESC limit {$start},{$end}";
+		echo  $sql;
+		exit;
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
