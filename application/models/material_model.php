@@ -1556,8 +1556,6 @@ class Material_Model extends CI_Model
 			}
 		}
 		$sql .= " order by m.update_at DESC limit {$start},{$end}";
-		echo  $sql;
-		exit;
 		$query = $this->rdb->query($sql);
 		$res = $query->result_array();
 		return $res;
@@ -1583,8 +1581,8 @@ class Material_Model extends CI_Model
 		}
 		
 		$query = $this->rdb->query($sql);
-		$res = $query->row();
-		return $res->num;
+		$res = $query->result_array();
+		return sizeof($res);
 	}
 	/**
 	 * 获取任意版本的附件信息
